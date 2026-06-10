@@ -22,7 +22,7 @@ export function RequestPromptForm({ source }: RequestPromptFormProps) {
 
     if (source !== "supabase" || !supabase) {
       setStatus("error");
-      setMessage("Supabase belum aktif, request belum bisa disimpan.");
+      setMessage("Layanan pengiriman sedang tidak aktif. Silakan hubungi admin atau coba lagi nanti.");
       return;
     }
 

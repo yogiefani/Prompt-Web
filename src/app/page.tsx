@@ -67,7 +67,7 @@ export default async function Home() {
             {[
               "Access user dari pembelian produk",
               "Product link bisa diatur admin",
-              "Supabase-ready schema",
+              "Skema data terintegrasi",
             ].map((item) => (
               <div key={item} className="flex items-center gap-2 text-sm font-semibold text-[var(--color-silver-pine)]">
                 <CheckCircle2 className="h-4 w-4 text-[var(--color-electric-blue)]" aria-hidden="true" />
@@ -141,8 +141,8 @@ export default async function Home() {
               },
               {
                 icon: Database,
-                title: "Supabase Backend",
-                body: "Disiapkan untuk Auth, role profile, RLS, prompt CMS, dan setting singleton untuk link registrasi.",
+                title: "Database Terintegrasi",
+                body: "Menggunakan otentikasi aman, pembagian peran akses, perlindungan data, dan pengaturan situs mandiri.",
               },
             ].map((item) => (
               <LiftCard key={item.title} className="feature-card">

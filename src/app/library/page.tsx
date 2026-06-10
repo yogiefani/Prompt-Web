@@ -107,9 +107,6 @@ export default async function LibraryPage() {
                   <span className="rounded-full bg-[var(--color-mint-glaze)] px-4 py-2 text-xs font-semibold text-[var(--color-silver-pine)]">
                     Premium Knowledge Base
                   </span>
-                  <span className="ml-2 rounded-full bg-[var(--color-sky-wash)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
-                    {workspace.source === "supabase" ? "Supabase Data" : "Fallback Data"}
-                  </span>
                   <h2 className="mt-5 max-w-3xl font-aeonik text-4xl leading-tight tracking-[-0.02em]">
                     Semua prompt tersimpan rapi berdasarkan tujuan, model AI, dan workflow.
                   </h2>

@@ -32,7 +32,7 @@ export function SuperadminConsole({
     setMessage("");
 
     if (!isReady || !supabase) {
-      setMessage("Supabase belum siap. Isi .env.local dan login sebagai superadmin untuk menyimpan setting.");
+      setMessage("Gagal menyimpan: Konfigurasi sistem database belum siap.");
       return;
     }
 
@@ -69,7 +69,7 @@ export function SuperadminConsole({
               Public Settings
             </h2>
             <p className="mt-1 text-sm font-medium text-[var(--color-silver-pine)]">
-              Brand, support email, dan tombol registrasi publik dibaca dari Supabase.
+              Brand, support email, dan tombol registrasi publik dibaca dari database.
             </p>
           </div>
         </div>
@@ -114,7 +114,7 @@ export function SuperadminConsole({
             Save Settings
           </button>
           <span className="rounded-full bg-[var(--color-sky-wash)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
-            {isReady ? "Supabase write ready" : "Supabase not connected"}
+            {isReady ? "Koneksi Sistem Aktif" : "Konfigurasi Diperlukan"}
           </span>
         </div>
 

@@ -107,7 +107,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
     if (!file) return;
 
     if (!isReady || !supabase) {
-      setMessage("Supabase belum siap untuk bulk import.");
+      setMessage("Sistem database belum siap untuk mengimpor file.");
       return;
     }
 
@@ -280,7 +280,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
     setMessage("");
 
     if (!isReady || !supabase) {
-      setMessage("Supabase belum siap. Isi .env.local, login sebagai superadmin, lalu jalankan schema SQL.");
+      setMessage("Sistem database belum dikonfigurasi.");
       return;
     }
 
@@ -333,7 +333,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
 
   async function deleteCategory(category: PromptCategoryView) {
     if (!isReady || !supabase) {
-      setMessage("Supabase belum siap untuk delete kategori.");
+      setMessage("Koneksi terputus. Gagal menghapus kategori.");
       return;
     }
 
@@ -359,7 +359,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
     setMessage("");
 
     if (!isReady || !supabase) {
-      setMessage("Supabase belum siap. Isi .env.local, login sebagai superadmin, lalu jalankan schema SQL.");
+      setMessage("Sistem database belum dikonfigurasi.");
       return;
     }
 
@@ -421,7 +421,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
 
   async function deletePrompt(prompt: PromptView) {
     if (!isReady || !supabase) {
-      setMessage("Supabase belum siap untuk delete prompt.");
+      setMessage("Koneksi terputus. Gagal menghapus prompt.");
       return;
     }
 
@@ -448,11 +448,11 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
         <div>
           <h2 className="font-aeonik text-2xl tracking-[-0.02em]">Prompt CMS</h2>
           <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-[var(--color-silver-pine)]">
-            Kelola kategori dan prompt dari Supabase. RLS tetap membatasi operasi tulis hanya untuk role superadmin.
+            Kelola kategori dan prompt utama. Aturan keamanan memastikan data hanya dapat diubah oleh pemilik hak akses.
           </p>
         </div>
         <span className="rounded-full bg-[var(--color-sky-wash)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
-          {isReady ? "Supabase write ready" : "Supabase not connected"}
+          {isReady ? "Koneksi Sistem Aktif" : "Konfigurasi Diperlukan"}
         </span>
       </div>
 

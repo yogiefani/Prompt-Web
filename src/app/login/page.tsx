@@ -32,8 +32,8 @@ export default async function LoginPage() {
             Login sesuai role akses {settings.brandName}.
           </h1>
           <p className="mt-5 max-w-xl text-lg font-medium leading-8 text-[var(--color-silver-pine)]">
-            Form ini memakai Supabase Auth. Superadmin masuk ke console pengelolaan,
-            user access masuk ke library prompt premium setelah credential valid.
+            Silakan masukkan email dan password terdaftar Anda. Superadmin akan dialihkan ke konsol manajemen,
+            sementara member akan masuk ke pustaka prompt premium.
           </p>
         </FadeIn>
 

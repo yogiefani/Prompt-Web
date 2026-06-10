@@ -37,7 +37,7 @@ export function RequestInbox({ initialRequests, source }: RequestInboxProps) {
     );
 
     if (source !== "supabase" || !supabase) {
-      setMessage("Supabase belum aktif, perubahan status hanya tampil sementara.");
+      setMessage("Layanan database tidak aktif, perubahan status hanya tersimpan sementara.");
       return;
     }
 

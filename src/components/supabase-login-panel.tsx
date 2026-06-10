@@ -65,7 +65,7 @@ export function SupabaseLoginPanel() {
     setMessage("");
 
     if (!isSupabaseConfigured || !supabase) {
-      setMessage("Supabase belum dikonfigurasi. Isi NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di .env.local.");
+      setMessage("Layanan database belum dikonfigurasi. Hubungi administrator.");
       return;
     }
 
@@ -93,7 +93,7 @@ export function SupabaseLoginPanel() {
     setMessage("");
 
     if (!isSupabaseConfigured || !supabase) {
-      setMessage("Supabase belum dikonfigurasi. Isi NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di .env.local.");
+      setMessage("Layanan database belum dikonfigurasi. Hubungi administrator.");
       return;
     }
 
@@ -212,7 +212,7 @@ export function SupabaseLoginPanel() {
               <input
                 id="password"
                 className="form-input mt-2"
-                placeholder="Password Supabase Auth"
+                placeholder="Password Akun"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -226,7 +226,7 @@ export function SupabaseLoginPanel() {
               ) : (
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               )}
-              {status === "loading" ? "Memeriksa akun..." : "Login dengan Supabase"}
+              {status === "loading" ? "Memeriksa akun..." : "Login Masuk"}
             </button>
 
             <div className="relative my-4 flex items-center justify-center">

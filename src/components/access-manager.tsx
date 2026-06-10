@@ -60,12 +60,12 @@ export function AccessManager({ source }: AccessManagerProps) {
           <div>
             <h2 className="font-aeonik text-2xl tracking-[-0.02em]">Access Manager</h2>
             <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-[var(--color-silver-pine)]">
-              Berikan akses member dari pembelian produk. Jika email belum punya akun, Supabase akan mengirim invite.
+              Berikan akses member dari pembelian produk. Jika email belum terdaftar, sistem akan mengirimkan undangan aktivasi via email.
             </p>
           </div>
         </div>
         <span className="rounded-full bg-[var(--color-sky-wash)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
-          {source === "supabase" ? "Ready after service key" : "Needs Supabase env"}
+          {source === "supabase" ? "Sistem Aktif" : "Konfigurasi Diperlukan"}
         </span>
       </div>
 
