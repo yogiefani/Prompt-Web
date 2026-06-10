@@ -1,26 +1,274 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-midnight-ink: #181d27;
+  --color-arctic-mist: #fafdff;
+  --color-canvas-white: #ffffff;
+  --color-obsidian: #0a0d12;
+  --color-silver-pine: #535862;
+  --color-ash-gray: #93979f;
+  --color-sky-wash: #ebf5ff;
+  --color-ghostly-blue: #cce7ff;
+  --color-electric-blue: #0069e0;
+  --color-lavender-mist: #f1e6ff;
+  --color-mint-glaze: #d3f6e3;
+  --color-sunburst-yellow: #bb9915;
+  --color-deep-violet: #9552e0;
+  --color-ocean-spray: #4fbeff;
+  --color-zesty-orange: #f26110;
+  --color-luminous-blue: #0099ff;
+  --color-whisper-fade-yellow: #fff9e0;
+  --color-whisper-fade-violet: #f4ebff;
+  --color-whisper-fade-blue: #e5f6ff;
+  --color-whisper-fade-orange: #fff2eb;
+  --gradient-whisper-fade-yellow: linear-gradient(rgb(255, 249, 224) 0%, rgb(255, 236, 163) 100%);
+  --gradient-whisper-fade-violet: linear-gradient(rgb(244, 235, 255) 0%, rgb(228, 204, 255) 100%);
+  --gradient-whisper-fade-blue: linear-gradient(rgb(229, 246, 255) 0%, rgb(194, 233, 255) 100%);
+  --gradient-whisper-fade-orange: linear-gradient(rgb(255, 242, 235) 0%, rgb(255, 209, 184) 100%);
+  --shadow-lg: rgba(4, 69, 144, 0.08) 0px 14px 20px 4px;
+  --shadow-subtle: rgba(10, 13, 18, 0.8) 0px 1px 2px 0px, rgb(10, 13, 18) 0px 0px 0px 1px;
+  --background: var(--color-sky-wash);
+  --foreground: var(--color-obsidian);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist);
+  --font-aeonik: var(--font-aeonik);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+a,
+button {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+button,
+a {
+  min-width: 0;
+}
+
+.font-aeonik {
+  font-family: var(--font-aeonik), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 9999px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.primary-button {
+  background: var(--color-midnight-ink);
+  color: white;
+  box-shadow: var(--shadow-subtle);
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+}
+
+.secondary-button {
+  border: 1px solid rgba(83, 88, 98, 0.16);
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--color-obsidian);
+}
+
+.secondary-button:hover {
+  background: white;
+}
+
+.feature-card {
+  min-height: 280px;
+  border-radius: 32px;
+  background: var(--color-arctic-mist);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+}
+
+.prompt-card {
+  min-height: 420px;
+  border-radius: 28px;
+  border: 1px solid rgba(83, 88, 98, 0.12);
+  background: white;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+}
+
+.prompt-card.compact {
+  min-height: auto;
+}
+
+.category-pill {
+  display: inline-flex;
+  min-height: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(83, 88, 98, 0.12);
+  padding: 9px 15px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-silver-pine);
+}
+
+.category-pill.active {
+  background: var(--color-midnight-ink);
+  color: white;
+}
+
+.icon-button {
+  display: inline-flex;
+  height: 40px;
+  width: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 1px solid rgba(83, 88, 98, 0.14);
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--color-silver-pine);
+}
+
+.icon-button:hover,
+.icon-button.active {
+  border-color: rgba(0, 105, 224, 0.2);
+  background: var(--color-whisper-fade-blue);
+  color: var(--color-electric-blue);
+}
+
+.login-role-card {
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 28px;
+  border: 1px solid rgba(83, 88, 98, 0.12);
+  background: white;
+  padding: 24px;
+}
+
+.login-role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.login-role-card.selected {
+  border-color: rgba(0, 105, 224, 0.36);
+  box-shadow: inset 0 0 0 1px rgba(0, 105, 224, 0.22), var(--shadow-lg);
+}
+
+.login-role-card h2 {
+  font-family: var(--font-aeonik), var(--font-geist), sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.login-role-card p {
+  color: var(--color-silver-pine);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.form-input {
+  min-height: 48px;
+  width: 100%;
+  border-radius: 9999px;
+  border: 1px solid rgba(83, 88, 98, 0.18);
+  background: var(--color-arctic-mist);
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-obsidian);
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--color-luminous-blue);
+}
+
+.admin-select,
+.admin-textarea {
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid rgba(83, 88, 98, 0.18);
+  background: white;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-obsidian);
+  outline: none;
+}
+
+.admin-select {
+  min-height: 48px;
+  border-radius: 9999px;
+}
+
+.admin-textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.admin-select:focus,
+.admin-textarea:focus {
+  border-color: var(--color-luminous-blue);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .primary-button,
+  .secondary-button {
+    min-height: 42px;
+    padding-inline: 16px;
+    font-size: 13px;
+  }
+
+  .feature-card {
+    padding: 28px;
+  }
+
+  .prompt-card {
+    min-height: auto;
+  }
 }
