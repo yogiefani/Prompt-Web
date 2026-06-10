@@ -68,10 +68,22 @@ export type PromptInsightView = {
   copyCount: number;
 };
 
+export type AccessGrantView = {
+  id: string;
+  email: string;
+  fullName: string;
+  provider: string;
+  productId: string;
+  status: string;
+  createdAt: string;
+  userId: string;
+};
+
 export type PromptWorkspaceData = {
   categories: PromptCategoryView[];
   prompts: PromptView[];
   requests: PromptRequestView[];
+  grants: AccessGrantView[];
   insights: PromptInsightView[];
   settings: SiteSettingsView;
   stats: AdminStatView[];
@@ -177,6 +189,7 @@ function getFallbackData(): PromptWorkspaceData {
       variables: {},
     })),
     requests: [],
+    grants: [],
     insights: prompts.slice(0, 4).map((prompt, index) => ({
       promptId: `${index}-${prompt.title.toLowerCase().replaceAll(" ", "-")}`,
       title: prompt.title,
@@ -338,6 +351,7 @@ export async function getPromptWorkspaceData(): Promise<PromptWorkspaceData> {
     copyCountResult,
     requestsResult,
     copyEventsResult,
+    grantsResult,
   ] =
     await Promise.all([
       supabase
@@ -366,6 +380,10 @@ export async function getPromptWorkspaceData(): Promise<PromptWorkspaceData> {
         .select("prompt_id")
         .gte("created_at", monthStart.toISOString())
         .limit(1000),
+      supabase
+        .from("access_grants")
+        .select("id,email,full_name,provider,product_id,status,created_at,granted_user_id")
+        .order("created_at", { ascending: false }),
     ]);
 
   if (categoriesResult.error || promptsResult.error) {
@@ -379,10 +397,35 @@ export async function getPromptWorkspaceData(): Promise<PromptWorkspaceData> {
   const requestRows = requestsResult.error ? [] : ((requestsResult.data as PromptRequestRow[] | null) ?? []);
   const copyEventRows = copyEventsResult.error ? [] : ((copyEventsResult.data as PromptCopyEventRow[] | null) ?? []);
 
+  type AccessGrantRow = {
+    id: string;
+    email: string;
+    full_name: string | null;
+    provider: string;
+    product_id: string | null;
+    status: string;
+    created_at: string;
+    granted_user_id: string | null;
+  };
+
+  const normalizeAccessGrant = (row: AccessGrantRow): AccessGrantView => ({
+    id: row.id,
+    email: row.email,
+    fullName: row.full_name ?? "",
+    provider: row.provider,
+    productId: row.product_id ?? "",
+    status: row.status,
+    createdAt: row.created_at,
+    userId: row.granted_user_id ?? "",
+  });
+
+  const grantsRows = !grantsResult || grantsResult.error ? [] : ((grantsResult.data as AccessGrantRow[] | null) ?? []);
+
   return {
     categories,
     prompts: promptList,
     requests: requestRows.map(normalizePromptRequest),
+    grants: grantsRows.map(normalizeAccessGrant),
     insights: getPromptInsights(copyEventRows, promptList),
     settings: {
       ...normalizeSettings(settingsRow),

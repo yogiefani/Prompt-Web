@@ -216,7 +216,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
                 <h2 className="font-aeonik text-2xl tracking-[-0.02em] text-[var(--color-obsidian)]">Kelola Akses Member</h2>
                 <p className="mt-1 text-sm font-medium text-[var(--color-silver-pine)]">Berikan hak akses premium kepada pembeli produk.</p>
               </div>
-              <AccessManager source={workspace.source} />
+              <AccessManager source={workspace.source} initialGrants={workspace.grants} />
             </ScaleIn>
           )}
 
