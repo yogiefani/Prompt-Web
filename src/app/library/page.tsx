@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, ChevronRight, Sparkles } from "lucide-react";
+import { Bell, ChevronRight, ShieldCheck, Sparkles } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { LogoutButton } from "@/components/logout-button";
 import { FadeIn, ScaleIn } from "@/components/motion-primitives";
@@ -12,11 +12,30 @@ import {
   toneRows,
 } from "@/lib/content";
 import { getPromptWorkspaceData } from "@/lib/prompt-data";
+import { createCookieSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function LibraryPage() {
   const workspace = await getPromptWorkspaceData();
+
+  const supabase = await createCookieSupabaseClient();
+  let isSuperadmin = false;
+
+  if (supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      isSuperadmin = profile?.role === "superadmin";
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)]">
@@ -67,6 +86,12 @@ export default async function LibraryPage() {
                 </h1>
               </div>
               <div className="flex items-center gap-2">
+                {isSuperadmin && (
+                  <Link href="/superadmin" className="secondary-button inline-flex items-center gap-2 font-semibold border-purple-200 hover:border-purple-300">
+                    <ShieldCheck className="h-4 w-4 text-[var(--color-deep-violet)]" />
+                    Admin Panel
+                  </Link>
+                )}
                 <button className="icon-button" type="button" title="Notifications">
                   <Bell className="h-4 w-4" aria-hidden="true" />
                 </button>

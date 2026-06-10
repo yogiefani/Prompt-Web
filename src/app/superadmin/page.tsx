@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  ArrowLeft,
   BarChart3,
   BookOpen,
   FileText,
@@ -45,8 +44,10 @@ export default async function SuperadminPage() {
           <BrandMark />
           <div className="flex items-center gap-2">
             <Link href="/" className="secondary-button">
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               Home
+            </Link>
+            <Link href="/library" className="secondary-button">
+              Member Library
             </Link>
             <LogoutButton className="secondary-button hidden sm:inline-flex" />
           </div>
