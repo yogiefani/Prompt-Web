@@ -8,10 +8,12 @@ import {
   Compass,
   Copy,
   Filter,
+  Folder,
   FolderKanban,
   Grid2X2,
   LayoutList,
   MessageSquareText,
+  Plus,
   Search,
   Sparkles,
   Star,
@@ -33,6 +35,11 @@ const iconMap: Record<IconName, typeof Sparkles> = {
   wand: WandSparkles,
 };
 
+function extractPlaceholders(text: string): string[] {
+  const matches = text.match(/\[([^\]]+)\]/g) ?? [];
+  return [...new Set(matches.map((m) => m.slice(1, -1)))];
+}
+
 type PromptLibraryProps = {
   categories: PromptCategoryView[];
   prompts: PromptView[];
@@ -47,11 +54,17 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   const [userId, setUserId] = useState("");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [inputs, setInputs] = useState<Record<string, Record<string, string>>>({});
+  const [collections, setCollections] = useState<{ id: string; name: string }[]>([]);
+  const [collectionItems, setCollectionItems] = useState<Record<string, Set<string>>>({});
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string>("All");
+  const [showAddToCollectionId, setShowAddToCollectionId] = useState<string>("");
+  const [newCollectionName, setNewCollectionName] = useState<string>("");
 
   useEffect(() => {
     let isMounted = true;
 
-    async function loadFavorites() {
+    async function loadFavoritesAndCollections() {
       if (source !== "supabase" || !supabase) return;
 
       const {
@@ -62,17 +75,45 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
 
       setUserId(user.id);
 
-      const { data, error } = await supabase
+      const { data: favs } = await supabase
         .from("prompt_favorites")
         .select("prompt_id")
         .eq("user_id", user.id);
 
-      if (!isMounted || error) return;
+      if (isMounted && favs) {
+        setFavoriteIds(new Set(favs.map((f) => f.prompt_id as string)));
+      }
 
-      setFavoriteIds(new Set((data ?? []).map((favorite) => favorite.prompt_id as string)));
+      const { data: cols } = await supabase
+        .from("prompt_collections")
+        .select("id, name")
+        .eq("user_id", user.id);
+
+      if (isMounted && cols) {
+        setCollections(cols);
+
+        const colIds = cols.map((c) => c.id);
+        if (colIds.length > 0) {
+          const { data: items } = await supabase
+            .from("prompt_collection_items")
+            .select("collection_id, prompt_id")
+            .in("collection_id", colIds);
+
+          if (isMounted && items) {
+            const mapping: Record<string, Set<string>> = {};
+            items.forEach((item) => {
+              if (!mapping[item.prompt_id]) {
+                mapping[item.prompt_id] = new Set();
+              }
+              mapping[item.prompt_id].add(item.collection_id);
+            });
+            setCollectionItems(mapping);
+          }
+        }
+      }
     }
 
-    loadFavorites();
+    loadFavoritesAndCollections();
 
     return () => {
       isMounted = false;
@@ -85,16 +126,32 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
         activeCategory === "All" ||
         prompt.category.toLowerCase().includes(activeCategory.toLowerCase());
       const matchesFavorite = !favoritesOnly || favoriteIds.has(prompt.id);
+      const matchesCollection =
+        selectedCollectionId === "All" ||
+        collectionItems[prompt.id]?.has(selectedCollectionId);
       const haystack = [prompt.title, prompt.category, prompt.body, prompt.model, ...prompt.tags]
         .join(" ")
         .toLowerCase();
 
-      return matchesCategory && matchesFavorite && haystack.includes(query.toLowerCase());
+      return matchesCategory && matchesFavorite && matchesCollection && haystack.includes(query.toLowerCase());
     });
-  }, [activeCategory, favoriteIds, favoritesOnly, prompts, query]);
+  }, [activeCategory, favoriteIds, favoritesOnly, selectedCollectionId, collectionItems, prompts, query]);
 
   async function copyPrompt(prompt: PromptView) {
-    await navigator.clipboard.writeText(prompt.body);
+    let finalBody = prompt.body;
+    const placeholders = extractPlaceholders(prompt.body);
+    const promptInputs = inputs[prompt.id] ?? {};
+
+    placeholders.forEach((placeholder) => {
+      const userValue = promptInputs[placeholder]?.trim();
+      if (userValue) {
+        const escapedVar = placeholder.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+        const regex = new RegExp(`\\[${escapedVar}\\]`, "g");
+        finalBody = finalBody.replace(regex, userValue);
+      }
+    });
+
+    await navigator.clipboard.writeText(finalBody);
     setCopiedTitle(prompt.title);
     window.setTimeout(() => setCopiedTitle(""), 1600);
 
@@ -149,6 +206,84 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
     }
   }
 
+  async function createCollection(name: string) {
+    if (!userId || !supabase || !name.trim()) return;
+
+    const { data, error } = await supabase
+      .from("prompt_collections")
+      .insert({ user_id: userId, name: name.trim() })
+      .select("id, name")
+      .single();
+
+    if (error || !data) return;
+
+    setCollections((prev) => [...prev, data]);
+    setNewCollectionName("");
+  }
+
+  async function deleteCollection(id: string) {
+    if (!supabase) return;
+    const confirmed = window.confirm("Hapus koleksi ini?");
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("prompt_collections")
+      .delete()
+      .eq("id", id);
+
+    if (error) return;
+
+    setCollections((prev) => prev.filter((c) => c.id !== id));
+    if (selectedCollectionId === id) {
+      setSelectedCollectionId("All");
+    }
+  }
+
+  async function togglePromptInCollection(promptId: string, collectionId: string) {
+    if (!supabase) return;
+
+    const isMember = collectionItems[promptId]?.has(collectionId);
+
+    setCollectionItems((prev) => {
+      const next = { ...prev };
+      if (!next[promptId]) {
+        next[promptId] = new Set();
+      }
+      if (isMember) {
+        next[promptId].delete(collectionId);
+      } else {
+        next[promptId].add(collectionId);
+      }
+      return next;
+    });
+
+    const result = isMember
+      ? await supabase
+          .from("prompt_collection_items")
+          .delete()
+          .eq("collection_id", collectionId)
+          .eq("prompt_id", promptId)
+      : await supabase.from("prompt_collection_items").insert({
+          collection_id: collectionId,
+          prompt_id: promptId,
+        });
+
+    if (result.error) {
+      setCollectionItems((prev) => {
+        const next = { ...prev };
+        if (!next[promptId]) {
+          next[promptId] = new Set();
+        }
+        if (isMember) {
+          next[promptId].add(collectionId);
+        } else {
+          next[promptId].delete(collectionId);
+        }
+        return next;
+      });
+    }
+  }
+
   return (
     <section className="space-y-6">
       <motion.div
@@ -196,6 +331,73 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
           </motion.button>
         </div>
       </motion.div>
+
+      {/* Folder Collections Manager */}
+      {userId && (
+        <div className="flex flex-wrap items-center gap-4 rounded-[32px] bg-white p-5 shadow-[var(--shadow-lg)]">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
+            <FolderKanban className="h-4 w-4 text-[var(--color-electric-blue)]" />
+            Folder Koleksi:
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setSelectedCollectionId("All")}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold border ${
+                selectedCollectionId === "All"
+                  ? "bg-[var(--color-midnight-ink)] text-white border-transparent"
+                  : "bg-white text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.16)] hover:bg-[var(--color-arctic-mist)]"
+              }`}
+            >
+              Semua Koleksi
+            </button>
+            {collections.map((c) => (
+              <span
+                key={c.id}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border ${
+                  selectedCollectionId === c.id
+                    ? "bg-[var(--color-electric-blue)] text-white border-transparent"
+                    : "bg-white text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.16)] hover:bg-[var(--color-arctic-mist)]"
+                }`}
+              >
+                <button type="button" onClick={() => setSelectedCollectionId(c.id)}>
+                  📁 {c.name}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => deleteCollection(c.id)}
+                  className="hover:text-red-500 font-bold ml-1 text-[10px]"
+                  title="Hapus Koleksi"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              createCollection(newCollectionName);
+            }}
+            className="flex items-center gap-2 ml-auto"
+          >
+            <input
+              type="text"
+              value={newCollectionName}
+              onChange={(e) => setNewCollectionName(e.target.value)}
+              placeholder="Nama Koleksi..."
+              className="rounded-xl border border-[rgba(83,88,98,0.18)] px-3 py-1.5 text-xs font-semibold text-[var(--color-obsidian)] outline-none"
+              required
+            />
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center p-1.5 rounded-xl bg-[var(--color-midnight-ink)] text-white hover:opacity-90"
+              title="Tambah Koleksi"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </form>
+        </div>
+      )}
 
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         <motion.button
@@ -265,19 +467,73 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                     </div>
                   </div>
                 </div>
-                <motion.button
-                  whileTap={{ scale: 0.92 }}
-                  onClick={() => toggleFavorite(prompt.id)}
-                  className={`icon-button ${favoriteIds.has(prompt.id) ? "active" : ""}`}
-                  type="button"
-                  title={favoriteIds.has(prompt.id) ? "Remove favorite" : "Favorite"}
-                >
-                  <Star
-                    className="h-4 w-4"
-                    fill={favoriteIds.has(prompt.id) ? "currentColor" : "none"}
-                    aria-hidden="true"
-                  />
-                </motion.button>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <motion.button
+                      whileTap={{ scale: 0.92 }}
+                      onClick={() => setShowAddToCollectionId(showAddToCollectionId === prompt.id ? "" : prompt.id)}
+                      className={`icon-button ${collectionItems[prompt.id]?.size ? "active" : ""}`}
+                      type="button"
+                      title="Simpan ke koleksi"
+                    >
+                      <Folder className="h-4 w-4" aria-hidden="true" />
+                    </motion.button>
+                    
+                    <AnimatePresence>
+                      {showAddToCollectionId === prompt.id && (
+                        <motion.div
+                          className="absolute right-0 top-12 z-20 w-48 rounded-2xl border border-[rgba(83,88,98,0.14)] bg-white p-3 text-left shadow-[var(--shadow-lg)]"
+                          initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 3, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                        >
+                          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--color-ash-gray)]">
+                            Simpan ke Koleksi:
+                          </p>
+                          {collections.length === 0 ? (
+                            <p className="text-[11px] font-semibold text-[var(--color-silver-pine)]">
+                              Belum ada koleksi. Buat koleksi baru di atas.
+                            </p>
+                          ) : (
+                            <div className="space-y-1.5 max-h-36 overflow-y-auto no-scrollbar">
+                              {collections.map((c) => {
+                                const isChecked = collectionItems[prompt.id]?.has(c.id);
+                                return (
+                                  <label
+                                    key={c.id}
+                                    className="flex items-center gap-2 text-xs font-semibold text-[var(--color-silver-pine)] cursor-pointer hover:text-[var(--color-obsidian)]"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={() => togglePromptInCollection(prompt.id, c.id)}
+                                    />
+                                    <span className="truncate">{c.name}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  <motion.button
+                    whileTap={{ scale: 0.92 }}
+                    onClick={() => toggleFavorite(prompt.id)}
+                    className={`icon-button ${favoriteIds.has(prompt.id) ? "active" : ""}`}
+                    type="button"
+                    title={favoriteIds.has(prompt.id) ? "Remove favorite" : "Favorite"}
+                  >
+                    <Star
+                      className="h-4 w-4"
+                      fill={favoriteIds.has(prompt.id) ? "currentColor" : "none"}
+                      aria-hidden="true"
+                    />
+                  </motion.button>
+                </div>
               </div>
 
               <div className="mb-4 flex flex-wrap gap-2">
@@ -301,6 +557,43 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
               >
                 {prompt.body}
               </p>
+
+              {(() => {
+                const placeholders = extractPlaceholders(prompt.body);
+                if (placeholders.length === 0) return null;
+
+                return (
+                  <div className="mt-4 space-y-3 rounded-2xl bg-[var(--color-sky-wash)]/40 p-4 border border-[rgba(83,88,98,0.08)]">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
+                      Lengkapi Variabel Prompt:
+                    </p>
+                    <div className="grid gap-2.5 sm:grid-cols-2">
+                      {placeholders.map((placeholder) => (
+                        <div key={placeholder} className="flex flex-col gap-1">
+                          <span className="text-[11px] font-bold text-[var(--color-silver-pine)]/80">
+                            {placeholder.charAt(0).toUpperCase() + placeholder.slice(1)}
+                          </span>
+                          <input
+                            type="text"
+                            value={inputs[prompt.id]?.[placeholder] ?? ""}
+                            onChange={(e) => {
+                              setInputs((prev) => ({
+                                ...prev,
+                                [prompt.id]: {
+                                  ...(prev[prompt.id] ?? {}),
+                                  [placeholder]: e.target.value,
+                                },
+                              }));
+                            }}
+                            placeholder={`Isi ${placeholder}...`}
+                            className="w-full rounded-xl border border-[rgba(83,88,98,0.14)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-obsidian)] outline-none transition focus:border-[var(--color-electric-blue)]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <motion.button
                 type="button"

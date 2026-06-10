@@ -35,6 +35,7 @@ export type PromptView = {
   tags: string[];
   body: string;
   isPublished: boolean;
+  variables: Record<string, string>;
 };
 
 export type SiteSettingsView = {
@@ -92,6 +93,7 @@ type PromptRow = {
   ai_model: string | null;
   tags: string[] | null;
   is_published: boolean | null;
+  variables: Record<string, string> | null;
   prompt_categories:
     | {
         name: string;
@@ -172,6 +174,7 @@ function getFallbackData(): PromptWorkspaceData {
       tags: prompt.tags,
       body: prompt.body,
       isPublished: true,
+      variables: {},
     })),
     requests: [],
     insights: prompts.slice(0, 4).map((prompt, index) => ({
@@ -257,6 +260,7 @@ function normalizePrompt(row: PromptRow): PromptView {
     tags: row.tags ?? [],
     body: row.body,
     isPublished: row.is_published ?? false,
+    variables: row.variables ?? {},
   };
 }
 
@@ -343,7 +347,7 @@ export async function getPromptWorkspaceData(): Promise<PromptWorkspaceData> {
         .order("name", { ascending: true }),
       supabase
         .from("prompts")
-        .select("id,category_id,title,body,ai_model,tags,is_published,prompt_categories(name,slug)")
+        .select("id,category_id,title,body,ai_model,tags,is_published,variables,prompt_categories(name,slug)")
         .order("created_at", { ascending: false }),
       supabase.from("site_settings").select("brand_name,product_url,support_email").eq("id", true).maybeSingle(),
       supabase.from("prompts").select("id", { count: "exact", head: true }).eq("is_published", true),

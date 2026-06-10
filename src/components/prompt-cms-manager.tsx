@@ -80,6 +80,163 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
     () => categories.find((category) => category.id === promptForm.categoryId),
     [categories, promptForm.categoryId],
   );
+  interface ImportedPrompt {
+    title?: string;
+    body?: string;
+    category?: string;
+    category_slug?: string;
+    model?: string;
+    ai_model?: string;
+    tags?: string | string[];
+    published?: boolean | string | number;
+  }
+
+  interface SupabasePromptRow {
+    id: string;
+    category_id: string;
+    title: string;
+    body: string;
+    ai_model: string | null;
+    tags: string[] | null;
+    is_published: boolean | null;
+    variables?: Record<string, string> | null;
+  }
+
+  async function handleBulkImport(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!isReady || !supabase) {
+      setMessage("Supabase belum siap untuk bulk import.");
+      return;
+    }
+
+    setStatus("loading");
+    setMessage("");
+
+    try {
+      const text = await file.text();
+      let importedPrompts: ImportedPrompt[] = [];
+
+      if (file.name.endsWith(".json")) {
+        const parsed = JSON.parse(text);
+        importedPrompts = Array.isArray(parsed) ? parsed : [parsed];
+      } else if (file.name.endsWith(".csv")) {
+        importedPrompts = parseCsv(text);
+      } else {
+        throw new Error("Format berkas tidak didukung. Harap pilih berkas .csv atau .json");
+      }
+
+      if (importedPrompts.length === 0) {
+        throw new Error("Tidak ada baris prompt valid yang terbaca.");
+      }
+
+      const payloads = importedPrompts.map((item) => {
+        const title = (item.title || "").trim();
+        const body = (item.body || "").trim();
+        const categoryStr = (item.category || item.category_slug || "").trim().toLowerCase();
+
+        const cat = categories.find(
+          (c) => c.slug === categoryStr || c.name.toLowerCase() === categoryStr
+        ) ?? categories[0];
+
+        const model = (item.model || item.ai_model || "All AI").trim();
+        const tags = Array.isArray(item.tags)
+          ? item.tags
+          : typeof item.tags === "string"
+          ? item.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+          : [];
+
+        const isPublished = item.published !== undefined
+          ? (item.published === true || String(item.published).toLowerCase() === "true" || String(item.published) === "1")
+          : true;
+
+        if (!title || !body) {
+          throw new Error("Judul (title) dan isi (body) prompt tidak boleh kosong.");
+        }
+
+        return {
+          title,
+          body,
+          category_id: cat ? cat.id : null,
+          ai_model: model,
+          tags,
+          is_published: isPublished,
+          updated_at: new Date().toISOString(),
+        };
+      });
+
+      const { data, error } = await supabase
+        .from("prompts")
+        .insert(payloads)
+        .select("id,category_id,title,body,ai_model,tags,is_published");
+
+      if (error) throw error;
+
+      const newPrompts = ((data as SupabasePromptRow[] | null) ?? []).map((row) => {
+        const category = categories.find((c) => c.id === row.category_id);
+        return {
+          id: row.id,
+          title: row.title,
+          categoryId: row.category_id,
+          category: category?.name ?? "Uncategorized",
+          categorySlug: category?.slug ?? "uncategorized",
+          model: row.ai_model ?? "All AI",
+          tags: row.tags ?? [],
+          body: row.body,
+          isPublished: row.is_published ?? false,
+          variables: row.variables ?? {},
+        };
+      });
+
+      setPrompts((current) => [...newPrompts, ...current]);
+      setMessage(`Sukses mengimpor ${newPrompts.length} prompt baru.`);
+      router.refresh();
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      setMessage(`Gagal mengimpor berkas: ${errorMsg}`);
+    } finally {
+      setStatus("idle");
+      event.target.value = "";
+    }
+  }
+
+  function parseCsv(text: string): Record<string, string>[] {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+    if (lines.length < 2) return [];
+
+    const parseLine = (line: string) => {
+      const result = [];
+      let current = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === "," && !inQuotes) {
+          result.push(current);
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      return result.map((v) => v.replace(/^"|"$/g, "").trim());
+    };
+
+    const headers = parseLine(lines[0] || "").map((h) => h.toLowerCase());
+    const data = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = parseLine(lines[i] || "");
+      const obj: Record<string, string> = {};
+      headers.forEach((header, idx) => {
+        obj[header] = values[idx] ?? "";
+      });
+      data.push(obj);
+    }
+    return data;
+  }
 
   function updateCategoryName(name: string) {
     setCategoryForm((current) => ({
@@ -303,6 +460,28 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
           {message}
         </div>
       ) : null}
+
+      {/* Bulk Import UI */}
+      {isReady && (
+        <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-[rgba(83,88,98,0.12)] bg-[var(--color-sky-wash)]/20 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="font-semibold text-[var(--color-obsidian)]">Bulk Import Prompt</h3>
+            <p className="mt-1 text-xs font-medium text-[var(--color-silver-pine)]">
+              Unggah file CSV (kolom: title, body, category, model, tags, published) atau JSON untuk menambah banyak prompt sekaligus.
+            </p>
+          </div>
+          <label className="secondary-button cursor-pointer">
+            Pilih Berkas (.csv, .json)
+            <input
+              type="file"
+              accept=".csv,.json"
+              onChange={handleBulkImport}
+              className="hidden"
+              disabled={status === "loading"}
+            />
+          </label>
+        </div>
+      )}
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[0.78fr_1.22fr]">
         <form className="rounded-[28px] bg-[var(--color-arctic-mist)] p-5" onSubmit={saveCategory}>

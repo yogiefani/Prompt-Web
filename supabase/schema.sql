@@ -222,3 +222,48 @@ with check (public.is_superadmin());
 insert into public.site_settings (id, brand_name, product_url, support_email)
 values (true, 'PromptVault OS', 'https://example.com/produk-prompt-manager', 'support@promptvault.local')
 on conflict (id) do nothing;
+
+create table public.prompt_collections (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  name text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table public.prompt_collection_items (
+  collection_id uuid not null references public.prompt_collections(id) on delete cascade,
+  prompt_id uuid not null references public.prompts(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (collection_id, prompt_id)
+);
+
+alter table public.prompt_collections enable row level security;
+alter table public.prompt_collection_items enable row level security;
+
+create policy "collections_own_access"
+on public.prompt_collections for all
+to authenticated
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+
+create policy "collection_items_own_access"
+on public.prompt_collection_items for all
+to authenticated
+using (
+  exists (
+    select 1
+    from public.prompt_collections
+    where prompt_collections.id = prompt_collection_items.collection_id
+      and prompt_collections.user_id = auth.uid()
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.prompt_collections
+    where prompt_collections.id = prompt_collection_items.collection_id
+      and prompt_collections.user_id = auth.uid()
+  )
+);
+
