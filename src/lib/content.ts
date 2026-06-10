@@ -2,14 +2,11 @@ import {
   BarChart3,
   BookOpen,
   Bot,
-  BrainCircuit,
   Compass,
   FileText,
   FolderKanban,
-  Megaphone,
   MessageSquareText,
   Search,
-  Settings2,
   Sparkles,
   WandSparkles,
 } from "lucide-react";
@@ -210,10 +207,8 @@ export const adminTasks = [
 ];
 
 export const sidebarItems = [
-  { label: "All Prompts", icon: FileText },
-  { label: "Collections", icon: FolderKanban },
-  { label: "AI Models", icon: Bot },
-  { label: "Prompt Brain", icon: BrainCircuit },
-  { label: "Campaigns", icon: Megaphone },
-  { label: "Settings", icon: Settings2 },
+  { label: "All Prompts", icon: FileText, href: "#library-section" },
+  { label: "Collections", icon: FolderKanban, href: "#collections-section" },
+  { label: "Cheat Sheet", icon: BookOpen, href: "#cheat-sheet-section" },
+  { label: "Tone Library", icon: MessageSquareText, href: "#tone-library-section" },
 ];

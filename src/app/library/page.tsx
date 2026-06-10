@@ -53,7 +53,7 @@ export default async function LibraryPage() {
                     ? "bg-[var(--color-midnight-ink)] text-white"
                     : "text-[var(--color-silver-pine)] hover:bg-white"
                 }`}
-                href="#"
+                href={item.href}
               >
                 <item.icon className="h-4 w-4" aria-hidden="true" />
                 {item.label}
@@ -118,14 +118,16 @@ export default async function LibraryPage() {
                     dan setiap prompt punya tombol copy langsung.
                   </p>
                 </div>
-                <RequestPromptForm source={workspace.source} />
+                {!isSuperadmin && <RequestPromptForm source={workspace.source} />}
               </div>
             </FadeIn>
 
-            <PromptLibrary categories={workspace.categories} prompts={workspace.prompts} source={workspace.source} />
+            <div id="library-section">
+              <PromptLibrary categories={workspace.categories} prompts={workspace.prompts} source={workspace.source} />
+            </div>
 
             <section className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-              <ScaleIn className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+              <ScaleIn id="cheat-sheet-section" className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
                 <h2 className="font-aeonik text-2xl tracking-[-0.02em]">
                   AI Prompting Cheat Sheet
                 </h2>
@@ -171,7 +173,7 @@ export default async function LibraryPage() {
                   </div>
                 </ScaleIn>
 
-                <ScaleIn className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8" delay={0.12}>
+                <ScaleIn id="tone-library-section" className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8" delay={0.12}>
                   <h2 className="font-aeonik text-2xl tracking-[-0.02em]">Tone Library</h2>
                   <div className="mt-6 overflow-hidden rounded-2xl border border-[rgba(83,88,98,0.16)]">
                     <table className="w-full text-left text-sm font-medium text-[var(--color-silver-pine)]">

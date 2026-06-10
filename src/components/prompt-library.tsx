@@ -334,7 +334,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
 
       {/* Folder Collections Manager */}
       {userId && (
-        <div className="flex flex-wrap items-center gap-4 rounded-[32px] bg-white p-5 shadow-[var(--shadow-lg)]">
+        <div id="collections-section" className="flex flex-wrap items-center gap-4 rounded-[32px] bg-white p-5 shadow-[var(--shadow-lg)]">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
             <FolderKanban className="h-4 w-4 text-[var(--color-electric-blue)]" />
             Folder Koleksi:

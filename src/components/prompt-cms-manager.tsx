@@ -169,7 +169,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
       const { data, error } = await supabase
         .from("prompts")
         .insert(payloads)
-        .select("id,category_id,title,body,ai_model,tags,is_published");
+        .select("id,category_id,title,body,ai_model,tags,is_published,variables");
 
       if (error) throw error;
 
@@ -380,12 +380,12 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
           .from("prompts")
           .update(payload)
           .eq("id", promptForm.id)
-          .select("id,category_id,title,body,ai_model,tags,is_published")
+          .select("id,category_id,title,body,ai_model,tags,is_published,variables")
           .single()
       : await supabase
           .from("prompts")
           .insert(payload)
-          .select("id,category_id,title,body,ai_model,tags,is_published")
+          .select("id,category_id,title,body,ai_model,tags,is_published,variables")
           .single();
 
     setStatus("idle");
@@ -406,6 +406,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
       tags: result.data.tags ?? [],
       body: result.data.body,
       isPublished: result.data.is_published ?? false,
+      variables: result.data.variables ?? {},
     };
 
     setPrompts((current) =>

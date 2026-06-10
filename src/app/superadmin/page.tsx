@@ -73,10 +73,10 @@ export default async function SuperadminPage() {
                 kategori multi-AI, user access, dan tahapan pengembangan fitur.
               </p>
             </div>
-            <button className="primary-button" type="button">
+            <a href="#prompt-cms-section" className="primary-button">
               <Plus className="h-4 w-4" aria-hidden="true" />
               New Prompt
-            </button>
+            </a>
           </div>
         </FadeIn>
 
@@ -111,11 +111,13 @@ export default async function SuperadminPage() {
 
         <RequestInbox initialRequests={workspace.requests} source={workspace.source} />
 
-        <PromptCmsManager
-          initialCategories={workspace.categories}
-          initialPrompts={workspace.prompts}
-          source={workspace.source}
-        />
+        <div id="prompt-cms-section">
+          <PromptCmsManager
+            initialCategories={workspace.categories}
+            initialPrompts={workspace.prompts}
+            source={workspace.source}
+          />
+        </div>
 
         <FadeIn className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
           <h2 className="font-aeonik text-2xl tracking-[-0.02em]">Tahapan Fitur</h2>
