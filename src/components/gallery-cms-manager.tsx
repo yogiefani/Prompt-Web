@@ -105,6 +105,7 @@ export function GalleryCmsManager() {
   const filteredItems = items.filter(i => i.row_index === activeRowTab);
 
   // Removed early return for loading
+  return (
     <div className="space-y-8">
       {cropImageSrc && (
         <ImageCropper
