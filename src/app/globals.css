@@ -453,7 +453,21 @@ a {
 }
 
 .blog-figure {
-  margin: 1.5rem 0;
+  margin: 1.5rem auto;
+  transition: max-width 0.3s ease;
+  width: 100%;
+}
+
+.blog-img-small {
+  max-width: 400px;
+}
+
+.blog-img-medium {
+  max-width: 768px;
+}
+
+.blog-img-full {
+  max-width: 100%;
 }
 
 .blog-caption {

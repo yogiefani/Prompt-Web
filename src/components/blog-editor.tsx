@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { uploadImageToCloudinary } from "@/lib/cloudinary";
 import {
   AlignLeft,
   Bold,
@@ -88,6 +89,9 @@ function ToolbarButton({ title, active, onClick, children }: ToolbarButtonProps)
 
 export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const inlineInputRef = useRef<HTMLInputElement>(null);
+  
   const [mode, setMode] = useState<"write" | "preview">("write");
   const [title, setTitle] = useState(initialPost?.title ?? "");
   const [slug, setSlug] = useState(initialPost?.slug ?? "");
@@ -99,6 +103,46 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [showMetadata, setShowMetadata] = useState(false);
+
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingInline, setUploadingInline] = useState(false);
+  const [savedRange, setSavedRange] = useState<Range | null>(null);
+  const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
+
+  // Image Selection Effect
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    function handleEditorClick(e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "IMG") {
+        setSelectedImage(target as HTMLImageElement);
+      } else {
+        setSelectedImage(null);
+      }
+    }
+    function handleOther() {
+      if (selectedImage) setSelectedImage(null);
+    }
+
+    editor.addEventListener("click", handleEditorClick);
+    editor.addEventListener("keydown", handleOther);
+    return () => {
+      editor.removeEventListener("click", handleEditorClick);
+      editor.removeEventListener("keydown", handleOther);
+    };
+  }, [mode, selectedImage]);
+
+  function applyImageSize(sizeClass: "blog-img-small" | "blog-img-medium" | "blog-img-full") {
+    if (!selectedImage) return;
+    const figure = selectedImage.closest("figure");
+    if (figure) {
+      figure.classList.remove("blog-img-small", "blog-img-medium", "blog-img-full");
+      figure.classList.add(sizeClass);
+    }
+    setSelectedImage(null);
+  }
 
   // Sync content to editorRef on mount
   useEffect(() => {
@@ -134,13 +178,51 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
     if (url) execFormat("createLink", url);
   }
 
-  function insertImage() {
-    const url = window.prompt("Masukkan URL gambar:", "https://");
-    if (url) {
-      execFormat(
+  function triggerInlineUpload() {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      setSavedRange(selection.getRangeAt(0));
+    }
+    inlineInputRef.current?.click();
+  }
+
+  async function handleInlineUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingInline(true);
+    try {
+      const url = await uploadImageToCloudinary(file);
+      editorRef.current?.focus();
+      const selection = window.getSelection();
+      if (savedRange && selection) {
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+      }
+      document.execCommand(
         "insertHTML",
-        `<figure class="blog-figure"><img src="${url}" alt="" class="blog-img" /><figcaption contenteditable="true" class="blog-caption">Keterangan gambar...</figcaption></figure><p><br/></p>`
+        false,
+        `<figure class="blog-figure blog-img-medium"><img src="${url}" alt="" class="blog-img" /><figcaption contenteditable="true" class="blog-caption">Keterangan gambar...</figcaption></figure><p><br/></p>`
       );
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setUploadingInline(false);
+      if (inlineInputRef.current) inlineInputRef.current.value = "";
+    }
+  }
+
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingCover(true);
+    try {
+      const url = await uploadImageToCloudinary(file);
+      setCoverUrl(url);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setUploadingCover(false);
+      if (coverInputRef.current) coverInputRef.current.value = "";
     }
   }
 
@@ -214,6 +296,8 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
 
   return (
     <div className="flex flex-col gap-0 rounded-[32px] overflow-hidden bg-white shadow-[var(--shadow-lg)] border border-[rgba(83,88,98,0.1)]">
+      <input type="file" ref={coverInputRef} className="hidden" accept="image/*" onChange={handleCoverUpload} />
+      <input type="file" ref={inlineInputRef} className="hidden" accept="image/*" onChange={handleInlineUpload} />
       {/* Top Bar */}
       <div className="flex items-center justify-between gap-4 border-b border-[rgba(83,88,98,0.12)] bg-[var(--color-arctic-mist)] px-5 py-3">
         <div className="flex items-center gap-2">
@@ -293,12 +377,22 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
           </label>
           <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.07em] text-[var(--color-silver-pine)]">
             Cover Image URL
-            <input
-              className="form-input text-sm font-normal normal-case tracking-normal"
-              value={coverUrl}
-              onChange={(e) => setCoverUrl(e.target.value)}
-              placeholder="https://..."
-            />
+            <div className="flex gap-2">
+              <input
+                className="form-input flex-1 text-sm font-normal normal-case tracking-normal"
+                value={coverUrl}
+                onChange={(e) => setCoverUrl(e.target.value)}
+                placeholder="https://..."
+              />
+              <button
+                type="button"
+                onClick={() => coverInputRef.current?.click()}
+                disabled={uploadingCover}
+                className="shrink-0 rounded-xl bg-[var(--color-obsidian)] px-4 py-2 text-xs font-bold text-white hover:bg-[var(--color-midnight-ink)] disabled:opacity-50"
+              >
+                {uploadingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : "Upload"}
+              </button>
+            </div>
           </label>
           <label className="col-span-full flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.07em] text-[var(--color-silver-pine)]">
             Excerpt (ringkasan)
@@ -373,9 +467,21 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
               <ToolbarButton title="Numbered List" onClick={() => execFormat("insertOrderedList")}><ListOrdered className="h-4 w-4" /></ToolbarButton>
               <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
               <ToolbarButton title="Link" onClick={insertLink}><Link className="h-4 w-4" /></ToolbarButton>
-              <ToolbarButton title="Gambar (URL)" onClick={insertImage}><Image className="h-4 w-4" /></ToolbarButton>
+              <ToolbarButton title="Upload Gambar" onClick={triggerInlineUpload}>
+                {uploadingInline ? <Loader2 className="h-4 w-4 animate-spin" /> : <Image className="h-4 w-4" />}
+              </ToolbarButton>
               <ToolbarButton title="Horizontal Rule" onClick={insertHr}><Minus className="h-4 w-4" /></ToolbarButton>
             </div>
+
+            {/* Image Resize Sub-Toolbar */}
+            {selectedImage && (
+              <div className="flex items-center gap-3 border-b border-[rgba(83,88,98,0.1)] bg-[var(--color-sky-wash)] px-5 py-2 text-xs font-semibold text-[var(--color-obsidian)]">
+                <span className="text-[var(--color-silver-pine)]">Ukuran Gambar:</span>
+                <button type="button" onClick={() => applyImageSize("blog-img-small")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Kecil</button>
+                <button type="button" onClick={() => applyImageSize("blog-img-medium")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Sedang</button>
+                <button type="button" onClick={() => applyImageSize("blog-img-full")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Penuh</button>
+              </div>
+            )}
 
             {/* Editor area */}
             <div
