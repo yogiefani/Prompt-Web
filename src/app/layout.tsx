@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Montserrat } from "next/font/google";
 import { MotionProvider } from "@/components/motion-provider";
+import { PhantomUIProvider } from "@/components/phantom-ui-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,6 +33,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full">
+        <PhantomUIProvider />
         <MotionProvider>{children}</MotionProvider>
       </body>
     </html>

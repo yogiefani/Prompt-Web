@@ -539,3 +539,15 @@ textarea.form-input {
 .marquee-container:hover .animate-marquee-right {
   animation-play-state: paused;
 }
+
+/* Phantom UI Skeleton Loader */
+phantom-ui[loading] * {
+  -webkit-text-fill-color: transparent !important;
+  pointer-events: none;
+  user-select: none;
+}
+phantom-ui[loading] img, phantom-ui[loading] svg,
+phantom-ui[loading] video, phantom-ui[loading] canvas,
+phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
+  opacity: 0 !important;
+}

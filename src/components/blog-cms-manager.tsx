@@ -198,19 +198,29 @@ export function BlogCmsManager() {
       </div>
 
       {/* Posts list */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-[var(--color-electric-blue)]" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-[32px] bg-white py-20 shadow-[var(--shadow-lg)]">
-          <BookOpen className="h-12 w-12 text-[var(--color-ash-gray)]" />
-          <div className="text-center">
-            <p className="font-aeonik text-xl text-[var(--color-obsidian)]">Belum ada artikel</p>
-            <p className="mt-1 text-sm text-[var(--color-silver-pine)]">Klik "Tulis Artikel Baru" untuk mulai.</p>
+      <phantom-ui loading={loading ? "true" : undefined}>
+        {loading ? (
+          <div className="space-y-3">
+            {Array(4).fill(0).map((_, i) => (
+              <div key={`skel-${i}`} className="group flex items-start gap-4 rounded-[24px] bg-white p-5 shadow-[var(--shadow-lg)]">
+                <div className="h-20 w-28 flex-shrink-0 rounded-2xl bg-[var(--color-arctic-mist)]" />
+                <div className="flex min-w-0 flex-1 flex-col gap-3 pt-1">
+                  <div className="h-3 w-24 rounded bg-[var(--color-arctic-mist)]" />
+                  <div className="h-5 w-2/3 rounded bg-[var(--color-arctic-mist)]" />
+                  <div className="h-4 w-full rounded bg-[var(--color-arctic-mist)]" />
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      ) : (
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-4 rounded-[32px] bg-white py-20 shadow-[var(--shadow-lg)]">
+            <BookOpen className="h-12 w-12 text-[var(--color-ash-gray)]" />
+            <div className="text-center">
+              <p className="font-aeonik text-xl text-[var(--color-obsidian)]">Belum ada artikel</p>
+              <p className="mt-1 text-sm text-[var(--color-silver-pine)]">Klik "Tulis Artikel Baru" untuk mulai.</p>
+            </div>
+          </div>
+        ) : (
         <AnimatePresence mode="popLayout">
           <div className="space-y-3">
             {filtered.map((post) => (
@@ -317,6 +327,7 @@ export function BlogCmsManager() {
           </div>
         </AnimatePresence>
       )}
+      </phantom-ui>
     </div>
   );
 }

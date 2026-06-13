@@ -104,11 +104,7 @@ export function GalleryCmsManager() {
 
   const filteredItems = items.filter(i => i.row_index === activeRowTab);
 
-  if (loading) {
-    return <div className="p-10 text-center text-[var(--color-silver-pine)]">Memuat galeri...</div>;
-  }
-
-  return (
+  // Removed early return for loading
     <div className="space-y-8">
       {cropImageSrc && (
         <ImageCropper
@@ -169,57 +165,65 @@ export function GalleryCmsManager() {
         </div>
 
         <div className="p-6">
-          {filteredItems.length === 0 ? (
-            <div className="text-center py-16 text-[var(--color-silver-pine)]">
-              <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-20" />
-              <p>Belum ada foto di baris ini.</p>
-              <p className="text-xs mt-1">Klik tombol "Tambah Foto Baru" di atas.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {filteredItems.map((item) => (
-                <div key={item.id} className="group relative rounded-2xl border border-[rgba(83,88,98,0.1)] overflow-hidden bg-[var(--color-arctic-mist)]">
-                  <div className="aspect-[4/5] relative">
-                    <img
-                      src={item.image_url}
-                      alt="Gallery Item"
-                      className={`w-full h-full object-cover transition-all ${
-                        !item.is_active ? "grayscale opacity-50" : ""
-                      }`}
-                    />
-                    
-                    {/* Hover Actions */}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
-                      <button
-                        onClick={() => toggleActive(item.id, item.is_active)}
-                        className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-bold text-[var(--color-obsidian)] hover:bg-[var(--color-electric-blue)] hover:text-white transition-colors"
-                      >
-                        {item.is_active ? (
-                          <><EyeOff className="h-4 w-4" /> Sembunyikan</>
-                        ) : (
-                          <><Eye className="h-4 w-4" /> Tampilkan</>
-                        )}
-                      </button>
+          <phantom-ui loading={loading ? "true" : undefined}>
+            {loading ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {Array(10).fill(0).map((_, i) => (
+                  <div key={`skeleton-${i}`} className="aspect-[4/5] rounded-2xl bg-[var(--color-arctic-mist)]" />
+                ))}
+              </div>
+            ) : filteredItems.length === 0 ? (
+              <div className="text-center py-16 text-[var(--color-silver-pine)]">
+                <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p>Belum ada foto di baris ini.</p>
+                <p className="text-xs mt-1">Klik tombol "Tambah Foto Baru" di atas.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {filteredItems.map((item) => (
+                  <div key={item.id} className="group relative rounded-2xl border border-[rgba(83,88,98,0.1)] overflow-hidden bg-[var(--color-arctic-mist)]">
+                    <div className="aspect-[4/5] relative">
+                      <img
+                        src={item.image_url}
+                        alt="Gallery Item"
+                        className={`w-full h-full object-cover transition-all ${
+                          !item.is_active ? "grayscale opacity-50" : ""
+                        }`}
+                      />
                       
-                      <button
-                        onClick={() => deleteItem(item.id)}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500 rounded-xl text-sm font-bold text-white hover:bg-red-600 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" /> Hapus
-                      </button>
+                      {/* Hover Actions */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                        <button
+                          onClick={() => toggleActive(item.id, item.is_active)}
+                          className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-bold text-[var(--color-obsidian)] hover:bg-[var(--color-electric-blue)] hover:text-white transition-colors"
+                        >
+                          {item.is_active ? (
+                            <><EyeOff className="h-4 w-4" /> Sembunyikan</>
+                          ) : (
+                            <><Eye className="h-4 w-4" /> Tampilkan</>
+                          )}
+                        </button>
+                        
+                        <button
+                          onClick={() => deleteItem(item.id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-500 rounded-xl text-sm font-bold text-white hover:bg-red-600 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" /> Hapus
+                        </button>
+                      </div>
                     </div>
+                    
+                    {/* Status Indicator */}
+                    {!item.is_active && (
+                      <div className="absolute top-3 left-3 px-2 py-1 bg-black/70 rounded text-[10px] font-bold text-white uppercase tracking-wider">
+                        Tersembunyi
+                      </div>
+                    )}
                   </div>
-                  
-                  {/* Status Indicator */}
-                  {!item.is_active && (
-                    <div className="absolute top-3 left-3 px-2 py-1 bg-black/70 rounded text-[10px] font-bold text-white uppercase tracking-wider">
-                      Tersembunyi
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </phantom-ui>
         </div>
       </div>
     </div>
