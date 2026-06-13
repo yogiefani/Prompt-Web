@@ -71,7 +71,6 @@ export async function proxy(request: NextRequest) {
 
     if (profile?.role !== "superadmin") {
       const libraryUrl = new URL("/library", request.url);
-      libraryUrl.searchParams.set("reason", "superadmin-required");
       return NextResponse.redirect(libraryUrl);
     }
   }
