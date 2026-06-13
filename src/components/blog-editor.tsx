@@ -376,23 +376,32 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
             />
           </label>
           <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.07em] text-[var(--color-silver-pine)]">
-            Cover Image URL
-            <div className="flex gap-2">
-              <input
-                className="form-input flex-1 text-sm font-normal normal-case tracking-normal"
-                value={coverUrl}
-                onChange={(e) => setCoverUrl(e.target.value)}
-                placeholder="https://..."
-              />
+            Cover Image
+            {coverUrl ? (
+              <div className="flex items-center gap-3 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white p-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={coverUrl} alt="Cover Mini" className="h-10 w-16 rounded object-cover" />
+                <span className="flex-1 truncate text-xs font-semibold normal-case tracking-normal text-[var(--color-obsidian)]">
+                  Gambar terpasang
+                </span>
+                <button type="button" onClick={() => coverInputRef.current?.click()} disabled={uploadingCover} className="text-[var(--color-electric-blue)] hover:underline font-semibold normal-case tracking-normal">
+                  {uploadingCover ? "..." : "Ganti"}
+                </button>
+                <button type="button" onClick={() => setCoverUrl("")} className="mr-2 text-red-500 hover:underline font-semibold normal-case tracking-normal">
+                  Hapus
+                </button>
+              </div>
+            ) : (
               <button
                 type="button"
                 onClick={() => coverInputRef.current?.click()}
                 disabled={uploadingCover}
-                className="shrink-0 rounded-xl bg-[var(--color-obsidian)] px-4 py-2 text-xs font-bold text-white hover:bg-[var(--color-midnight-ink)] disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(83,88,98,0.3)] bg-white px-4 py-3 text-sm font-semibold normal-case tracking-normal text-[var(--color-silver-pine)] transition-colors hover:border-[var(--color-electric-blue)] hover:text-[var(--color-electric-blue)] disabled:opacity-50"
               >
-                {uploadingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : "Upload"}
+                {uploadingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : <Image className="h-4 w-4" />}
+                {uploadingCover ? "Mengunggah..." : "Upload Cover Image"}
               </button>
-            </div>
+            )}
           </label>
           <label className="col-span-full flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.07em] text-[var(--color-silver-pine)]">
             Excerpt (ringkasan)
