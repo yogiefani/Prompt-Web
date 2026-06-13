@@ -449,51 +449,51 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
           />
         </div>
 
-        {mode === "write" ? (
-          <>
-            {/* Toolbar */}
-            <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 border-y border-[rgba(83,88,98,0.1)] bg-white/90 px-4 py-2 backdrop-blur-sm">
-              <ToolbarButton title="Bold" onClick={() => execFormat("bold")}><Bold className="h-4 w-4" /></ToolbarButton>
-              <ToolbarButton title="Italic" onClick={() => execFormat("italic")}><Italic className="h-4 w-4" /></ToolbarButton>
-              <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
-              <ToolbarButton title="Heading 1" onClick={() => formatHeading("h1")}><Heading1 className="h-4 w-4" /></ToolbarButton>
-              <ToolbarButton title="Heading 2" onClick={() => formatHeading("h2")}><Heading2 className="h-4 w-4" /></ToolbarButton>
-              <ToolbarButton title="Heading 3" onClick={() => formatHeading("h3")}><Heading3 className="h-4 w-4" /></ToolbarButton>
-              <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
-              <ToolbarButton title="Blockquote" onClick={() => formatHeading("blockquote")}><Quote className="h-4 w-4" /></ToolbarButton>
-              <ToolbarButton title="Code Block" onClick={insertCodeBlock}><Code className="h-4 w-4" /></ToolbarButton>
-              <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
-              <ToolbarButton title="Bullet List" onClick={() => execFormat("insertUnorderedList")}><List className="h-4 w-4" /></ToolbarButton>
-              <ToolbarButton title="Numbered List" onClick={() => execFormat("insertOrderedList")}><ListOrdered className="h-4 w-4" /></ToolbarButton>
-              <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
-              <ToolbarButton title="Link" onClick={insertLink}><Link className="h-4 w-4" /></ToolbarButton>
-              <ToolbarButton title="Upload Gambar" onClick={triggerInlineUpload}>
-                {uploadingInline ? <Loader2 className="h-4 w-4 animate-spin" /> : <Image className="h-4 w-4" />}
-              </ToolbarButton>
-              <ToolbarButton title="Horizontal Rule" onClick={insertHr}><Minus className="h-4 w-4" /></ToolbarButton>
+        <div style={{ display: mode === "write" ? "block" : "none" }}>
+          {/* Toolbar */}
+          <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 border-y border-[rgba(83,88,98,0.1)] bg-white/90 px-4 py-2 backdrop-blur-sm">
+            <ToolbarButton title="Bold" onClick={() => execFormat("bold")}><Bold className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton title="Italic" onClick={() => execFormat("italic")}><Italic className="h-4 w-4" /></ToolbarButton>
+            <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
+            <ToolbarButton title="Heading 1" onClick={() => formatHeading("h1")}><Heading1 className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton title="Heading 2" onClick={() => formatHeading("h2")}><Heading2 className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton title="Heading 3" onClick={() => formatHeading("h3")}><Heading3 className="h-4 w-4" /></ToolbarButton>
+            <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
+            <ToolbarButton title="Blockquote" onClick={() => formatHeading("blockquote")}><Quote className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton title="Code Block" onClick={insertCodeBlock}><Code className="h-4 w-4" /></ToolbarButton>
+            <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
+            <ToolbarButton title="Bullet List" onClick={() => execFormat("insertUnorderedList")}><List className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton title="Numbered List" onClick={() => execFormat("insertOrderedList")}><ListOrdered className="h-4 w-4" /></ToolbarButton>
+            <div className="mx-1 h-5 w-px bg-[rgba(83,88,98,0.18)]" />
+            <ToolbarButton title="Link" onClick={insertLink}><Link className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton title="Upload Gambar" onClick={triggerInlineUpload}>
+              {uploadingInline ? <Loader2 className="h-4 w-4 animate-spin" /> : <Image className="h-4 w-4" />}
+            </ToolbarButton>
+            <ToolbarButton title="Horizontal Rule" onClick={insertHr}><Minus className="h-4 w-4" /></ToolbarButton>
+          </div>
+
+          {/* Image Resize Sub-Toolbar */}
+          {selectedImage && (
+            <div className="flex items-center gap-3 border-b border-[rgba(83,88,98,0.1)] bg-[var(--color-sky-wash)] px-5 py-2 text-xs font-semibold text-[var(--color-obsidian)]">
+              <span className="text-[var(--color-silver-pine)]">Ukuran Gambar:</span>
+              <button type="button" onClick={() => applyImageSize("blog-img-small")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Kecil</button>
+              <button type="button" onClick={() => applyImageSize("blog-img-medium")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Sedang</button>
+              <button type="button" onClick={() => applyImageSize("blog-img-full")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Penuh</button>
             </div>
+          )}
 
-            {/* Image Resize Sub-Toolbar */}
-            {selectedImage && (
-              <div className="flex items-center gap-3 border-b border-[rgba(83,88,98,0.1)] bg-[var(--color-sky-wash)] px-5 py-2 text-xs font-semibold text-[var(--color-obsidian)]">
-                <span className="text-[var(--color-silver-pine)]">Ukuran Gambar:</span>
-                <button type="button" onClick={() => applyImageSize("blog-img-small")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Kecil</button>
-                <button type="button" onClick={() => applyImageSize("blog-img-medium")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Sedang</button>
-                <button type="button" onClick={() => applyImageSize("blog-img-full")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Penuh</button>
-              </div>
-            )}
+          {/* Editor area */}
+          <div
+            ref={editorRef}
+            contentEditable
+            suppressContentEditableWarning
+            className="blog-content min-h-[460px] flex-1 cursor-text px-6 py-6 text-[var(--color-obsidian)] outline-none"
+            data-placeholder="Mulai menulis artikel tutorial di sini..."
+            onInput={() => {/* keep reactive if needed */}}
+          />
+        </div>
 
-            {/* Editor area */}
-            <div
-              ref={editorRef}
-              contentEditable
-              suppressContentEditableWarning
-              className="blog-content min-h-[460px] flex-1 cursor-text px-6 py-6 text-[var(--color-obsidian)] outline-none"
-              data-placeholder="Mulai menulis artikel tutorial di sini..."
-              onInput={() => {/* keep reactive if needed */}}
-            />
-          </>
-        ) : (
+        {mode === "preview" && (
           /* Preview */
           <div className="blog-content min-h-[460px] px-6 py-6">
             {coverUrl && (
