@@ -17,8 +17,37 @@ import {
   RotateCcw,
   Layers,
   ChevronRight,
+  MessageSquare,
+  FileText,
+  Settings,
+  Database,
+  Users,
+  Mail,
+  Globe,
+  Briefcase,
+  PenTool,
+  Camera,
+  Video,
+  Music,
+  Mic,
+  Heart,
+  Star,
+  Flame,
+  Layout,
+  Box,
+  Terminal,
+  Code2,
 } from "lucide-react";
 import type { PromptGeneratorView } from "@/lib/prompt-data";
+
+export const ICONS: Record<string, React.ElementType> = {
+  wand: Wand, sparkles: Sparkles, zap: Zap, message_square: MessageSquare, image: ImageIcon, code2: Code2, file_text: FileText, settings: Settings, database: Database, users: Users, mail: Mail, globe: Globe, briefcase: Briefcase, pen_tool: PenTool, camera: Camera, video: Video, music: Music, mic: Mic, heart: Heart, star: Star, flame: Flame, layout: Layout, box: Box, terminal: Terminal
+};
+
+export function DynamicIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = ICONS[name] || Wand;
+  return <Icon className={className} />;
+}
 
 // ─────────────────────────────────────────────
 // Types
@@ -317,7 +346,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                       : "text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)] hover:text-[var(--color-electric-blue)]"
                   }`}
                 >
-                  <Wand className="h-5 w-5" />
+                  <DynamicIcon name={g.icon as string} className="h-5 w-5" />
                   {/* Tooltip */}
                   <div className="pointer-events-none absolute left-full ml-3 z-30 hidden group-hover:block">
                     <div className="whitespace-nowrap rounded-xl bg-[var(--color-midnight-ink)] px-3 py-1.5 text-xs font-bold text-white shadow-xl">

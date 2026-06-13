@@ -15,7 +15,58 @@ import {
   AlignLeft,
   ToggleLeft,
   ToggleRight,
+  Sparkles,
+  Zap,
+  MessageSquare,
+  FileText,
+  Settings,
+  Database,
+  Users,
+  Mail,
+  Globe,
+  Briefcase,
+  PenTool,
+  Camera,
+  Video,
+  Music,
+  Mic,
+  Heart,
+  Star,
+  Flame,
+  Layout,
+  Box,
+  Terminal,
 } from "lucide-react";
+
+export const ICONS: Record<string, React.ElementType> = {
+  wand: Wand, sparkles: Sparkles, zap: Zap, message_square: MessageSquare, image: ImageIcon, code2: Code2, file_text: FileText, settings: Settings, database: Database, users: Users, mail: Mail, globe: Globe, briefcase: Briefcase, pen_tool: PenTool, camera: Camera, video: Video, music: Music, mic: Mic, heart: Heart, star: Star, flame: Flame, layout: Layout, box: Box, terminal: Terminal
+};
+
+export function DynamicIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = ICONS[name] || Wand;
+  return <Icon className={className} />;
+}
+
+function ImageUploader({ value, onChange, label, placeholder }: { value: string; onChange: (v: string) => void; label?: string; placeholder?: string }) {
+  return (
+    <div>
+      {label && <label className="mb-1.5 block text-sm font-bold text-[var(--color-obsidian)]">{label}</label>}
+      <div className="flex gap-2">
+        <input className="form-input flex-1 text-sm" value={value || ""} onChange={e => onChange(e.target.value)} placeholder={placeholder || "https://..."} />
+        <label className="secondary-button cursor-pointer shrink-0 !min-h-0 !h-[42px]">
+           <input type="file" className="hidden" accept="image/*" onChange={e => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = ev => onChange(ev.target?.result as string);
+              reader.readAsDataURL(file);
+           }} />
+           <ImageIcon className="h-4 w-4" /> Upload
+        </label>
+      </div>
+    </div>
+  );
+}
 import { supabase } from "@/lib/supabase";
 import type { PromptGeneratorView } from "@/lib/prompt-data";
 
@@ -54,6 +105,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"builder" | "template" | "settings">("builder");
   const [sections, setSections] = useState<FormSection[]>([]);
+  const [showIconPicker, setShowIconPicker] = useState(false);
 
   function startCreate() {
     setEditingGen({
@@ -169,7 +221,20 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
           {/* ── Editor Header ── */}
           <div className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-[var(--shadow-md)]">
             <div className="flex flex-1 items-center gap-3">
-              <button onClick={() => setEditingGen(null)} className="icon-button"><X className="h-5 w-5" /></button>
+              <div className="relative">
+                <button onClick={() => setShowIconPicker(!showIconPicker)} className="icon-button">
+                  <DynamicIcon name={editingGen.icon as string} className="h-5 w-5 text-[var(--color-obsidian)]" />
+                </button>
+                {showIconPicker && (
+                  <div className="absolute top-12 left-0 z-50 p-3 bg-white rounded-2xl shadow-[var(--shadow-lg)] border border-[rgba(83,88,98,0.1)] w-64 grid grid-cols-6 gap-2">
+                    {Object.keys(ICONS).map(name => (
+                      <button key={name} onClick={() => { setEditingGen({...editingGen, icon: name}); setShowIconPicker(false); }} className={`p-2 rounded-xl flex justify-center items-center ${editingGen.icon === name ? 'bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]' : 'text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)] hover:text-[var(--color-electric-blue)]'}`} title={name}>
+                        <DynamicIcon name={name} className="h-4 w-4" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <input
                 className="flex-1 bg-transparent font-aeonik text-xl font-bold outline-none"
                 value={editingGen.title}
@@ -263,10 +328,12 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
                         )}
                         {/* Reference URL for select */}
                         {field.type === "select" && (
-                          <div>
-                            <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">URL Gambar Referensi (opsional — muncul sebagai link "Lihat Referensi" di samping label)</label>
-                            <input className="form-input text-sm bg-white" value={field.reference_url || ""} onChange={(e) => updateField(section.id, field.id, { reference_url: e.target.value })} placeholder="https://..." />
-                          </div>
+                          <ImageUploader
+                            label="URL Gambar Referensi (opsional — muncul sebagai link &quot;Lihat Referensi&quot; di samping label)"
+                            value={field.reference_url || ""}
+                            onChange={(val) => updateField(section.id, field.id, { reference_url: val })}
+                            placeholder="https://..."
+                          />
                         )}
                         {/* Chips hint */}
                         {field.type === "chips" && (
@@ -344,11 +411,10 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
               {/* Preview Image */}
               <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
                 <h3 className="font-bold text-[var(--color-obsidian)] mb-4 flex items-center gap-2"><ImageIcon className="h-5 w-5 text-[var(--color-electric-blue)]" /> Preview Image (Mockup)</h3>
-                <label className="mb-1.5 block text-sm font-bold text-[var(--color-obsidian)]">URL Gambar Preview</label>
-                <input
-                  className="form-input"
+                <ImageUploader
+                  label="URL Gambar Preview"
                   value={editingGen.preview_image_url || ""}
-                  onChange={(e) => setEditingGen({ ...editingGen, preview_image_url: e.target.value })}
+                  onChange={(val) => setEditingGen({ ...editingGen, preview_image_url: val })}
                   placeholder="https://... (gambar yang muncul di panel kanan studio user)"
                 />
                 {editingGen.preview_image_url && (
@@ -400,7 +466,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
               <div>
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-arctic-mist)] text-[var(--color-electric-blue)]">
-                    <Wand className="h-5 w-5" />
+                    <DynamicIcon name={gen.icon as string} className="h-5 w-5" />
                   </div>
                   <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${gen.is_published ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
                     {gen.is_published ? "Published" : "Draft"}
