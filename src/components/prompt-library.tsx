@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bot,
@@ -64,6 +65,19 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   const [showFilters, setShowFilters] = useState(false);
   const [selectedModel, setSelectedModel] = useState("All");
   const [selectedTag, setSelectedTag] = useState("All");
+
+  const searchParams = useSearchParams();
+  const urlPromptId = searchParams.get("prompt");
+
+  useEffect(() => {
+    if (urlPromptId && prompts.length > 0) {
+      const target = prompts.find(p => p.id === urlPromptId);
+      if (target) {
+        setQuery(target.title);
+        setActiveCategory("All");
+      }
+    }
+  }, [urlPromptId, prompts]);
 
   const uniqueModels = useMemo(() => {
     const models = new Set<string>();
