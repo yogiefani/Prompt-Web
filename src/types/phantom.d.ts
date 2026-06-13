@@ -1,4 +1,6 @@
-type PhantomUIProps = import("react").DetailedHTMLProps<import("react").HTMLAttributes<HTMLElement> & {
+import * as React from "react";
+
+type PhantomUIProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
   loading?: boolean | string;
   animation?: string;
   "shimmer-direction"?: string;
@@ -15,13 +17,15 @@ type PhantomUIProps = import("react").DetailedHTMLProps<import("react").HTMLAttr
   "pierce-shadow"?: boolean | string;
 }, HTMLElement>;
 
-declare namespace JSX {
-  interface IntrinsicElements {
-    "phantom-ui": PhantomUIProps;
+declare module "react" {
+  namespace JSX {
+    interface IntrinsicElements {
+      "phantom-ui": PhantomUIProps;
+    }
   }
 }
 
-declare module "react" {
+declare global {
   namespace JSX {
     interface IntrinsicElements {
       "phantom-ui": PhantomUIProps;
