@@ -1,12 +1,17 @@
 import { getPromptWorkspaceData } from "@/lib/prompt-data";
+import { getBlogPosts } from "@/lib/blog-data";
 import { createCookieSupabaseClient } from "@/lib/supabase-server";
 import { LibraryDashboard } from "@/components/library-dashboard";
 
 export const dynamic = "force-dynamic";
 
 export default async function LibraryPage() {
-  const workspace = await getPromptWorkspaceData();
-  const supabase = await createCookieSupabaseClient();
+  const [workspace, allBlogPosts, supabase] = await Promise.all([
+    getPromptWorkspaceData(),
+    getBlogPosts(),
+    createCookieSupabaseClient(),
+  ]);
+
   let isSuperadmin = false;
 
   if (supabase) {
@@ -24,9 +29,14 @@ export default async function LibraryPage() {
     }
   }
 
+  // Users only see published posts; superadmin sees all
+  const blogPosts = isSuperadmin
+    ? allBlogPosts
+    : allBlogPosts.filter((p) => p.status === "published");
+
   return (
     <main className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)]">
-      <LibraryDashboard workspace={workspace} isSuperadmin={isSuperadmin} />
+      <LibraryDashboard workspace={workspace} isSuperadmin={isSuperadmin} blogPosts={blogPosts} />
     </main>
   );
 }

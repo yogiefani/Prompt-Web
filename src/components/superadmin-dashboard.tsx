@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   BarChart3,
   BookOpen,
+  BookText,
   Compass,
   FileText,
   FolderKanban,
@@ -22,6 +23,7 @@ import { SuperadminConsole } from "@/components/superadmin-console";
 import { AccessManager } from "@/components/access-manager";
 import { RequestInbox } from "@/components/request-inbox";
 import { PromptCmsManager } from "@/components/prompt-cms-manager";
+import { BlogCmsManager } from "@/components/blog-cms-manager";
 import { featurePhases } from "@/lib/content";
 import type { PromptWorkspaceData, IconName } from "@/lib/prompt-data";
 
@@ -43,7 +45,7 @@ const iconMap: Record<IconName, typeof Sparkles> = {
 };
 
 export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "cms" | "access" | "requests" | "settings" | "roadmap">(
+  const [activeTab, setActiveTab] = useState<"overview" | "cms" | "blog" | "access" | "requests" | "settings" | "roadmap">(
     "overview"
   );
 
@@ -51,11 +53,12 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
     (request) => request.status === "pending" || request.status === "reviewing"
   ).length;
 
-  type TabId = "overview" | "cms" | "access" | "requests" | "settings" | "roadmap";
+  type TabId = "overview" | "cms" | "blog" | "access" | "requests" | "settings" | "roadmap";
 
   const sidebarMenu: { id: TabId; label: string; icon: typeof LayoutDashboard; badge?: number }[] = [
     { id: "overview", label: "Overview & Analitik", icon: LayoutDashboard },
     { id: "cms", label: "Prompt CMS", icon: FolderKanban },
+    { id: "blog", label: "Blog & Tutorial", icon: BookText },
     { id: "access", label: "Akses Member", icon: ShieldCheck },
     { id: "requests", label: "Permintaan Prompt", icon: Inbox, badge: pendingRequestsCount },
     { id: "settings", label: "Pengaturan Publik", icon: Settings },
@@ -207,6 +210,11 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
                 initialPrompts={workspace.prompts}
                 source={workspace.source}
               />
+            </ScaleIn>
+          )}
+          {activeTab === "blog" && (
+            <ScaleIn className="space-y-6">
+              <BlogCmsManager />
             </ScaleIn>
           )}
 

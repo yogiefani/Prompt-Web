@@ -267,3 +267,32 @@ with check (
   )
 );
 
+-- Blog / Tutorial Posts
+create table public.blog_posts (
+  id           uuid primary key default gen_random_uuid(),
+  title        text not null,
+  slug         text not null unique,
+  excerpt      text,
+  cover_url    text,
+  content      text not null default '',
+  tags         text[] not null default '{}',
+  read_time    int not null default 1,
+  status       text not null default 'draft',
+  author_id    uuid references public.profiles(id) on delete set null,
+  published_at timestamptz,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+alter table public.blog_posts enable row level security;
+
+create policy "blog_posts_read_published"
+on public.blog_posts for select
+to authenticated
+using (status = 'published' or public.is_superadmin());
+
+create policy "blog_posts_superadmin_write"
+on public.blog_posts for all
+to authenticated
+using (public.is_superadmin())
+with check (public.is_superadmin());

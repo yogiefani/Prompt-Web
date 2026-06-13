@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Bell,
   BookOpen,
+  BookText,
   FileText,
   MessageSquareText,
   ShieldCheck,
@@ -15,23 +16,30 @@ import { LogoutButton } from "@/components/logout-button";
 import { FadeIn } from "@/components/motion-primitives";
 import { PromptLibrary } from "@/components/prompt-library";
 import { RequestPromptForm } from "@/components/request-prompt-form";
+import { BlogList } from "@/components/blog-list";
 import { cheatSheetRows, promptKeywords, toneRows } from "@/lib/content";
 import type { PromptWorkspaceData } from "@/lib/prompt-data";
+import type { BlogPostListItem } from "@/lib/blog-data";
+
+type TabId = "library" | "tutorials" | "cheat-sheet" | "tone";
 
 export function LibraryDashboard({
   workspace,
   isSuperadmin,
+  blogPosts,
 }: {
   workspace: PromptWorkspaceData;
   isSuperadmin: boolean;
+  blogPosts: BlogPostListItem[];
 }) {
-  const [activeTab, setActiveTab] = useState<"library" | "cheat-sheet" | "tone">("library");
+  const [activeTab, setActiveTab] = useState<TabId>("library");
 
-  const sidebarMenu = [
+  const sidebarMenu: { id: TabId; label: string; icon: typeof FileText; badge?: number }[] = [
     { id: "library", label: "Prompt Library", icon: FileText },
+    { id: "tutorials", label: "Tutorials", icon: BookText, badge: blogPosts.length > 0 ? blogPosts.length : undefined },
     { id: "cheat-sheet", label: "Cheat Sheet", icon: BookOpen },
     { id: "tone", label: "Tone Library", icon: MessageSquareText },
-  ] as const;
+  ];
 
   return (
     <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
@@ -48,14 +56,21 @@ export function LibraryDashboard({
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 type="button"
-                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all ${
+                className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all ${
                   isActive
                     ? "bg-[var(--color-midnight-ink)] text-white shadow-[var(--shadow-subtle)]"
                     : "text-[var(--color-silver-pine)] hover:bg-white hover:text-[var(--color-obsidian)]"
                 }`}
               >
-                <item.icon className="h-4.5 w-4.5" aria-hidden="true" />
-                {item.label}
+                <span className="flex items-center gap-3">
+                  <item.icon className="h-4.5 w-4.5" aria-hidden="true" />
+                  {item.label}
+                </span>
+                {item.badge ? (
+                  <span className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${isActive ? "bg-white/20 text-white" : "bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]"}`}>
+                    {item.badge}
+                  </span>
+                ) : null}
               </button>
             );
           })}
@@ -121,6 +136,11 @@ export function LibraryDashboard({
                 >
                   <item.icon className="h-3.5 w-3.5" aria-hidden="true" />
                   {item.label}
+                  {item.badge ? (
+                    <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-black ${isActive ? "bg-white/20 text-white" : "bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]"}`}>
+                      {item.badge}
+                    </span>
+                  ) : null}
                 </button>
               );
             })}
@@ -153,6 +173,25 @@ export function LibraryDashboard({
                 prompts={workspace.prompts}
                 source={workspace.source}
               />
+            </FadeIn>
+          )}
+
+          {activeTab === "tutorials" && (
+            <FadeIn className="space-y-8">
+              <div className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+                <div className="flex flex-col gap-2">
+                  <span className="w-fit rounded-full bg-[var(--color-whisper-fade-blue)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
+                    Tutorial & Panduan
+                  </span>
+                  <h2 className="mt-3 max-w-2xl font-aeonik text-4xl leading-tight tracking-[-0.02em]">
+                    Pelajari cara kerja AI prompting dari nol sampai mahir.
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-base font-medium leading-7 text-[var(--color-silver-pine)]">
+                    Artikel tutorial eksklusif yang dibuat khusus untuk member PromptVault OS.
+                  </p>
+                </div>
+              </div>
+              <BlogList posts={blogPosts} />
             </FadeIn>
           )}
 
