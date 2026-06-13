@@ -25,6 +25,7 @@ import {
   Tag,
   X,
   Sparkles,
+  Search,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -109,6 +110,12 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
   const [uploadingInline, setUploadingInline] = useState(false);
   const [savedRange, setSavedRange] = useState<Range | null>(null);
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
+
+  // Prompt Modal States
+  const [showPromptModal, setShowPromptModal] = useState(false);
+  const [promptSearchQuery, setPromptSearchQuery] = useState("");
+  const [promptList, setPromptList] = useState<{ id: string; title: string; category: string }[]>([]);
+  const [loadingPrompts, setLoadingPrompts] = useState(false);
 
   // Image Selection Effect
   useEffect(() => {
@@ -234,15 +241,48 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
     );
   }
 
-  function insertPrompt() {
-    const promptId = window.prompt("Masukkan ID Prompt (dapat dicopy dari URL Library):", "");
-    if (!promptId) return;
-    const title = window.prompt("Masukkan Judul Prompt yang akan ditampilkan:", "Prompt Premium");
-    if (!title) return;
+  async function triggerInsertPrompt() {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      setSavedRange(selection.getRangeAt(0));
+    }
+    
+    setShowPromptModal(true);
+    if (promptList.length === 0) {
+      if (!supabase) return;
+      setLoadingPrompts(true);
+      const { data } = await supabase
+        .from("prompts")
+        .select("id, title, prompt_categories(name)")
+        .order("created_at", { ascending: false });
+        
+      if (data) {
+        setPromptList(data.map(d => ({
+          id: d.id,
+          title: d.title,
+          category: (d.prompt_categories as any)?.name ?? "Uncategorized"
+        })));
+      }
+      setLoadingPrompts(false);
+    }
+  }
+
+  function handleInsertPromptSelect(promptId: string, promptTitle: string) {
+    setShowPromptModal(false);
+    editorRef.current?.focus();
+    const selection = window.getSelection();
+    if (savedRange && selection) {
+      selection.removeAllRanges();
+      selection.addRange(savedRange);
+    }
     execFormat(
       "insertHTML",
-      `<a href="/library?prompt=${encodeURIComponent(promptId)}" class="blog-prompt-link" data-prompt-id="${encodeURIComponent(promptId)}" contenteditable="false">✨ Gunakan Prompt: ${title.replace(/</g, "&lt;")}</a><p><br/></p>`
+      `<a href="/library?prompt=${encodeURIComponent(promptId)}" class="blog-prompt-link" data-prompt-id="${encodeURIComponent(promptId)}" contenteditable="false">✨ Gunakan Prompt: ${promptTitle.replace(/</g, "&lt;")}</a><p><br/></p>`
     );
+  }
+
+  function insertPrompt() {
+    triggerInsertPrompt();
   }
 
   function addTag() {
@@ -509,7 +549,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
             ref={editorRef}
             contentEditable
             suppressContentEditableWarning
-            className="blog-content min-h-[460px] flex-1 cursor-text px-6 py-6 text-[var(--color-obsidian)] outline-none"
+            className="blog-content min-h-[460px] max-h-[65vh] overflow-y-auto flex-1 cursor-text px-6 py-6 text-[var(--color-obsidian)] outline-none"
             data-placeholder="Mulai menulis artikel tutorial di sini..."
             onInput={() => {/* keep reactive if needed */}}
           />
@@ -517,7 +557,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
 
         {mode === "preview" && (
           /* Preview */
-          <div className="blog-content min-h-[460px] px-6 py-6">
+          <div className="blog-content min-h-[460px] max-h-[65vh] overflow-y-auto px-6 py-6">
             {coverUrl && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={coverUrl} alt="Cover" className="blog-img mb-8" />
@@ -549,6 +589,72 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
           </button>
         </div>
       </div>
+
+      {/* Prompt Search Modal */}
+      {showPromptModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-obsidian)]/40 p-4 backdrop-blur-sm">
+          <div className="flex h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[rgba(83,88,98,0.1)] px-6 py-5">
+              <h3 className="font-aeonik text-xl font-bold tracking-[-0.02em] text-[var(--color-obsidian)]">
+                Pilih Prompt
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowPromptModal(false)}
+                className="rounded-full p-2 text-[var(--color-silver-pine)] transition-colors hover:bg-[var(--color-sky-wash)] hover:text-[var(--color-obsidian)]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="border-b border-[rgba(83,88,98,0.1)] bg-[var(--color-arctic-mist)] p-4">
+              <div className="flex items-center gap-3 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white px-4 py-2.5 focus-within:border-[var(--color-electric-blue)] focus-within:ring-1 focus-within:ring-[var(--color-electric-blue)]">
+                <Search className="h-4 w-4 text-[var(--color-silver-pine)]" />
+                <input
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                  placeholder="Cari judul prompt..."
+                  value={promptSearchQuery}
+                  onChange={(e) => setPromptSearchQuery(e.target.value)}
+                  className="w-full bg-transparent text-sm font-medium text-[var(--color-obsidian)] outline-none placeholder:text-[var(--color-ash-gray)]"
+                />
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              {loadingPrompts ? (
+                <div className="flex h-full items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-[var(--color-electric-blue)]" />
+                </div>
+              ) : (
+                <div className="grid gap-2">
+                  {promptList
+                    .filter((p) => p.title.toLowerCase().includes(promptSearchQuery.toLowerCase()))
+                    .map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => handleInsertPromptSelect(p.id, p.title)}
+                        className="flex w-full items-center justify-between rounded-2xl border border-transparent p-4 text-left transition-all hover:border-[rgba(0,105,224,0.15)] hover:bg-[var(--color-sky-wash)]"
+                      >
+                        <div>
+                          <p className="font-semibold text-[var(--color-obsidian)]">{p.title}</p>
+                          <p className="mt-1 text-xs font-medium text-[var(--color-silver-pine)]">{p.category}</p>
+                        </div>
+                        <span className="rounded-full bg-[var(--color-electric-blue)] px-3 py-1 text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100">
+                          Pilih
+                        </span>
+                      </button>
+                    ))}
+                  {promptList.filter((p) => p.title.toLowerCase().includes(promptSearchQuery.toLowerCase())).length === 0 && (
+                    <div className="py-12 text-center text-sm font-medium text-[var(--color-silver-pine)]">
+                      Tidak ada prompt yang cocok dengan "{promptSearchQuery}"
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

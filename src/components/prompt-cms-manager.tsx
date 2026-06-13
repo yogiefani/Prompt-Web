@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Edit3, Loader2, Save, Trash2 } from "lucide-react";
+import { Edit3, Loader2, Save, Trash2, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { PromptCategoryView, PromptView } from "@/lib/prompt-data";
@@ -74,6 +74,18 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
   );
   const [status, setStatus] = useState<"idle" | "loading">("idle");
   const [message, setMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredPrompts = useMemo(() => {
+    if (!searchQuery.trim()) return prompts;
+    const q = searchQuery.toLowerCase();
+    return prompts.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.body.toLowerCase().includes(q) ||
+        p.tags.some((tag) => tag.toLowerCase().includes(q))
+    );
+  }, [prompts, searchQuery]);
 
   const isReady = isSupabaseConfigured && source === "supabase" && Boolean(supabase);
   const selectedCategory = useMemo(
@@ -643,8 +655,29 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
             </div>
           </form>
 
-          <div className="mt-6 overflow-hidden rounded-2xl border border-[rgba(83,88,98,0.14)] bg-white">
-            {prompts.map((prompt) => (
+          <div className="mt-10 flex items-center gap-3 border-b border-[rgba(83,88,98,0.14)] pb-4">
+            <h3 className="font-aeonik text-xl tracking-[-0.02em] text-[var(--color-obsidian)]">
+              Daftar Prompt
+            </h3>
+            <div className="flex flex-1 items-center gap-2 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white px-3 py-2 focus-within:border-[var(--color-electric-blue)] focus-within:ring-1 focus-within:ring-[var(--color-electric-blue)]">
+              <Search className="h-4 w-4 text-[var(--color-silver-pine)]" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari berdasarkan judul, isi, atau tag..."
+                className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-[var(--color-ash-gray)] text-[var(--color-obsidian)]"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 overflow-hidden rounded-2xl border border-[rgba(83,88,98,0.14)] bg-white">
+            {filteredPrompts.length === 0 ? (
+              <div className="p-8 text-center text-sm font-medium text-[var(--color-silver-pine)]">
+                Tidak ada prompt yang ditemukan.
+              </div>
+            ) : (
+              filteredPrompts.map((prompt) => (
               <motion.div
                 layout
                 key={prompt.id}
@@ -673,7 +706,8 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
                   </button>
                 </div>
               </motion.div>
-            ))}
+            ))
+            )}
           </div>
         </div>
       </div>
