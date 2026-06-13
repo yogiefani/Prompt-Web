@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Wand,
   ChevronLeft,
-  ChevronRight,
   Sparkles,
   Copy,
   ExternalLink,
@@ -17,6 +16,7 @@ import {
   Check,
   RotateCcw,
   Layers,
+  ChevronRight,
 } from "lucide-react";
 import type { PromptGeneratorView } from "@/lib/prompt-data";
 
@@ -26,7 +26,7 @@ import type { PromptGeneratorView } from "@/lib/prompt-data";
 type HistoryItem = { id: string; timestamp: string; output: string };
 
 // ─────────────────────────────────────────────
-// ChipsInput — interactive multi-tag input
+// ChipsInput
 // ─────────────────────────────────────────────
 function ChipsInput({
   value,
@@ -38,10 +38,7 @@ function ChipsInput({
   placeholder?: string;
 }) {
   const chips = value
-    ? value
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean)
+    ? value.split(",").map((s) => s.trim()).filter(Boolean)
     : [];
   const [draft, setDraft] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +52,7 @@ function ChipsInput({
 
   return (
     <div
-      className="flex min-h-[44px] flex-wrap gap-1.5 rounded-xl border border-[#30363D] bg-[#0D1117] px-3 py-2 cursor-text"
+      className="form-input flex min-h-[44px] flex-wrap gap-1.5 cursor-text p-2"
       onClick={() => inputRef.current?.focus()}
     >
       {chips.map((chip) => (
@@ -63,14 +60,16 @@ function ChipsInput({
           key={chip}
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.7, opacity: 0 }}
-          className="flex items-center gap-1 rounded-lg bg-orange-500/20 px-2.5 py-0.5 text-xs font-bold text-orange-300 border border-orange-500/30"
+          className="flex items-center gap-1 rounded-lg bg-[var(--color-whisper-fade-blue)] px-2.5 py-0.5 text-xs font-bold text-[var(--color-electric-blue)] border border-[rgba(0,105,224,0.15)]"
         >
           {chip}
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); onChange(chips.filter((c) => c !== chip).join(", ")); }}
-            className="text-orange-400 hover:text-white transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onChange(chips.filter((c) => c !== chip).join(", "));
+            }}
+            className="text-[var(--color-electric-blue)]/60 hover:text-[var(--color-electric-blue)] transition-colors"
           >
             <X className="h-2.5 w-2.5" />
           </button>
@@ -87,7 +86,7 @@ function ChipsInput({
           }
         }}
         onBlur={() => { if (draft) commit(draft); }}
-        className="flex-1 min-w-[120px] bg-transparent text-sm text-[#E6EDF3] outline-none placeholder:text-[#8B949E]"
+        className="flex-1 min-w-[120px] bg-transparent text-sm text-[var(--color-obsidian)] outline-none placeholder:text-[var(--color-ash-gray)]"
         placeholder={chips.length === 0 ? (placeholder ?? "Ketik lalu tekan Enter atau koma...") : ""}
       />
     </div>
@@ -101,21 +100,19 @@ function JsonOutput({ text }: { text: string }) {
   try {
     JSON.parse(text);
     const html = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"([^"]+)"(\s*:)/g, '<span style="color:#F97316">"$1"</span>$2')
-      .replace(/:\s*"([^"]*)"/g, ': <span style="color:#A5D6A7">"$1"</span>')
-      .replace(/:\s*(true|false)/g, ': <span style="color:#79C0FF">$1</span>')
-      .replace(/:\s*([0-9.]+)/g, ': <span style="color:#79C0FF">$1</span>');
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"([^"]+)"(\s*:)/g, '<span style="color:var(--color-electric-blue);font-weight:700">"$1"</span>$2')
+      .replace(/:\s*"([^"]*)"/g, ': <span style="color:var(--color-silver-pine)">"$1"</span>')
+      .replace(/:\s*(true|false)/g, ': <span style="color:var(--color-deep-violet)">$1</span>')
+      .replace(/:\s*([0-9.]+)/g, ': <span style="color:var(--color-deep-violet)">$1</span>');
     return (
       <pre
-        className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[#E6EDF3]"
+        className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[var(--color-obsidian)]"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     );
   } catch {
-    return <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[#E6EDF3]">{text}</pre>;
+    return <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[var(--color-obsidian)]">{text}</pre>;
   }
 }
 
@@ -124,31 +121,29 @@ function JsonOutput({ text }: { text: string }) {
 // ─────────────────────────────────────────────
 function ReferenceModal({ url, onClose }: { url: string; onClose: () => void }) {
   return (
-    <AnimatePresence>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-        onClick={onClose}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="relative max-w-3xl w-full rounded-3xl overflow-hidden shadow-2xl bg-white"
+        onClick={(e) => e.stopPropagation()}
       >
-        <motion.div
-          initial={{ scale: 0.85, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.85, opacity: 0 }}
-          className="relative max-w-3xl w-full rounded-2xl overflow-hidden shadow-2xl"
-          onClick={(e) => e.stopPropagation()}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-10 icon-button"
         >
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
-          >
-            <X className="h-4 w-4" />
-          </button>
-          <img src={url} alt="Style Reference" className="w-full object-contain max-h-[70vh]" />
-        </motion.div>
+          <X className="h-4 w-4" />
+        </button>
+        <img src={url} alt="Style Reference" className="w-full object-contain max-h-[70vh]" />
       </motion.div>
-    </AnimatePresence>
+    </motion.div>
   );
 }
 
@@ -170,32 +165,34 @@ function HistoryDrawer({
       animate={{ x: 0 }}
       exit={{ x: "100%" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="absolute inset-0 z-20 flex flex-col bg-[#161B22] rounded-3xl border border-[#30363D] overflow-hidden"
+      className="absolute inset-0 z-20 flex flex-col bg-white rounded-3xl border border-[rgba(83,88,98,0.12)] shadow-[var(--shadow-lg)] overflow-hidden"
     >
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#30363D]">
-        <div className="flex items-center gap-2 font-bold text-[#E6EDF3]">
-          <Clock className="h-4 w-4 text-orange-400" />
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)]">
+        <div className="flex items-center gap-2 font-bold text-[var(--color-obsidian)] text-sm">
+          <Clock className="h-4 w-4 text-[var(--color-electric-blue)]" />
           Riwayat Generate
         </div>
-        <button onClick={onClose} className="p-1 text-[#8B949E] hover:text-[#E6EDF3]">
+        <button onClick={onClose} className="icon-button">
           <X className="h-4 w-4" />
         </button>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {history.length === 0 && (
-          <p className="text-center text-sm text-[#8B949E] pt-8">Belum ada riwayat generate.</p>
+          <p className="text-center text-sm text-[var(--color-silver-pine)] pt-8">
+            Belum ada riwayat generate.
+          </p>
         )}
         {history.map((item, i) => (
           <button
             key={item.id}
             onClick={() => { onSelect(item); onClose(); }}
-            className="w-full text-left rounded-xl border border-[#30363D] bg-[#0D1117] p-4 hover:border-orange-500/50 transition-colors"
+            className="w-full text-left rounded-2xl border border-[rgba(83,88,98,0.1)] bg-[var(--color-arctic-mist)] p-4 hover:border-[var(--color-electric-blue)]/30 hover:bg-[var(--color-whisper-fade-blue)] transition-colors"
           >
-            <div className="text-xs text-[#8B949E] mb-1.5 flex items-center gap-1.5">
-              <span className="font-bold text-orange-400">#{i + 1}</span>
+            <div className="text-xs text-[var(--color-silver-pine)] mb-1.5 flex items-center gap-1.5">
+              <span className="font-bold text-[var(--color-electric-blue)]">#{i + 1}</span>
               <span>{item.timestamp}</span>
             </div>
-            <p className="text-xs font-mono text-[#E6EDF3] line-clamp-3">{item.output}</p>
+            <p className="text-xs font-mono text-[var(--color-obsidian)] line-clamp-3">{item.output}</p>
           </button>
         ))}
       </div>
@@ -221,7 +218,6 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
 
   const gen = published.find((g) => g.id === activeId) ?? published[0] ?? null;
 
-  // Reset form when switching generator
   useEffect(() => {
     setFormValues({});
     setOutput("");
@@ -282,12 +278,12 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
   // ── Empty state ──────────────────────────
   if (published.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[400px] rounded-3xl bg-[#0D1117]">
-        <div className="text-center">
-          <Sparkles className="h-12 w-12 text-orange-400 mx-auto mb-4" />
-          <p className="text-[#E6EDF3] font-bold text-lg">Belum ada Generator</p>
-          <p className="text-[#8B949E] text-sm mt-1">Superadmin belum mempublikasikan generator apa pun.</p>
+      <div className="flex flex-col items-center justify-center h-[400px] rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-whisper-fade-yellow)] mb-4">
+          <Sparkles className="h-8 w-8 text-[var(--color-sunburst-yellow)]" />
         </div>
+        <p className="font-aeonik text-xl font-bold text-[var(--color-obsidian)]">Belum ada Generator</p>
+        <p className="text-sm text-[var(--color-silver-pine)] mt-1.5">Superadmin belum mempublikasikan generator apa pun.</p>
       </div>
     );
   }
@@ -295,33 +291,36 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
   // ── Main Layout ──────────────────────────
   return (
     <>
-      {referenceUrl && <ReferenceModal url={referenceUrl} onClose={() => setReferenceUrl(null)} />}
+      <AnimatePresence>
+        {referenceUrl && <ReferenceModal url={referenceUrl} onClose={() => setReferenceUrl(null)} />}
+      </AnimatePresence>
 
       <div className="flex gap-4 h-[calc(100vh-130px)] min-h-[600px]">
+
         {/* ── Sidebar: Generator Navigator ── */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.aside
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 64, opacity: 1 }}
+              animate={{ width: 60, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              className="flex flex-col items-center gap-2 rounded-3xl bg-[#161B22] border border-[#30363D] py-4 overflow-hidden shrink-0"
+              className="flex flex-col items-center gap-2 rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] py-4 overflow-hidden shrink-0"
             >
               {published.map((g) => (
                 <button
                   key={g.id}
                   onClick={() => setActiveId(g.id)}
                   title={g.title}
-                  className={`group relative flex h-11 w-11 items-center justify-center rounded-xl transition-all ${
+                  className={`group relative flex h-11 w-11 items-center justify-center rounded-2xl transition-all ${
                     g.id === activeId
-                      ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30"
-                      : "text-[#8B949E] hover:bg-[#21262D] hover:text-[#E6EDF3]"
+                      ? "bg-[var(--color-midnight-ink)] text-white shadow-[var(--shadow-subtle)]"
+                      : "text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)] hover:text-[var(--color-electric-blue)]"
                   }`}
                 >
                   <Wand className="h-5 w-5" />
                   {/* Tooltip */}
-                  <div className="pointer-events-none absolute left-full ml-2 z-30 hidden group-hover:block">
-                    <div className="whitespace-nowrap rounded-lg bg-[#21262D] border border-[#30363D] px-3 py-1.5 text-xs font-bold text-[#E6EDF3] shadow-xl">
+                  <div className="pointer-events-none absolute left-full ml-3 z-30 hidden group-hover:block">
+                    <div className="whitespace-nowrap rounded-xl bg-[var(--color-midnight-ink)] px-3 py-1.5 text-xs font-bold text-white shadow-xl">
                       {g.title}
                     </div>
                   </div>
@@ -332,23 +331,27 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
         </AnimatePresence>
 
         {/* ── Form Panel (Left) ── */}
-        <div className="flex-1 flex flex-col rounded-3xl bg-[#161B22] border border-[#30363D] overflow-hidden">
+        <div className="flex-1 flex flex-col rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] overflow-hidden">
           {/* Form Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#30363D] shrink-0">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)] shrink-0">
             <div className="flex items-center gap-3">
-              <button onClick={() => setSidebarOpen((v) => !v)} className="p-1.5 rounded-lg text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]">
+              <button
+                onClick={() => setSidebarOpen((v) => !v)}
+                className="icon-button"
+                title={sidebarOpen ? "Tutup sidebar" : "Buka sidebar"}
+              >
                 {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
               </button>
               <div>
-                <h2 className="font-aeonik text-base font-bold text-[#E6EDF3] leading-none">{gen?.title}</h2>
-                <p className="text-xs text-[#8B949E] mt-0.5">{gen?.description}</p>
+                <h2 className="font-aeonik text-base font-bold text-[var(--color-obsidian)] leading-none">{gen?.title}</h2>
+                <p className="text-xs text-[var(--color-silver-pine)] mt-0.5 line-clamp-1">{gen?.description}</p>
               </div>
             </div>
             {gen?.demo_values && Object.keys(gen.demo_values).length > 0 && (
               <button
                 onClick={randomizeDemo}
                 disabled={randomizing}
-                className="flex items-center gap-2 rounded-xl bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 font-bold text-xs px-3.5 py-2 border border-orange-500/30 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 rounded-2xl bg-[var(--color-whisper-fade-orange)] hover:bg-[rgba(242,97,16,0.12)] text-[var(--color-zesty-orange)] font-bold text-xs px-3.5 py-2 border border-[rgba(242,97,16,0.15)] transition-colors disabled:opacity-50"
               >
                 <Shuffle className={`h-3.5 w-3.5 ${randomizing ? "animate-spin" : ""}`} />
                 Randomize Demo
@@ -357,51 +360,53 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
           </div>
 
           {/* Form Body */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-6" style={{ scrollbarWidth: "thin", scrollbarColor: "#30363D transparent" }}>
+          <div className="flex-1 overflow-y-auto p-5 space-y-6">
             {schema.length === 0 ? (
-              <p className="text-center text-sm text-[#8B949E] pt-16">Admin belum mengatur form schema untuk generator ini.</p>
+              <p className="text-center text-sm text-[var(--color-silver-pine)] pt-16">
+                Admin belum mengatur form schema untuk generator ini.
+              </p>
             ) : (
               schema.map((section: any, sIdx: number) => (
                 <div key={section.id ?? sIdx}>
-                  {/* Section Label */}
+                  {/* Section Header */}
                   <div className="flex items-center gap-2.5 mb-4">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-black">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[var(--color-midnight-ink)] text-white text-xs font-black shrink-0">
                       {"ABCDEFGHIJ"[sIdx] ?? sIdx + 1}
                     </div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-[#8B949E]">{section.title}</h3>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-[var(--color-silver-pine)]">
+                      {section.title}
+                    </h3>
                   </div>
 
                   <div className="space-y-4">
                     {(section.fields ?? []).map((field: any) => (
                       <div key={field.id ?? field.name}>
-                        {/* Field Label */}
                         <div className="mb-1.5 flex items-center justify-between">
-                          <label className="text-sm font-bold text-[#E6EDF3]">{field.label}</label>
+                          <label className="text-sm font-bold text-[var(--color-obsidian)]">{field.label}</label>
                           {field.type === "select" && field.reference_url && (
                             <button
                               onClick={() => setReferenceUrl(field.reference_url)}
-                              className="flex items-center gap-1 text-[10px] font-bold text-orange-400 hover:text-orange-300 transition-colors"
+                              className="flex items-center gap-1 text-[10px] font-bold text-[var(--color-electric-blue)] hover:text-[var(--color-electric-blue)]/70 transition-colors"
                             >
                               <ImageIcon className="h-3 w-3" /> LIHAT REFERENSI
                             </button>
                           )}
                         </div>
 
-                        {/* Input by type */}
                         {field.type === "textarea" ? (
                           <textarea
-                            className="w-full min-h-[90px] resize-none rounded-xl border border-[#30363D] bg-[#0D1117] px-4 py-3 text-sm text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-orange-500/60 transition-colors"
+                            className="form-input min-h-[90px] resize-none text-sm"
                             value={formValues[field.name] ?? ""}
                             onChange={(e) => handleChange(field.name, e.target.value)}
                             placeholder={field.placeholder ?? `Masukkan ${field.label.toLowerCase()}...`}
                           />
                         ) : field.type === "select" ? (
                           <select
-                            className="w-full rounded-xl border border-[#30363D] bg-[#0D1117] px-4 py-3 text-sm text-[#E6EDF3] outline-none focus:border-orange-500/60 transition-colors appearance-none"
+                            className="form-input text-sm"
                             value={formValues[field.name] ?? ""}
                             onChange={(e) => handleChange(field.name, e.target.value)}
                           >
-                            <option value="" disabled className="text-[#484F58]">Pilih {field.label}...</option>
+                            <option value="" disabled>Pilih {field.label}...</option>
                             {(field.options ?? "").split(",").map((opt: string) => (
                               <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>
                             ))}
@@ -410,28 +415,28 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                           <ChipsInput
                             value={formValues[field.name] ?? ""}
                             onChange={(v) => handleChange(field.name, v)}
-                            placeholder={field.placeholder ?? "Ketik lalu Enter atau koma..."}
+                            placeholder={field.placeholder}
                           />
                         ) : field.type === "color" ? (
                           <div className="flex items-center gap-3">
                             <input
                               type="color"
-                              value={formValues[field.name] ?? "#F97316"}
+                              value={formValues[field.name] ?? "#0069e0"}
                               onChange={(e) => handleChange(field.name, e.target.value)}
-                              className="h-11 w-16 rounded-xl border border-[#30363D] bg-[#0D1117] cursor-pointer p-1"
+                              className="h-11 w-14 rounded-xl border border-[rgba(83,88,98,0.16)] bg-white cursor-pointer p-1"
                             />
                             <input
                               type="text"
                               value={formValues[field.name] ?? ""}
                               onChange={(e) => handleChange(field.name, e.target.value)}
-                              placeholder="#F97316"
-                              className="flex-1 rounded-xl border border-[#30363D] bg-[#0D1117] px-4 py-3 text-sm text-[#E6EDF3] font-mono placeholder:text-[#484F58] outline-none focus:border-orange-500/60 transition-colors"
+                              placeholder="#0069e0"
+                              className="form-input flex-1 text-sm font-mono"
                             />
                           </div>
                         ) : (
                           <input
                             type="text"
-                            className="w-full rounded-xl border border-[#30363D] bg-[#0D1117] px-4 py-3 text-sm text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-orange-500/60 transition-colors"
+                            className="form-input text-sm"
                             value={formValues[field.name] ?? ""}
                             onChange={(e) => handleChange(field.name, e.target.value)}
                             placeholder={field.placeholder ?? `Masukkan ${field.label.toLowerCase()}...`}
@@ -446,11 +451,11 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
           </div>
 
           {/* Generate Button */}
-          <div className="p-4 border-t border-[#30363D] shrink-0">
+          <div className="p-4 border-t border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)] shrink-0">
             <button
               onClick={generate}
               disabled={status === "generating"}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-orange-500 hover:bg-orange-400 text-white font-black text-sm py-3.5 transition-all disabled:opacity-50 shadow-lg shadow-orange-500/25"
+              className="primary-button w-full justify-center disabled:opacity-50"
             >
               {status === "generating" ? (
                 <>
@@ -470,45 +475,48 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
         </div>
 
         {/* ── Output Panel (Right) ── */}
-        <div className="w-[440px] flex-col rounded-3xl bg-[#0D1117] border border-[#30363D] overflow-hidden relative shrink-0 hidden lg:flex">
-          {/* Mockup Preview */}
-          <div className="h-[180px] bg-[#161B22] border-b border-[#30363D] relative overflow-hidden shrink-0">
+        <div className="w-[420px] flex-col rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] overflow-hidden relative shrink-0 hidden lg:flex">
+          {/* Preview Area */}
+          <div className="h-[170px] bg-[var(--color-midnight-ink)] border-b border-[rgba(83,88,98,0.08)] relative overflow-hidden shrink-0 rounded-t-3xl">
             {gen?.preview_image_url ? (
               <img src={gen.preview_image_url} alt="Preview" className="h-full w-full object-cover" />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6">
-                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(#F97316 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-                <Layers className="h-6 w-6 text-[#484F58]" />
-                <div className="space-y-2 w-full max-w-[200px]">
-                  <div className="h-2 w-full bg-[#21262D] rounded-full animate-pulse" />
-                  <div className="h-2 w-3/4 bg-[#21262D] rounded-full animate-pulse" />
-                  <div className="h-2 w-1/2 bg-[#21262D] rounded-full animate-pulse" />
+                <div
+                  className="absolute inset-0 opacity-[0.04]"
+                  style={{ backgroundImage: "radial-gradient(white 1px, transparent 1px)", backgroundSize: "18px 18px" }}
+                />
+                <Layers className="h-6 w-6 text-white/20" />
+                <div className="space-y-2 w-full max-w-[160px]">
+                  <div className="h-1.5 w-full bg-white/10 rounded-full" />
+                  <div className="h-1.5 w-3/4 bg-white/10 rounded-full" />
+                  <div className="h-1.5 w-1/2 bg-white/10 rounded-full" />
                 </div>
-                <p className="text-[10px] font-bold text-[#484F58] tracking-widest">MOCKUP PREVIEW</p>
+                <p className="text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">Mockup Preview</p>
               </div>
             )}
           </div>
 
           {/* Terminal Header */}
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#30363D] shrink-0">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)] shrink-0">
+            <div className="flex items-center gap-3">
               <div className="flex gap-1.5">
-                <div className="h-3 w-3 rounded-full bg-[#FF5F57]" />
-                <div className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
-                <div className="h-3 w-3 rounded-full bg-[#28C840]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
+                <div className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
               </div>
-              <span className="ml-2 text-xs font-bold text-[#8B949E]">Output Prompt</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border">
-                {isJson ? (
-                  <span className="text-blue-400 border-blue-400/30">JSON</span>
-                ) : (
-                  <span className="text-green-400 border-green-400/30">TEXT</span>
-                )}
+              <span className="text-xs font-bold text-[var(--color-obsidian)]">Output Prompt</span>
+              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                isJson
+                  ? "bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]"
+                  : "bg-[var(--color-mint-glaze)] text-[var(--color-obsidian)]"
+              }`}>
+                {isJson ? "JSON" : "TEXT"}
               </span>
             </div>
             <button
               onClick={() => setShowHistory((v) => !v)}
-              className={`p-1.5 rounded-lg transition-colors ${showHistory ? "bg-orange-500/20 text-orange-400" : "text-[#8B949E] hover:text-[#E6EDF3] hover:bg-[#21262D]"}`}
+              className={`icon-button ${showHistory ? "active" : ""}`}
               title="Riwayat"
             >
               <Clock className="h-4 w-4" />
@@ -516,7 +524,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
           </div>
 
           {/* Terminal Body */}
-          <div className="flex-1 overflow-hidden relative">
+          <div className="flex-1 overflow-hidden relative bg-[var(--color-arctic-mist)]">
             <AnimatePresence>
               {showHistory && (
                 <HistoryDrawer
@@ -527,39 +535,46 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
               )}
             </AnimatePresence>
 
-            <div className="h-full overflow-y-auto p-5" style={{ scrollbarWidth: "thin", scrollbarColor: "#30363D transparent" }}>
+            <div className="h-full overflow-y-auto p-5">
               {status === "idle" && (
-                <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-                  <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-                    <Zap className="h-6 w-6 text-orange-400" />
+                <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-whisper-fade-blue)]">
+                    <Zap className="h-7 w-7 text-[var(--color-electric-blue)]" />
                   </div>
-                  <p className="text-sm font-bold text-[#8B949E]">Isi formulir lalu tekan<br />"Generate Prompt"</p>
-                  <div className="font-mono text-xs text-[#484F58] text-left mt-4 space-y-1">
-                    <p><span className="text-green-400">✓</span> template : ready</p>
-                    <p><span className="text-[#484F58]">○</span> output : <span className="text-yellow-500 animate-pulse">awaiting trigger</span></p>
+                  <div>
+                    <p className="font-bold text-[var(--color-obsidian)] text-sm">Isi formulir lalu tekan</p>
+                    <p className="font-bold text-[var(--color-obsidian)] text-sm">"Generate Prompt"</p>
+                  </div>
+                  <div className="font-mono text-xs text-[var(--color-silver-pine)] text-left space-y-1 mt-2">
+                    <p><span className="text-green-600">✓</span> template : ready</p>
+                    <p><span className="text-[var(--color-ash-gray)]">○</span> output : <span className="text-[var(--color-zesty-orange)]">awaiting trigger</span></p>
                   </div>
                 </div>
               )}
 
               {status === "generating" && (
-                <div className="flex flex-col items-center justify-center h-full gap-3">
+                <div className="flex flex-col items-center justify-center h-full gap-4">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    className="h-10 w-10 rounded-full border-2 border-orange-500/20 border-t-orange-500"
+                    className="h-10 w-10 rounded-full border-2 border-[rgba(0,105,224,0.15)] border-t-[var(--color-electric-blue)]"
                   />
-                  <div className="font-mono text-xs text-[#8B949E] text-center space-y-1">
-                    <p className="text-yellow-400 animate-pulse">Processing...</p>
-                    <p className="text-[#484F58]">interpolating variables...</p>
-                    <p className="text-[#484F58]">building output...</p>
+                  <div className="font-mono text-xs text-[var(--color-silver-pine)] text-center space-y-1">
+                    <p className="text-[var(--color-electric-blue)] animate-pulse font-bold">Processing...</p>
+                    <p>interpolating variables...</p>
+                    <p>building output...</p>
                   </div>
                 </div>
               )}
 
               {status === "done" && output && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-2xl border border-[rgba(83,88,98,0.1)] bg-white p-4 shadow-sm"
+                >
                   {isJson ? <JsonOutput text={output} /> : (
-                    <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[#E6EDF3]">{output}</pre>
+                    <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[var(--color-obsidian)]">{output}</pre>
                   )}
                 </motion.div>
               )}
@@ -567,31 +582,31 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
           </div>
 
           {/* Footer: stats + actions */}
-          <div className="border-t border-[#30363D] shrink-0">
+          <div className="border-t border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)] shrink-0">
             {status === "done" && (
-              <div className="px-5 py-2 text-[10px] font-mono text-[#484F58] border-b border-[#30363D]">
+              <div className="px-5 py-2 text-[10px] font-mono font-bold text-[var(--color-ash-gray)]">
                 {charCount.toLocaleString()} chars · {lineCount} lines
               </div>
             )}
-            <div className="flex gap-2 p-4">
+            <div className="flex gap-2 p-4 pt-2">
               {status === "done" ? (
                 <>
                   <button
                     onClick={copyOutput}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[#30363D] bg-[#21262D] hover:bg-[#30363D] text-[#E6EDF3] font-bold text-sm py-2.5 transition-colors"
+                    className="secondary-button flex-1"
                   >
-                    {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                    {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
                     {copied ? "Copied!" : "Copy"}
                   </button>
                   <button
                     onClick={() => window.open(`https://chatgpt.com/?q=${encodeURIComponent(output)}`, "_blank")}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#E6EDF3] hover:bg-white text-[#0D1117] font-bold text-sm py-2.5 transition-colors"
+                    className="primary-button flex-1"
                   >
-                    <ExternalLink className="h-4 w-4" /> AI Open
+                    <ExternalLink className="h-4 w-4" /> Buka AI
                   </button>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-xs font-mono text-[#484F58] py-1">
+                <div className="flex-1 text-center text-xs font-mono text-[var(--color-ash-gray)] py-1">
                   — output will appear after generate —
                 </div>
               )}
