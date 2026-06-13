@@ -17,11 +17,12 @@ import { FadeIn } from "@/components/motion-primitives";
 import { PromptLibrary } from "@/components/prompt-library";
 import { RequestPromptForm } from "@/components/request-prompt-form";
 import { BlogList } from "@/components/blog-list";
+import { PromptStudio } from "@/components/prompt-studio";
 import { cheatSheetRows, promptKeywords, toneRows } from "@/lib/content";
 import type { PromptWorkspaceData } from "@/lib/prompt-data";
 import type { BlogPostListItem } from "@/lib/blog-data";
 
-type TabId = "library" | "tutorials" | "cheat-sheet" | "tone";
+type TabId = "library" | "studio" | "tutorials" | "cheat-sheet" | "tone";
 
 export function LibraryDashboard({
   workspace,
@@ -36,6 +37,7 @@ export function LibraryDashboard({
 
   const sidebarMenu: { id: TabId; label: string; icon: typeof FileText; badge?: number }[] = [
     { id: "library", label: "Prompt Library", icon: FileText },
+    { id: "studio", label: "AI Prompt Studio", icon: Sparkles },
     { id: "tutorials", label: "Tutorials", icon: BookText, badge: blogPosts.length > 0 ? blogPosts.length : undefined },
     { id: "cheat-sheet", label: "Cheat Sheet", icon: BookOpen },
     { id: "tone", label: "Tone Library", icon: MessageSquareText },
@@ -173,6 +175,12 @@ export function LibraryDashboard({
                 prompts={workspace.prompts}
                 source={workspace.source}
               />
+            </FadeIn>
+          )}
+
+          {activeTab === "studio" && (
+            <FadeIn key="studio" className="h-full">
+              <PromptStudio generators={workspace.generators || []} />
             </FadeIn>
           )}
 

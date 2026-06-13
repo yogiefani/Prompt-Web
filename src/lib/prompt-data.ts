@@ -79,9 +79,21 @@ export type AccessGrantView = {
   userId: string;
 };
 
+export type PromptGeneratorView = {
+  id: string;
+  title: string;
+  description: string;
+  icon: IconName | string;
+  form_schema: any;
+  prompt_template: string;
+  is_published: boolean;
+  created_at: string;
+};
+
 export type PromptWorkspaceData = {
   categories: PromptCategoryView[];
   prompts: PromptView[];
+  generators: PromptGeneratorView[];
   requests: PromptRequestView[];
   grants: AccessGrantView[];
   insights: PromptInsightView[];
@@ -188,6 +200,7 @@ function getFallbackData(): PromptWorkspaceData {
       isPublished: true,
       variables: {},
     })),
+    generators: [],
     requests: [],
     grants: [],
     insights: prompts.slice(0, 4).map((prompt, index) => ({
@@ -345,46 +358,51 @@ export async function getPromptWorkspaceData(): Promise<PromptWorkspaceData> {
   const [
     categoriesResult,
     promptsResult,
-    settingsResult,
-    promptCountResult,
-    userCountResult,
-    copyCountResult,
-    requestsResult,
-    copyEventsResult,
-    grantsResult,
-  ] =
-    await Promise.all([
-      supabase
-        .from("prompt_categories")
-        .select("id,name,slug,description,sort_order")
-        .order("sort_order", { ascending: true })
-        .order("name", { ascending: true }),
-      supabase
-        .from("prompts")
-        .select("id,category_id,title,body,ai_model,tags,is_published,variables,prompt_categories(name,slug)")
-        .order("created_at", { ascending: false }),
-      supabase.from("site_settings").select("brand_name,product_url,support_email").eq("id", true).maybeSingle(),
-      supabase.from("prompts").select("id", { count: "exact", head: true }).eq("is_published", true),
-      supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "access"),
-      supabase
-        .from("prompt_copy_events")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", monthStart.toISOString()),
-      supabase
-        .from("prompt_requests")
-        .select("id,title,description,target_model,status,created_at,profiles(email)")
-        .order("created_at", { ascending: false })
-        .limit(12),
-      supabase
-        .from("prompt_copy_events")
-        .select("prompt_id")
-        .gte("created_at", monthStart.toISOString())
-        .limit(1000),
-      supabase
-        .from("access_grants")
-        .select("id,email,full_name,provider,product_id,status,created_at,granted_user_id")
-        .order("created_at", { ascending: false }),
-    ]);
+      settingsResult,
+      promptCountResult,
+      userCountResult,
+      copyCountResult,
+      requestsResult,
+      copyEventsResult,
+      grantsResult,
+      generatorsResult,
+    ] =
+      await Promise.all([
+        supabase
+          .from("prompt_categories")
+          .select("id,name,slug,description,sort_order")
+          .order("sort_order", { ascending: true })
+          .order("name", { ascending: true }),
+        supabase
+          .from("prompts")
+          .select("id,category_id,title,body,ai_model,tags,is_published,variables,prompt_categories(name,slug)")
+          .order("created_at", { ascending: false }),
+        supabase.from("site_settings").select("brand_name,product_url,support_email").eq("id", true).maybeSingle(),
+        supabase.from("prompts").select("id", { count: "exact", head: true }).eq("is_published", true),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "access"),
+        supabase
+          .from("prompt_copy_events")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", monthStart.toISOString()),
+        supabase
+          .from("prompt_requests")
+          .select("id,title,description,target_model,status,created_at,profiles(email)")
+          .order("created_at", { ascending: false })
+          .limit(12),
+        supabase
+          .from("prompt_copy_events")
+          .select("prompt_id")
+          .gte("created_at", monthStart.toISOString())
+          .limit(1000),
+        supabase
+          .from("access_grants")
+          .select("id,email,full_name,provider,product_id,status,created_at,granted_user_id")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("prompt_generators")
+          .select("*")
+          .order("created_at", { ascending: false }),
+      ]);
 
   if (categoriesResult.error || promptsResult.error) {
     return fallback;
@@ -420,10 +438,23 @@ export async function getPromptWorkspaceData(): Promise<PromptWorkspaceData> {
   });
 
   const grantsRows = !grantsResult || grantsResult.error ? [] : ((grantsResult.data as AccessGrantRow[] | null) ?? []);
+  
+  const generatorsRows = !generatorsResult || generatorsResult.error ? [] : (generatorsResult.data || []);
+  const generatorsList: PromptGeneratorView[] = generatorsRows.map((g: any) => ({
+    id: g.id,
+    title: g.title,
+    description: g.description,
+    icon: g.icon,
+    form_schema: g.form_schema,
+    prompt_template: g.prompt_template,
+    is_published: g.is_published,
+    created_at: g.created_at,
+  }));
 
   return {
     categories,
     prompts: promptList,
+    generators: generatorsList,
     requests: requestRows.map(normalizePromptRequest),
     grants: grantsRows.map(normalizeAccessGrant),
     insights: getPromptInsights(copyEventRows, promptList),
