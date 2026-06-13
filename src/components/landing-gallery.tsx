@@ -56,11 +56,11 @@ export function LandingGallery() {
     const multipliedItems = [...items, ...items, ...items, ...items];
 
     return (
-      <div className="relative w-full overflow-hidden flex py-4 group">
+      <div className="relative w-full overflow-hidden flex py-4 marquee-container">
         <div 
           className={`flex gap-6 min-w-max ${
             direction === "left" ? "animate-marquee-left" : "animate-marquee-right"
-          } group-hover:[animation-play-state:paused]`}
+          }`}
         >
           {multipliedItems.map((item, i) => (
             <div 
