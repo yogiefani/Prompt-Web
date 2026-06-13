@@ -232,14 +232,12 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
 
           {activeTab === "settings" && (
             <ScaleIn className="space-y-8">
-              <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-                <SuperadminConsole
-                  initialBrandName={workspace.settings.brandName}
-                  initialProductUrl={workspace.settings.productUrl}
-                  initialSupportEmail={workspace.settings.supportEmail}
-                  source={workspace.source}
-                />
-              </div>
+              <SuperadminConsole
+                initialBrandName={workspace.settings.brandName}
+                initialProductUrl={workspace.settings.productUrl}
+                initialSupportEmail={workspace.settings.supportEmail}
+                source={workspace.source}
+              />
             </ScaleIn>
           )}
 
