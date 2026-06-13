@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
   Edit3,
   Plus,
@@ -9,13 +8,13 @@ import {
   Save,
   X,
   Wand,
-  Type,
-  AlignLeft,
-  List,
-  Tags,
-  Image as ImageIcon,
   ChevronDown,
   ChevronUp,
+  Image as ImageIcon,
+  Code2,
+  AlignLeft,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { PromptGeneratorView } from "@/lib/prompt-data";
@@ -24,8 +23,10 @@ type FormField = {
   id: string;
   name: string;
   label: string;
-  type: "text" | "textarea" | "select" | "tags";
-  options?: string; // Comma separated options for select
+  type: "text" | "textarea" | "select" | "tags" | "chips" | "color";
+  options?: string;
+  reference_url?: string;
+  placeholder?: string;
 };
 
 type FormSection = {
@@ -34,21 +35,24 @@ type FormSection = {
   fields: FormField[];
 };
 
-type StudioCmsManagerProps = {
-  initialGenerators: PromptGeneratorView[];
-};
-
 function generateId() {
   return Math.random().toString(36).substring(2, 9);
 }
 
-export function StudioCmsManager({ initialGenerators }: StudioCmsManagerProps) {
+const FIELD_TYPE_LABELS: Record<FormField["type"], string> = {
+  text: "Teks Pendek",
+  textarea: "Teks Panjang",
+  select: "Pilihan (Select)",
+  tags: "Tags (Teks)",
+  chips: "Chips (Multi-Tag Interaktif)",
+  color: "Color Picker",
+};
+
+export function StudioCmsManager({ initialGenerators }: { initialGenerators: PromptGeneratorView[] }) {
   const [generators, setGenerators] = useState<PromptGeneratorView[]>(initialGenerators);
   const [editingGen, setEditingGen] = useState<PromptGeneratorView | null>(null);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"builder" | "template">("builder");
-
-  // Visual Builder State
+  const [activeTab, setActiveTab] = useState<"builder" | "template" | "settings">("builder");
   const [sections, setSections] = useState<FormSection[]>([]);
 
   function startCreate() {
@@ -58,16 +62,19 @@ export function StudioCmsManager({ initialGenerators }: StudioCmsManagerProps) {
       description: "",
       icon: "wand",
       form_schema: [],
-      prompt_template: "Ganti teks ini dengan template prompt Anda...",
+      prompt_template: "",
       is_published: false,
+      preview_image_url: "",
+      demo_values: {},
+      output_format: "text",
       created_at: new Date().toISOString(),
     });
-    setSections([{ id: generateId(), title: "Seksi 1", fields: [] }]);
+    setSections([{ id: generateId(), title: "Seksi A", fields: [] }]);
     setActiveTab("builder");
   }
 
   function editGen(gen: PromptGeneratorView) {
-    setEditingGen(gen);
+    setEditingGen({ ...gen });
     setSections(gen.form_schema || []);
     setActiveTab("builder");
   }
@@ -76,17 +83,13 @@ export function StudioCmsManager({ initialGenerators }: StudioCmsManagerProps) {
     if (!supabase) return;
     if (!window.confirm("Yakin ingin menghapus generator ini?")) return;
     const { error } = await supabase.from("prompt_generators").delete().eq("id", id);
-    if (!error) {
-      setGenerators((prev) => prev.filter((g) => g.id !== id));
-    } else {
-      alert("Error: " + error.message);
-    }
+    if (!error) setGenerators((prev) => prev.filter((g) => g.id !== id));
+    else alert("Error: " + error.message);
   }
 
   async function saveGen() {
     if (!supabase || !editingGen) return;
     setSaving(true);
-    
     const payload = {
       title: editingGen.title,
       description: editingGen.description,
@@ -94,304 +97,327 @@ export function StudioCmsManager({ initialGenerators }: StudioCmsManagerProps) {
       form_schema: sections,
       prompt_template: editingGen.prompt_template,
       is_published: editingGen.is_published,
+      preview_image_url: editingGen.preview_image_url || null,
+      demo_values: editingGen.demo_values || {},
+      output_format: editingGen.output_format || "text",
     };
-
     let result;
     if (editingGen.id) {
       result = await supabase.from("prompt_generators").update(payload).eq("id", editingGen.id).select().single();
     } else {
       result = await supabase.from("prompt_generators").insert(payload).select().single();
     }
-
     setSaving(false);
-    
-    if (result.error) {
-      alert("Error saving: " + result.error.message);
-      return;
-    }
-
-    const savedData = result.data as PromptGeneratorView;
-    
+    if (result.error) { alert("Error: " + result.error.message); return; }
+    const saved = result.data as PromptGeneratorView;
     if (editingGen.id) {
-      setGenerators((prev) => prev.map((g) => (g.id === savedData.id ? savedData : g)));
+      setGenerators((prev) => prev.map((g) => (g.id === saved.id ? saved : g)));
     } else {
-      setGenerators([savedData, ...generators]);
+      setGenerators([saved, ...generators]);
     }
-    
     setEditingGen(null);
   }
 
+  // ── Section helpers ──────────────────────────────────────────
   function addSection() {
-    setSections([...sections, { id: generateId(), title: "Seksi Baru", fields: [] }]);
+    const letters = "ABCDEFGHIJ";
+    setSections([...sections, { id: generateId(), title: `Seksi ${letters[sections.length] ?? sections.length + 1}`, fields: [] }]);
+  }
+  function removeSection(id: string) { setSections(sections.filter((s) => s.id !== id)); }
+  function updateSection(id: string, title: string) { setSections(sections.map((s) => (s.id === id ? { ...s, title } : s))); }
+  function moveSection(index: number, dir: 1 | -1) {
+    if (index + dir < 0 || index + dir >= sections.length) return;
+    const arr = [...sections];
+    [arr[index], arr[index + dir]] = [arr[index + dir], arr[index]];
+    setSections(arr);
   }
 
-  function removeSection(id: string) {
-    setSections(sections.filter(s => s.id !== id));
-  }
-
-  function updateSection(id: string, title: string) {
-    setSections(sections.map(s => s.id === id ? { ...s, title } : s));
-  }
-
+  // ── Field helpers ────────────────────────────────────────────
   function addField(sectionId: string) {
-    setSections(sections.map(s => {
-      if (s.id !== sectionId) return s;
-      return {
-        ...s,
-        fields: [...s.fields, { id: generateId(), name: "field_" + generateId(), label: "Label Baru", type: "text" }]
-      };
+    setSections(sections.map((s) => s.id !== sectionId ? s : {
+      ...s, fields: [...s.fields, { id: generateId(), name: "field_" + generateId().slice(0, 5), label: "Label Baru", type: "text" }]
+    }));
+  }
+  function removeField(sid: string, fid: string) {
+    setSections(sections.map((s) => s.id !== sid ? s : { ...s, fields: s.fields.filter((f) => f.id !== fid) }));
+  }
+  function updateField(sid: string, fid: string, updates: Partial<FormField>) {
+    setSections(sections.map((s) => s.id !== sid ? s : {
+      ...s, fields: s.fields.map((f) => f.id === fid ? { ...f, ...updates } : f)
     }));
   }
 
-  function removeField(sectionId: string, fieldId: string) {
-    setSections(sections.map(s => {
-      if (s.id !== sectionId) return s;
-      return { ...s, fields: s.fields.filter(f => f.id !== fieldId) };
-    }));
-  }
-
-  function updateField(sectionId: string, fieldId: string, updates: Partial<FormField>) {
-    setSections(sections.map(s => {
-      if (s.id !== sectionId) return s;
-      return {
-        ...s,
-        fields: s.fields.map(f => f.id === fieldId ? { ...f, ...updates } : f)
-      };
-    }));
-  }
-
-  function moveSection(index: number, direction: 1 | -1) {
-    if (index + direction < 0 || index + direction >= sections.length) return;
-    const newSections = [...sections];
-    const temp = newSections[index];
-    newSections[index] = newSections[index + direction];
-    newSections[index + direction] = temp;
-    setSections(newSections);
-  }
+  // ── All fields flat (for demo_values editor) ─────────────────
+  const allFields = sections.flatMap((s) => s.fields);
 
   return (
     <section>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="font-aeonik text-2xl font-bold tracking-tight text-[var(--color-obsidian)]">
-            AI Prompt Studio
-          </h2>
-          <p className="text-sm text-[var(--color-silver-pine)]">
-            Bangun formulir generator dinamis untuk memanjakan pengguna Anda.
-          </p>
+          <h2 className="font-aeonik text-2xl font-bold text-[var(--color-obsidian)]">AI Prompt Studio</h2>
+          <p className="text-sm text-[var(--color-silver-pine)]">Bangun generator prompt dinamis untuk user Anda.</p>
         </div>
         {!editingGen && (
           <button onClick={startCreate} className="primary-button flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Generator Baru
+            <Plus className="h-4 w-4" /> Generator Baru
           </button>
         )}
       </div>
 
       {editingGen ? (
         <div className="grid gap-6">
-          {/* Header Editor */}
+          {/* ── Editor Header ── */}
           <div className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-[var(--shadow-md)]">
-            <div className="flex flex-1 items-center gap-4">
-              <button onClick={() => setEditingGen(null)} className="icon-button" title="Kembali">
-                <X className="h-5 w-5" />
-              </button>
-              <div className="flex-1">
-                <input
-                  className="w-full bg-transparent font-aeonik text-xl font-bold outline-none"
-                  value={editingGen.title}
-                  onChange={(e) => setEditingGen({ ...editingGen, title: e.target.value })}
-                  placeholder="Nama Generator"
-                />
-              </div>
+            <div className="flex flex-1 items-center gap-3">
+              <button onClick={() => setEditingGen(null)} className="icon-button"><X className="h-5 w-5" /></button>
+              <input
+                className="flex-1 bg-transparent font-aeonik text-xl font-bold outline-none"
+                value={editingGen.title}
+                onChange={(e) => setEditingGen({ ...editingGen, title: e.target.value })}
+                placeholder="Nama Generator"
+              />
             </div>
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-sm font-semibold text-[var(--color-silver-pine)]">
+              <label className="flex items-center gap-2 text-sm font-semibold text-[var(--color-silver-pine)] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={editingGen.is_published}
                   onChange={(e) => setEditingGen({ ...editingGen, is_published: e.target.checked })}
-                  className="rounded border-[rgba(83,88,98,0.2)] text-[var(--color-electric-blue)] focus:ring-[var(--color-electric-blue)]"
+                  className="rounded"
                 />
                 Published
               </label>
-              <button onClick={saveGen} disabled={saving} className="primary-button">
-                {saving ? "Menyimpan..." : <><Save className="h-4 w-4" /> Simpan</>}
+              <button onClick={saveGen} disabled={saving} className="primary-button flex items-center gap-2">
+                <Save className="h-4 w-4" />{saving ? "Menyimpan..." : "Simpan"}
               </button>
             </div>
           </div>
 
-          {/* Description & Icon */}
-          <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
-            <div className="grid gap-4 md:grid-cols-[1fr_200px]">
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-[var(--color-obsidian)]">Deskripsi Singkat</label>
-                <input
-                  className="form-input"
-                  value={editingGen.description}
-                  onChange={(e) => setEditingGen({ ...editingGen, description: e.target.value })}
-                  placeholder="Contoh: Isi detail produk untuk menghasilkan prompt JSON siap pakai."
-                />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-bold text-[var(--color-obsidian)]">Ikon (opsional)</label>
-                <input
-                  className="form-input"
-                  value={editingGen.icon}
-                  onChange={(e) => setEditingGen({ ...editingGen, icon: e.target.value })}
-                  placeholder="wand, image, text..."
-                />
-              </div>
-            </div>
+          {/* ── Tabs ── */}
+          <div className="flex gap-1 rounded-xl bg-[var(--color-arctic-mist)] p-1">
+            {(["builder", "template", "settings"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 rounded-lg py-2 text-sm font-bold capitalize transition-all ${
+                  activeTab === tab ? "bg-white shadow text-[var(--color-obsidian)]" : "text-[var(--color-silver-pine)] hover:text-[var(--color-obsidian)]"
+                }`}
+              >
+                {tab === "builder" ? "Form Builder" : tab === "template" ? "Output Template" : "Pengaturan & Demo"}
+              </button>
+            ))}
           </div>
 
-          {/* Tabs */}
-          <div className="flex border-b border-[rgba(83,88,98,0.1)]">
-            <button
-              onClick={() => setActiveTab("builder")}
-              className={`px-6 py-3 text-sm font-bold transition-colors ${
-                activeTab === "builder"
-                  ? "border-b-2 border-[var(--color-electric-blue)] text-[var(--color-electric-blue)]"
-                  : "text-[var(--color-silver-pine)] hover:text-[var(--color-obsidian)]"
-              }`}
-            >
-              Form Builder (Visual)
-            </button>
-            <button
-              onClick={() => setActiveTab("template")}
-              className={`px-6 py-3 text-sm font-bold transition-colors ${
-                activeTab === "template"
-                  ? "border-b-2 border-[var(--color-electric-blue)] text-[var(--color-electric-blue)]"
-                  : "text-[var(--color-silver-pine)] hover:text-[var(--color-obsidian)]"
-              }`}
-            >
-              Output Template (Prompt)
-            </button>
-          </div>
-
-          {/* Tab Content: Form Builder */}
+          {/* ── TAB: Form Builder ── */}
           {activeTab === "builder" && (
-            <div className="space-y-6">
-              {sections.map((section, sIndex) => (
-                <div key={section.id} className="rounded-2xl border border-[rgba(83,88,98,0.15)] bg-white overflow-hidden shadow-sm">
-                  {/* Section Header */}
-                  <div className="flex items-center gap-3 bg-[var(--color-arctic-mist)] p-4 border-b border-[rgba(83,88,98,0.1)]">
-                    <div className="flex flex-col">
-                      <button onClick={() => moveSection(sIndex, -1)} className="text-[var(--color-silver-pine)] hover:text-[var(--color-electric-blue)] disabled:opacity-30" disabled={sIndex === 0}><ChevronUp className="h-4 w-4" /></button>
-                      <button onClick={() => moveSection(sIndex, 1)} className="text-[var(--color-silver-pine)] hover:text-[var(--color-electric-blue)] disabled:opacity-30" disabled={sIndex === sections.length - 1}><ChevronDown className="h-4 w-4" /></button>
+            <div className="space-y-4">
+              {sections.map((section, sIdx) => (
+                <div key={section.id} className="rounded-2xl border border-[rgba(83,88,98,0.12)] bg-white overflow-hidden shadow-sm">
+                  <div className="flex items-center gap-3 bg-[var(--color-arctic-mist)] px-4 py-3 border-b border-[rgba(83,88,98,0.08)]">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--color-midnight-ink)] text-white text-xs font-bold">
+                      {"ABCDEFGHIJ"[sIdx] ?? sIdx + 1}
                     </div>
                     <input
-                      className="flex-1 bg-transparent font-bold text-[var(--color-obsidian)] outline-none"
+                      className="flex-1 bg-transparent font-bold text-[var(--color-obsidian)] outline-none text-sm"
                       value={section.title}
                       onChange={(e) => updateSection(section.id, e.target.value)}
-                      placeholder="Nama Seksi (Misal: Seksi A - Informasi Produk)"
+                      placeholder="Nama Seksi"
                     />
-                    <button onClick={() => removeSection(section.id)} className="icon-button text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => moveSection(sIdx, -1)} disabled={sIdx === 0} className="p-1 text-[var(--color-silver-pine)] disabled:opacity-30 hover:text-[var(--color-electric-blue)]"><ChevronUp className="h-4 w-4" /></button>
+                      <button onClick={() => moveSection(sIdx, 1)} disabled={sIdx === sections.length - 1} className="p-1 text-[var(--color-silver-pine)] disabled:opacity-30 hover:text-[var(--color-electric-blue)]"><ChevronDown className="h-4 w-4" /></button>
+                      <button onClick={() => removeSection(section.id)} className="p-1 text-red-400 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+                    </div>
                   </div>
 
-                  {/* Fields */}
-                  <div className="p-4 space-y-4">
+                  <div className="p-4 space-y-3">
                     {section.fields.map((field) => (
-                      <div key={field.id} className="grid gap-3 rounded-xl border border-[rgba(83,88,98,0.1)] bg-[var(--color-sky-wash)] p-4 sm:grid-cols-[2fr_1fr_1fr_auto]">
-                        <div>
-                          <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Label UI</label>
-                          <input className="form-input text-sm" value={field.label} onChange={(e) => updateField(section.id, field.id, { label: e.target.value })} placeholder="Label yang dilihat user" />
-                        </div>
-                        <div>
-                          <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Tipe Input</label>
-                          <select className="form-input text-sm" value={field.type} onChange={(e) => updateField(section.id, field.id, { type: e.target.value as any })}>
-                            <option value="text">Teks Pendek</option>
-                            <option value="textarea">Teks Panjang</option>
-                            <option value="select">Pilihan (Select)</option>
-                            <option value="tags">Tags (Koma)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Variabel Template</label>
-                          <input className="form-input text-sm font-mono text-[var(--color-electric-blue)]" value={field.name} onChange={(e) => updateField(section.id, field.id, { name: e.target.value.replace(/[^a-zA-Z0-9_]/g, '') })} placeholder="nama_variabel" />
-                        </div>
-                        <div className="flex items-end pb-1">
-                          <button onClick={() => removeField(section.id, field.id)} className="p-2 text-[var(--color-silver-pine)] hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
-                        </div>
-                        
-                        {/* Options for Select */}
-                        {field.type === "select" && (
-                          <div className="sm:col-span-4 mt-2">
-                            <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Opsi Pilihan (Pisahkan dengan koma)</label>
-                            <input className="form-input text-sm" value={field.options || ""} onChange={(e) => updateField(section.id, field.id, { options: e.target.value })} placeholder="Opsi A, Opsi B, Opsi C..." />
+                      <div key={field.id} className="rounded-xl border border-[rgba(83,88,98,0.1)] bg-[var(--color-sky-wash)] p-4 space-y-3">
+                        <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto]">
+                          <div>
+                            <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Label UI</label>
+                            <input className="form-input text-sm bg-white" value={field.label} onChange={(e) => updateField(section.id, field.id, { label: e.target.value })} placeholder="Label yang dilihat user" />
                           </div>
+                          <div>
+                            <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Tipe Input</label>
+                            <select className="form-input text-sm bg-white" value={field.type} onChange={(e) => updateField(section.id, field.id, { type: e.target.value as FormField["type"] })}>
+                              {Object.entries(FIELD_TYPE_LABELS).map(([val, label]) => (
+                                <option key={val} value={val}>{label}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Variabel <code className="text-[var(--color-electric-blue)]">{"{{x}}"}</code></label>
+                            <input className="form-input text-sm bg-white font-mono text-[var(--color-electric-blue)]" value={field.name} onChange={(e) => updateField(section.id, field.id, { name: e.target.value.replace(/[^a-zA-Z0-9_]/g, "") })} placeholder="nama_var" />
+                          </div>
+                          <div className="flex items-end pb-1">
+                            <button onClick={() => removeField(section.id, field.id)} className="p-2 text-[var(--color-silver-pine)] hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                          </div>
+                        </div>
+                        {/* Select options */}
+                        {(field.type === "select") && (
+                          <div>
+                            <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Opsi (pisahkan dengan koma)</label>
+                            <input className="form-input text-sm bg-white" value={field.options || ""} onChange={(e) => updateField(section.id, field.id, { options: e.target.value })} placeholder="Opsi A, Opsi B, Opsi C" />
+                          </div>
+                        )}
+                        {/* Reference URL for select */}
+                        {field.type === "select" && (
+                          <div>
+                            <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">URL Gambar Referensi (opsional — muncul sebagai link "Lihat Referensi" di samping label)</label>
+                            <input className="form-input text-sm bg-white" value={field.reference_url || ""} onChange={(e) => updateField(section.id, field.id, { reference_url: e.target.value })} placeholder="https://..." />
+                          </div>
+                        )}
+                        {/* Chips hint */}
+                        {field.type === "chips" && (
+                          <p className="text-xs text-[var(--color-silver-pine)] bg-white/60 rounded-lg px-3 py-2">
+                            ✨ <strong>Chips</strong>: User tekan <kbd>Enter</kbd> atau <kbd>,</kbd> untuk menambah tag. Klik × untuk hapus. Value disimpan sebagai teks dipisah koma.
+                          </p>
+                        )}
+                        {/* Color hint */}
+                        {field.type === "color" && (
+                          <p className="text-xs text-[var(--color-silver-pine)] bg-white/60 rounded-lg px-3 py-2">
+                            🎨 <strong>Color Picker</strong>: User memilih warna dari color swatch. Value: kode hex (contoh: <code>#F97316</code>).
+                          </p>
                         )}
                       </div>
                     ))}
-
-                    <button onClick={() => addField(section.id)} className="w-full rounded-xl border border-dashed border-[rgba(83,88,98,0.3)] py-3 text-sm font-bold text-[var(--color-silver-pine)] hover:border-[var(--color-electric-blue)] hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)] transition-colors">
+                    <button onClick={() => addField(section.id)} className="w-full rounded-xl border border-dashed border-[rgba(83,88,98,0.25)] py-2.5 text-sm font-bold text-[var(--color-silver-pine)] hover:border-[var(--color-electric-blue)] hover:text-[var(--color-electric-blue)] transition-colors">
                       + Tambah Kolom Input
                     </button>
                   </div>
                 </div>
               ))}
-              
-              <button onClick={addSection} className="secondary-button w-full justify-center border-dashed">
+              <button onClick={addSection} className="secondary-button w-full justify-center">
                 <Plus className="h-4 w-4 mr-2" /> Tambah Seksi Form
               </button>
             </div>
           )}
 
-          {/* Tab Content: Output Template */}
+          {/* ── TAB: Output Template ── */}
           {activeTab === "template" && (
-            <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
-              <div className="mb-4 rounded-xl bg-[var(--color-arctic-mist)] p-4">
-                <h4 className="font-bold text-[var(--color-obsidian)] text-sm mb-1">Cara menggunakan variabel:</h4>
-                <p className="text-sm text-[var(--color-silver-pine)]">Bungkus nama variabel (kolom ke-3 pada Form Builder) dengan kurung kurawal ganda: <code className="bg-white px-1.5 py-0.5 rounded text-[var(--color-electric-blue)] font-bold">{`{{nama_variabel}}`}</code>. Saat digenerate, teks ini akan otomatis diganti dengan isian user.</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {sections.flatMap(s => s.fields).map(f => (
-                    <span key={f.id} className="text-xs font-mono font-semibold text-[var(--color-obsidian)] bg-white px-2 py-1 rounded border border-[rgba(0,0,0,0.05)] cursor-default">
+            <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)] space-y-4">
+              <div className="rounded-xl bg-[var(--color-arctic-mist)] p-4">
+                <p className="text-sm font-bold text-[var(--color-obsidian)] mb-2">Variabel yang tersedia dari Form Builder:</p>
+                <div className="flex flex-wrap gap-2">
+                  {allFields.map((f) => (
+                    <span key={f.id} className="font-mono text-xs bg-white px-2 py-1 rounded border border-[rgba(0,0,0,0.07)] text-[var(--color-electric-blue)] font-bold cursor-pointer select-all">
                       {`{{${f.name}}}`}
                     </span>
                   ))}
+                  {allFields.length === 0 && <span className="text-xs text-[var(--color-silver-pine)]">Belum ada field di Form Builder.</span>}
                 </div>
               </div>
-
               <textarea
-                className="form-input min-h-[400px] font-mono text-sm leading-relaxed"
+                className="form-input min-h-[440px] font-mono text-sm leading-relaxed"
                 value={editingGen.prompt_template}
                 onChange={(e) => setEditingGen({ ...editingGen, prompt_template: e.target.value })}
-                placeholder="Tulis prompt master Anda di sini..."
+                placeholder={`Tulis prompt master Anda di sini...\n\nContoh:\n{\n  "task": "generate_banner",\n  "brand": "{{nama_brand}}",\n  "style": "{{gaya_desain}}"\n}`}
               />
             </div>
           )}
 
+          {/* ── TAB: Settings & Demo ── */}
+          {activeTab === "settings" && (
+            <div className="space-y-6">
+              {/* Output Format */}
+              <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
+                <h3 className="font-bold text-[var(--color-obsidian)] mb-4 flex items-center gap-2"><Code2 className="h-5 w-5 text-[var(--color-electric-blue)]" /> Format Output</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {(["text", "json"] as const).map((fmt) => (
+                    <button
+                      key={fmt}
+                      onClick={() => setEditingGen({ ...editingGen, output_format: fmt })}
+                      className={`rounded-xl border-2 p-4 text-left transition-all ${
+                        editingGen.output_format === fmt
+                          ? "border-[var(--color-electric-blue)] bg-[var(--color-whisper-fade-blue)]"
+                          : "border-[rgba(83,88,98,0.12)] hover:border-[var(--color-electric-blue)]/50"
+                      }`}
+                    >
+                      <div className="font-bold text-sm capitalize text-[var(--color-obsidian)]">{fmt === "json" ? "JSON (Structured)" : "Plain Text"}</div>
+                      <div className="text-xs text-[var(--color-silver-pine)] mt-1">{fmt === "json" ? "Output ditampilkan dengan syntax highlighting JSON" : "Output ditampilkan sebagai teks biasa"}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Preview Image */}
+              <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
+                <h3 className="font-bold text-[var(--color-obsidian)] mb-4 flex items-center gap-2"><ImageIcon className="h-5 w-5 text-[var(--color-electric-blue)]" /> Preview Image (Mockup)</h3>
+                <label className="mb-1.5 block text-sm font-bold text-[var(--color-obsidian)]">URL Gambar Preview</label>
+                <input
+                  className="form-input"
+                  value={editingGen.preview_image_url || ""}
+                  onChange={(e) => setEditingGen({ ...editingGen, preview_image_url: e.target.value })}
+                  placeholder="https://... (gambar yang muncul di panel kanan studio user)"
+                />
+                {editingGen.preview_image_url && (
+                  <img src={editingGen.preview_image_url} alt="Preview" className="mt-3 h-32 w-full rounded-xl object-cover border border-[rgba(83,88,98,0.1)]" />
+                )}
+              </div>
+
+              {/* Demo Values */}
+              <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
+                <h3 className="font-bold text-[var(--color-obsidian)] mb-1 flex items-center gap-2">
+                  {editingGen.output_format === "json" ? <ToggleRight className="h-5 w-5 text-[var(--color-electric-blue)]" /> : <ToggleLeft className="h-5 w-5 text-[var(--color-electric-blue)]" />}
+                  Nilai Demo (Randomize Demo)
+                </h3>
+                <p className="text-sm text-[var(--color-silver-pine)] mb-4">Isi nilai contoh untuk tiap field. Tombol "Randomize Demo" di Studio user akan auto-mengisi formulir dengan nilai ini.</p>
+                {allFields.length === 0 ? (
+                  <p className="text-sm text-[var(--color-silver-pine)] italic">Tambahkan field di tab Form Builder terlebih dahulu.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {allFields.map((field) => (
+                      <div key={field.id} className="grid grid-cols-[160px_1fr] items-center gap-3">
+                        <label className="text-sm font-mono font-bold text-[var(--color-electric-blue)] truncate">{`{{${field.name}}}`}</label>
+                        <input
+                          className="form-input text-sm"
+                          value={(editingGen.demo_values?.[field.name]) || ""}
+                          onChange={(e) => setEditingGen({
+                            ...editingGen,
+                            demo_values: { ...(editingGen.demo_values || {}), [field.name]: e.target.value }
+                          })}
+                          placeholder={`Contoh nilai untuk "${field.label}"`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
+        /* ── Generator List ── */
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {generators.length === 0 && (
             <div className="col-span-full rounded-3xl border-2 border-dashed border-[rgba(83,88,98,0.2)] py-16 text-center">
-              <p className="font-semibold text-[var(--color-silver-pine)]">Belum ada Generator yang dibuat.</p>
+              <p className="font-semibold text-[var(--color-silver-pine)]">Belum ada Generator. Klik "Generator Baru" untuk mulai.</p>
             </div>
           )}
           {generators.map((gen) => (
             <div key={gen.id} className="flex flex-col justify-between rounded-3xl bg-white p-6 shadow-[var(--shadow-md)] border border-[rgba(83,88,98,0.05)]">
               <div>
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4 flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-arctic-mist)] text-[var(--color-electric-blue)]">
                     <Wand className="h-5 w-5" />
                   </div>
-                  <span className={`px-3 py-1 text-xs font-bold rounded-full ${gen.is_published ? 'bg-[var(--color-mint-glaze)] text-[var(--color-silver-pine)]' : 'bg-[var(--color-whisper-fade-orange)] text-[var(--color-zesty-orange)]'}`}>
-                    {gen.is_published ? 'Published' : 'Draft'}
+                  <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${gen.is_published ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+                    {gen.is_published ? "Published" : "Draft"}
                   </span>
                 </div>
                 <h3 className="font-aeonik text-lg font-bold text-[var(--color-obsidian)] line-clamp-1">{gen.title}</h3>
-                <p className="mt-2 line-clamp-2 text-sm text-[var(--color-silver-pine)] leading-relaxed">
-                  {gen.description || "Tidak ada deskripsi"}
-                </p>
+                <p className="mt-1.5 line-clamp-2 text-sm text-[var(--color-silver-pine)]">{gen.description || "Tidak ada deskripsi."}</p>
               </div>
-              <div className="mt-6 flex items-center justify-between border-t border-[rgba(83,88,98,0.1)] pt-4">
-                <span className="text-xs font-semibold text-[var(--color-ash-gray)]">
-                  {gen.form_schema?.length || 0} Seksi Form
-                </span>
+              <div className="mt-5 flex items-center justify-between border-t border-[rgba(83,88,98,0.08)] pt-4">
+                <div className="flex gap-2 text-xs font-semibold text-[var(--color-ash-gray)]">
+                  <span>{(gen.form_schema as any[])?.length || 0} Seksi</span>
+                  <span>·</span>
+                  <span className="uppercase">{gen.output_format || "text"}</span>
+                </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => editGen(gen)} className="icon-button text-[var(--color-electric-blue)] hover:bg-[var(--color-arctic-mist)]"><Edit3 className="h-4 w-4" /></button>
-                  <button onClick={() => deleteGen(gen.id)} className="icon-button text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
+                  <button onClick={() => editGen(gen)} className="icon-button text-[var(--color-electric-blue)]"><Edit3 className="h-4 w-4" /></button>
+                  <button onClick={() => deleteGen(gen.id)} className="icon-button text-red-500"><Trash2 className="h-4 w-4" /></button>
                 </div>
               </div>
             </div>

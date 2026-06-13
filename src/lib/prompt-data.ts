@@ -88,6 +88,10 @@ export type PromptGeneratorView = {
   prompt_template: string;
   is_published: boolean;
   created_at: string;
+  // v2 fields
+  preview_image_url?: string;
+  demo_values?: Record<string, string>;
+  output_format?: "text" | "json";
 };
 
 export type PromptWorkspaceData = {
