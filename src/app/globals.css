@@ -492,3 +492,27 @@ textarea.form-input {
   100% { transform: translateX(-50%); }
 }
 
+/* Prompt Link (Lead Magnet) */
+.blog-prompt-link {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  margin: 2rem 0 !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 1rem !important;
+  background-color: var(--color-midnight-ink) !important;
+  color: white !important;
+  font-family: var(--font-aeonik) !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 14px 0 rgba(33, 43, 54, 0.39) !important;
+  transition: all 0.3s ease !important;
+}
+
+.blog-prompt-link:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(33, 43, 54, 0.23) !important;
+  background-color: var(--color-electric-blue) !important;
+}
+

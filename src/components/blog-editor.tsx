@@ -24,6 +24,7 @@ import {
   Save,
   Tag,
   X,
+  Sparkles,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -230,6 +231,17 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
     execFormat(
       "insertHTML",
       `<pre class="blog-pre"><code contenteditable="true">// Paste your code here</code></pre><p><br/></p>`
+    );
+  }
+
+  function insertPrompt() {
+    const promptId = window.prompt("Masukkan ID Prompt (dapat dicopy dari URL Library):", "");
+    if (!promptId) return;
+    const title = window.prompt("Masukkan Judul Prompt yang akan ditampilkan:", "Prompt Premium");
+    if (!title) return;
+    execFormat(
+      "insertHTML",
+      `<a href="/library?prompt=${encodeURIComponent(promptId)}" class="blog-prompt-link" data-prompt-id="${encodeURIComponent(promptId)}" contenteditable="false">✨ Gunakan Prompt: ${title.replace(/</g, "&lt;")}</a><p><br/></p>`
     );
   }
 
@@ -478,6 +490,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
             <ToolbarButton title="Upload Gambar" onClick={triggerInlineUpload}>
               {uploadingInline ? <Loader2 className="h-4 w-4 animate-spin" /> : <Image className="h-4 w-4" />}
             </ToolbarButton>
+            <ToolbarButton title="Sisipkan Link Prompt" onClick={insertPrompt}><Sparkles className="h-4 w-4 text-[var(--color-electric-blue)]" /></ToolbarButton>
             <ToolbarButton title="Horizontal Rule" onClick={insertHr}><Minus className="h-4 w-4" /></ToolbarButton>
           </div>
 

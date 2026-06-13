@@ -2,16 +2,20 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { getSiteSettingsData } from "@/lib/prompt-data";
+import { getBlogPosts } from "@/lib/blog-data";
 
 import { HeroSection } from "@/components/landing/hero-section";
 import { BentoFeatures } from "@/components/landing/bento-features";
 import { TestimonialMarquee } from "@/components/landing/testimonial-marquee";
 import { FaqAccordion } from "@/components/landing/faq-accordion";
+import { BlogList } from "@/components/blog-list";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const settings = await getSiteSettingsData();
+  const posts = await getBlogPosts();
+  const publishedPosts = posts.filter((p) => p.status === "published");
 
   return (
     <main className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)] selection:bg-[var(--color-electric-blue)] selection:text-white">
@@ -21,7 +25,7 @@ export default async function Home() {
           <div className="hidden items-center gap-8 text-sm font-bold text-[var(--color-silver-pine)] md:flex">
             <a href="#features" className="hover:text-[var(--color-electric-blue)] transition-colors">Fitur</a>
             <a href="#faq" className="hover:text-[var(--color-electric-blue)] transition-colors">FAQ</a>
-            <Link href="/library/tutorials" className="hover:text-[var(--color-electric-blue)] transition-colors">Tutorials</Link>
+            <Link href="/tutorials" className="hover:text-[var(--color-electric-blue)] transition-colors">Tutorials</Link>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login" className="secondary-button hidden sm:inline-flex">
@@ -43,6 +47,29 @@ export default async function Home() {
 
       {/* Testimonials */}
       <TestimonialMarquee />
+
+      {/* Latest Tutorials */}
+      <section className="bg-white py-24 sm:py-32" id="tutorials">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <h2 className="font-aeonik text-3xl font-bold tracking-[-0.02em] text-[var(--color-obsidian)] sm:text-4xl">
+              Tutorial & Panduan Terbaru
+            </h2>
+            <p className="mt-4 text-lg font-medium text-[var(--color-silver-pine)]">
+              Pelajari trik prompting dari para ahli. Coba langsung prompt-nya ke dalam workflow Anda.
+            </p>
+          </div>
+          <BlogList posts={publishedPosts} maxItems={3} />
+          <div className="mt-12 flex justify-center">
+            <Link
+              href="/tutorials"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-6 py-3 text-sm font-bold text-[var(--color-obsidian)] transition-all hover:bg-[var(--color-arctic-mist)]"
+            >
+              Lihat Semua Tutorial
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* FAQ */}
       <FaqAccordion />
