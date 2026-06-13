@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bot,
@@ -67,6 +67,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   const [selectedTag, setSelectedTag] = useState("All");
 
   const searchParams = useSearchParams();
+  const router = useRouter();
   const urlPromptId = searchParams.get("prompt");
 
   useEffect(() => {
@@ -75,6 +76,8 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
       if (target) {
         setQuery(target.title);
         setActiveCategory("All");
+        // ✅ Bersihkan URL param secara diam-diam tanpa reload halaman
+        router.replace("/library", { scroll: false });
       }
     }
   }, [urlPromptId, prompts]);
