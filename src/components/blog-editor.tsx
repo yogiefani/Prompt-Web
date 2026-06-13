@@ -119,7 +119,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
     document.execCommand(command, false, value);
   }
 
-  function formatHeading(level: "h1" | "h2" | "h3") {
+  function formatHeading(level: "h1" | "h2" | "h3" | "blockquote") {
     editorRef.current?.focus();
     document.execCommand("formatBlock", false, level);
   }
