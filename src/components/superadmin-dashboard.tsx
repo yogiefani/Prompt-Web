@@ -25,6 +25,7 @@ import { RequestInbox } from "@/components/request-inbox";
 import { PromptCmsManager } from "@/components/prompt-cms-manager";
 import { BlogCmsManager } from "@/components/blog-cms-manager";
 import { StudioCmsManager } from "@/components/studio-cms-manager";
+import { GalleryCmsManager } from "@/components/gallery-cms-manager";
 import { featurePhases } from "@/lib/content";
 import type { PromptWorkspaceData, IconName } from "@/lib/prompt-data";
 
@@ -46,7 +47,7 @@ const iconMap: Record<IconName, typeof Sparkles> = {
 };
 
 export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "cms" | "studio" | "blog" | "access" | "requests" | "settings" | "roadmap">(
+  const [activeTab, setActiveTab] = useState<"overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "settings" | "roadmap">(
     "overview"
   );
 
@@ -54,13 +55,14 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
     (request) => request.status === "pending" || request.status === "reviewing"
   ).length;
 
-  type TabId = "overview" | "cms" | "studio" | "blog" | "access" | "requests" | "settings" | "roadmap";
+  type TabId = "overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "settings" | "roadmap";
 
   const sidebarMenu: { id: TabId; label: string; icon: typeof LayoutDashboard; badge?: number }[] = [
     { id: "overview", label: "Overview & Analitik", icon: LayoutDashboard },
     { id: "cms", label: "Prompt CMS", icon: FolderKanban },
     { id: "studio", label: "Prompt Studio", icon: Sparkles },
     { id: "blog", label: "Blog & Tutorial", icon: BookText },
+    { id: "gallery", label: "Galeri Landing", icon: Sparkles },
     { id: "access", label: "Akses Member", icon: ShieldCheck },
     { id: "requests", label: "Permintaan Prompt", icon: Inbox, badge: pendingRequestsCount },
     { id: "settings", label: "Pengaturan Publik", icon: Settings },
@@ -222,9 +224,15 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
           )}
 
           {activeTab === "blog" && (
-            <ScaleIn className="space-y-6">
+            <FadeIn>
               <BlogCmsManager />
-            </ScaleIn>
+            </FadeIn>
+          )}
+
+          {activeTab === "gallery" && (
+            <FadeIn>
+              <GalleryCmsManager />
+            </FadeIn>
           )}
 
           {activeTab === "access" && (

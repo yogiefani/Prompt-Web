@@ -516,3 +516,21 @@ textarea.form-input {
   background-color: var(--color-electric-blue) !important;
 }
 
+/* Landing Gallery Marquee */
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-100% / 4)); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translateX(calc(-100% / 4)); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 40s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: marquee-right 40s linear infinite;
+}

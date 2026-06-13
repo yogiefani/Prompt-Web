@@ -5,6 +5,7 @@ import { getSiteSettingsData } from "@/lib/prompt-data";
 import { getBlogPosts } from "@/lib/blog-data";
 
 import { HeroSection } from "@/components/landing/hero-section";
+import { LandingGallery } from "@/components/landing-gallery";
 import { BentoFeatures } from "@/components/landing/bento-features";
 import { TestimonialMarquee } from "@/components/landing/testimonial-marquee";
 import { FaqAccordion } from "@/components/landing/faq-accordion";
@@ -41,6 +42,9 @@ export default async function Home() {
 
       {/* Hero Section */}
       <HeroSection settings={settings} />
+
+      {/* Landing Gallery */}
+      <LandingGallery />
 
       {/* Bento Grid Features */}
       <BentoFeatures />

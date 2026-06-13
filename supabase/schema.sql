@@ -296,3 +296,27 @@ on public.blog_posts for all
 to authenticated
 using (public.is_superadmin())
 with check (public.is_superadmin());
+
+-- Landing Gallery
+create table public.landing_gallery (
+  id uuid primary key default gen_random_uuid(),
+  image_url text not null,
+  row_index int not null default 1 check (row_index in (1, 2)),
+  sort_order int not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.landing_gallery enable row level security;
+
+create policy "landing_gallery_read_all"
+on public.landing_gallery for select
+to anon, authenticated
+using (true);
+
+create policy "landing_gallery_superadmin_write"
+on public.landing_gallery for all
+to authenticated
+using (public.is_superadmin())
+with check (public.is_superadmin());
