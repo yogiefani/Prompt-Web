@@ -18,6 +18,7 @@ import {
   Sparkles,
   Star,
   WandSparkles,
+  SlidersHorizontal,
 } from "lucide-react";
 import type { IconName, PromptCategoryView, PromptView } from "@/lib/prompt-data";
 import { supabase } from "@/lib/supabase";
@@ -60,6 +61,56 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   const [selectedCollectionId, setSelectedCollectionId] = useState<string>("All");
   const [showAddToCollectionId, setShowAddToCollectionId] = useState<string>("");
   const [newCollectionName, setNewCollectionName] = useState<string>("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("All");
+  const [selectedTag, setSelectedTag] = useState("All");
+
+  const uniqueModels = useMemo(() => {
+    const models = new Set<string>();
+    prompts.forEach((p) => {
+      if (p.model) models.add(p.model);
+    });
+    return ["All", ...Array.from(models)];
+  }, [prompts]);
+
+  const uniqueTags = useMemo(() => {
+    const tags = new Set<string>();
+    prompts.forEach((p) => {
+      p.tags.forEach((t) => tags.add(t));
+    });
+    return ["All", ...Array.from(tags)];
+  }, [prompts]);
+
+  function escapeHtml(text: string): string {
+    return text
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function getRenderedBody(body: string, promptId: string) {
+    let finalBody = escapeHtml(body);
+    const placeholders = extractPlaceholders(body);
+    const promptInputs = inputs[promptId] ?? {};
+
+    placeholders.forEach((placeholder) => {
+      const userValue = promptInputs[placeholder]?.trim();
+      const escapedPlaceholder = escapeHtml(`[${placeholder}]`);
+      
+      let replacement = "";
+      if (userValue) {
+        replacement = `<span class="bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)] px-1.5 py-0.5 rounded-lg border border-[rgba(0,105,224,0.12)] font-bold">${escapeHtml(userValue)}</span>`;
+      } else {
+        replacement = `<span class="bg-[var(--color-whisper-fade-orange)] text-[var(--color-zesty-orange)] px-1.5 py-0.5 rounded-lg border border-[rgba(242,97,16,0.12)] font-bold">[${escapeHtml(placeholder)}]</span>`;
+      }
+
+      finalBody = finalBody.replaceAll(escapedPlaceholder, replacement);
+    });
+
+    return finalBody;
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -129,13 +180,36 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
       const matchesCollection =
         selectedCollectionId === "All" ||
         collectionItems[prompt.id]?.has(selectedCollectionId);
+      const matchesModel =
+        selectedModel === "All" ||
+        prompt.model.toLowerCase() === selectedModel.toLowerCase();
+      const matchesTag =
+        selectedTag === "All" ||
+        prompt.tags.some((t) => t.toLowerCase() === selectedTag.toLowerCase());
       const haystack = [prompt.title, prompt.category, prompt.body, prompt.model, ...prompt.tags]
         .join(" ")
         .toLowerCase();
 
-      return matchesCategory && matchesFavorite && matchesCollection && haystack.includes(query.toLowerCase());
+      return (
+        matchesCategory &&
+        matchesFavorite &&
+        matchesCollection &&
+        matchesModel &&
+        matchesTag &&
+        haystack.includes(query.toLowerCase())
+      );
     });
-  }, [activeCategory, favoriteIds, favoritesOnly, selectedCollectionId, collectionItems, prompts, query]);
+  }, [
+    activeCategory,
+    favoriteIds,
+    favoritesOnly,
+    selectedCollectionId,
+    collectionItems,
+    selectedModel,
+    selectedTag,
+    prompts,
+    query,
+  ]);
 
   async function copyPrompt(prompt: PromptView) {
     let finalBody = prompt.body;
@@ -287,49 +361,109 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   return (
     <section className="space-y-6">
       <motion.div
-        className="flex flex-col gap-4 rounded-[32px] bg-white p-4 shadow-[var(--shadow-lg)] lg:flex-row lg:items-center lg:justify-between"
+        className="flex flex-col gap-4 rounded-[32px] bg-white p-4 shadow-[var(--shadow-lg)]"
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="flex flex-1 items-center gap-3 rounded-full border border-[rgba(83,88,98,0.16)] bg-[var(--color-arctic-mist)] px-4 py-3">
-          <Search className="h-4 w-4 text-[var(--color-silver-pine)]" aria-hidden="true" />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Cari prompt, tag, kategori, atau model AI..."
-            className="w-full bg-transparent text-sm font-medium tracking-[-0.01em] text-[var(--color-obsidian)] outline-none placeholder:text-[var(--color-ash-gray)]"
-          />
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-1 items-center gap-3 rounded-full border border-[rgba(83,88,98,0.16)] bg-[var(--color-arctic-mist)] px-4 py-3">
+            <Search className="h-4 w-4 text-[var(--color-silver-pine)]" aria-hidden="true" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Cari prompt, tag, kategori, atau model AI..."
+              className="w-full bg-transparent text-sm font-medium tracking-[-0.01em] text-[var(--color-obsidian)] outline-none placeholder:text-[var(--color-ash-gray)]"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setFavoritesOnly((current) => !current)}
+              className={`icon-button ${favoritesOnly ? "active" : ""}`}
+              type="button"
+              title="Tampilkan Favorit"
+            >
+              <Star className="h-4 w-4" fill={favoritesOnly ? "currentColor" : "none"} aria-hidden="true" />
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowFilters((current) => !current)}
+              className={`icon-button ${showFilters ? "active" : ""}`}
+              type="button"
+              title="Filter Lanjutan"
+            >
+              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setViewMode("grid")}
+              className={`icon-button ${viewMode === "grid" ? "active" : ""}`}
+              type="button"
+              title="Grid view"
+            >
+              <Grid2X2 className="h-4 w-4" aria-hidden="true" />
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setViewMode("list")}
+              className={`icon-button ${viewMode === "list" ? "active" : ""}`}
+              type="button"
+              title="List view"
+            >
+              <LayoutList className="h-4 w-4" aria-hidden="true" />
+            </motion.button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setFavoritesOnly((current) => !current)}
-            className={`icon-button ${favoritesOnly ? "active" : ""}`}
-            type="button"
-            title="Filter favorites"
-          >
-            <Filter className="h-4 w-4" aria-hidden="true" />
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setViewMode("grid")}
-            className={`icon-button ${viewMode === "grid" ? "active" : ""}`}
-            type="button"
-            title="Grid view"
-          >
-            <Grid2X2 className="h-4 w-4" aria-hidden="true" />
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setViewMode("list")}
-            className={`icon-button ${viewMode === "list" ? "active" : ""}`}
-            type="button"
-            title="List view"
-          >
-            <LayoutList className="h-4 w-4" aria-hidden="true" />
-          </motion.button>
-        </div>
+
+        {/* Collapsible Filter Panel */}
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden border-t border-[rgba(83,88,98,0.12)] pt-4"
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
+                    Model AI Target:
+                  </span>
+                  <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value)}
+                    className="admin-select bg-[var(--color-arctic-mist)] text-xs font-semibold py-2"
+                  >
+                    {uniqueModels.map((model) => (
+                      <option key={model} value={model}>
+                        {model === "All" ? "Semua Model AI" : model}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
+                    Tag Prompt:
+                  </span>
+                  <select
+                    value={selectedTag}
+                    onChange={(e) => setSelectedTag(e.target.value)}
+                    className="admin-select bg-[var(--color-arctic-mist)] text-xs font-semibold py-2"
+                  >
+                    {uniqueTags.map((tag) => (
+                      <option key={tag} value={tag}>
+                        {tag === "All" ? "Semua Tag" : `#${tag}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Folder Collections Manager */}
@@ -551,12 +685,11 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
               </div>
 
               <p
-                className={`text-sm font-medium leading-6 tracking-[-0.01em] text-[var(--color-silver-pine)] ${
+                className={`text-sm font-medium leading-6 tracking-[-0.01em] text-[var(--color-silver-pine)] whitespace-pre-wrap ${
                   viewMode === "grid" ? "min-h-32" : "line-clamp-3"
                 }`}
-              >
-                {prompt.body}
-              </p>
+                dangerouslySetInnerHTML={{ __html: getRenderedBody(prompt.body, prompt.id) }}
+              />
 
               {(() => {
                 const placeholders = extractPlaceholders(prompt.body);

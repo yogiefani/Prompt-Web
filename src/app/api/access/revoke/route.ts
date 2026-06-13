@@ -3,10 +3,18 @@ import { createCookieSupabaseClient } from "@/lib/supabase-server";
 import { createSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase-admin";
 
 type AccessRevokePayload = {
-  grantId: string;
+  grantId?: string;
   email: string;
   userId?: string;
 };
+
+function getBearerToken(request: NextRequest) {
+  const authorization = request.headers.get("authorization");
+
+  if (!authorization?.startsWith("Bearer ")) return "";
+
+  return authorization.slice("Bearer ".length).trim();
+}
 
 async function isSuperadminRequest() {
   const supabase = await createCookieSupabaseClient();
@@ -43,7 +51,10 @@ async function findAuthUserByEmail(email: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const isAllowed = await isSuperadminRequest();
+  const webhookSecret = process.env.PRODUCT_WEBHOOK_SECRET;
+  const requestSecret = request.headers.get("x-webhook-secret") || getBearerToken(request);
+  const isWebhook = Boolean(webhookSecret && requestSecret && requestSecret === webhookSecret);
+  const isAllowed = isWebhook ? true : await isSuperadminRequest();
 
   if (!isAllowed) {
     return NextResponse.json({ error: "Unauthorized access revoke request." }, { status: 401 });
@@ -57,10 +68,15 @@ export async function POST(request: NextRequest) {
   }
 
   const payload = (await request.json()) as AccessRevokePayload;
-  const { grantId, email, userId } = payload;
+  const email = payload.email?.trim().toLowerCase();
+  const { grantId, userId } = payload;
 
-  if (!grantId || !email) {
-    return NextResponse.json({ error: "Grant ID and Email are required." }, { status: 400 });
+  if (!email) {
+    return NextResponse.json({ error: "Email is required." }, { status: 400 });
+  }
+
+  if (!isWebhook && !grantId) {
+    return NextResponse.json({ error: "Grant ID is required for admin dashboard requests." }, { status: 400 });
   }
 
   const admin = createSupabaseAdminClient();
@@ -80,19 +96,35 @@ export async function POST(request: NextRequest) {
   if (finalUserId) {
     const { error: authError } = await admin.auth.admin.deleteUser(finalUserId);
     if (authError) {
-      // Jika errornya bukan user not found, log atau kembalikan error
       console.error("Gagal menghapus user dari auth:", authError.message);
     }
   }
 
   // 2. Hapus baris data dari tabel access_grants
-  const { error: grantError } = await admin
-    .from("access_grants")
-    .delete()
-    .eq("id", grantId);
+  let finalGrantId = grantId;
+  if (!finalGrantId) {
+    // Coba cari grantId berdasarkan email jika dipanggil lewat webhook
+    const { data: grantData } = await admin
+      .from("access_grants")
+      .select("id")
+      .eq("email", email)
+      .limit(1)
+      .maybeSingle();
 
-  if (grantError) {
-    return NextResponse.json({ error: grantError.message }, { status: 400 });
+    if (grantData) {
+      finalGrantId = grantData.id;
+    }
+  }
+
+  if (finalGrantId) {
+    const { error: grantError } = await admin
+      .from("access_grants")
+      .delete()
+      .eq("id", finalGrantId);
+
+    if (grantError) {
+      return NextResponse.json({ error: grantError.message }, { status: 400 });
+    }
   }
 
   return NextResponse.json({

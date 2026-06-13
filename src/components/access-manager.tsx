@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { Loader2, Search, Send, ShieldCheck, Trash2 } from "lucide-react";
+import { Loader2, Search, Send, ShieldCheck, Trash2, Mail } from "lucide-react";
 import type { AccessGrantView } from "@/lib/prompt-data";
 
 type AccessManagerProps = {
@@ -20,6 +20,7 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
   const [grants, setGrants] = useState<AccessGrantView[]>(initialGrants);
   const [searchQuery, setSearchQuery] = useState("");
   const [revokingId, setRevokingId] = useState("");
+  const [sendingInviteEmail, setSendingInviteEmail] = useState("");
 
   // Filter daftar grants berdasarkan input pencarian
   const filteredGrants = useMemo(() => {
@@ -125,6 +126,39 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
     } catch {
       setRevokingId("");
       setMessage("Terjadi kesalahan jaringan saat mencabut akses.");
+    }
+  }
+
+  async function resendInvite(memberEmail: string, fullName: string, provider: string, productId: string) {
+    setSendingInviteEmail(memberEmail);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/access/invite/resend", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          email: memberEmail,
+          fullName,
+          provider,
+          productId,
+        }),
+      });
+
+      const result = (await response.json()) as { error?: string; ok?: boolean };
+      setSendingInviteEmail("");
+
+      if (!response.ok) {
+        setMessage(result.error ?? "Gagal mengirim ulang undangan.");
+        return;
+      }
+
+      setMessage(`Undangan aktivasi berhasil dikirim ulang ke ${memberEmail}.`);
+    } catch {
+      setSendingInviteEmail("");
+      setMessage("Terjadi kesalahan jaringan saat mengirim ulang undangan.");
     }
   }
 
@@ -276,11 +310,27 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
                       minute: "2-digit",
                     }).format(new Date(grant.createdAt))}
                   </td>
-                  <td className="p-4 text-center">
+                  <td className="p-4 text-center whitespace-nowrap">
+                    {grant.status === "invited" && (
+                      <button
+                        onClick={() => resendInvite(grant.email, grant.fullName, grant.provider, grant.productId)}
+                        disabled={sendingInviteEmail === grant.email}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-violet-100 text-violet-500 hover:bg-violet-50 transition mr-2"
+                        type="button"
+                        title="Kirim ulang undangan aktivasi"
+                      >
+                        {sendingInviteEmail === grant.email ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Mail className="h-4 w-4" />
+                        )}
+                      </button>
+                    )}
                     <button
                       onClick={() => revokeAccess(grant.id, grant.email, grant.userId)}
                       disabled={revokingId === grant.id}
                       className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-red-100 text-red-500 hover:bg-red-50 transition"
+                      type="button"
                       title="Cabut Akses Member"
                     >
                       {revokingId === grant.id ? (

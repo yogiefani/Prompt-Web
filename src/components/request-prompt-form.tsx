@@ -16,6 +16,46 @@ export function RequestPromptForm({ source }: RequestPromptFormProps) {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [myRequests, setMyRequests] = useState<any[]>([]);
+  const [loadingRequests, setLoadingRequests] = useState(false);
+
+  async function fetchMyRequests() {
+    if (source !== "supabase" || !supabase) return;
+    setLoadingRequests(true);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from("prompt_requests")
+          .select("id, title, description, target_model, status, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+
+        if (!error && data) {
+          setMyRequests(data);
+        }
+      }
+    } catch (err) {
+      console.error("Gagal mengambil riwayat request:", err);
+    } finally {
+      setLoadingRequests(false);
+    }
+  }
+
+  // Fetch riwayat ketika form dibuka
+  useState(() => {
+    if (isOpen) {
+      fetchMyRequests();
+    }
+  });
+
+  // Re-run fetch saat status open berubah
+  const previousOpen = isOpen;
+  if (isOpen && !previousOpen) {
+    fetchMyRequests();
+  }
+
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -58,6 +98,7 @@ export function RequestPromptForm({ source }: RequestPromptFormProps) {
     setTitle("");
     setTargetModel("All AI");
     setDescription("");
+    fetchMyRequests();
   }
 
   return (
@@ -76,7 +117,7 @@ export function RequestPromptForm({ source }: RequestPromptFormProps) {
         {isOpen ? (
           <motion.form
             onSubmit={handleSubmit}
-            className="absolute right-0 top-14 z-20 w-[min(92vw,420px)] space-y-4 rounded-[28px] border border-[rgba(83,88,98,0.14)] bg-white p-5 text-left shadow-[var(--shadow-lg)]"
+            className="absolute right-0 top-14 z-20 w-[min(92vw,420px)] space-y-4 rounded-[28px] border border-[rgba(83,88,98,0.14)] bg-white p-5 text-left shadow-[var(--shadow-lg)] max-h-[85vh] overflow-y-auto no-scrollbar"
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
@@ -143,6 +184,38 @@ export function RequestPromptForm({ source }: RequestPromptFormProps) {
               )}
               {status === "loading" ? "Mengirim..." : "Kirim Request"}
             </button>
+
+            {source === "supabase" && (
+              <div className="border-t border-[rgba(83,88,98,0.12)] pt-4 mt-2">
+                <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)] mb-2">
+                  Riwayat Request Anda ({myRequests.length}):
+                </p>
+                {loadingRequests ? (
+                  <p className="text-xs font-semibold text-[var(--color-silver-pine)]">Memuat riwayat...</p>
+                ) : myRequests.length === 0 ? (
+                  <p className="text-xs font-medium text-[var(--color-ash-gray)]">Belum ada request sebelumnya.</p>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+                    {myRequests.map((req) => (
+                      <div key={req.id} className="rounded-xl bg-[var(--color-sky-wash)]/40 p-2.5 border border-[rgba(83,88,98,0.06)]">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-xs font-bold text-[var(--color-obsidian)] truncate">{req.title}</h4>
+                          <span className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.02em] whitespace-nowrap ${
+                            req.status === "pending" ? "bg-[var(--color-whisper-fade-orange)] text-[var(--color-zesty-orange)]" :
+                            req.status === "approved" || req.status === "done" ? "bg-[var(--color-mint-glaze)] text-[var(--color-silver-pine)]" :
+                            "bg-gray-100 text-[var(--color-silver-pine)]"
+                          }`}>
+                            {req.status}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-[11px] text-[var(--color-silver-pine)] line-clamp-2 leading-relaxed">{req.description}</p>
+                        <span className="mt-1 block text-[9px] text-[var(--color-ash-gray)]">Target: {req.target_model || "All AI"}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </motion.form>
         ) : null}
       </AnimatePresence>

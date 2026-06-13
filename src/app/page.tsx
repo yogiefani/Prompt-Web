@@ -59,9 +59,6 @@ export default async function Home() {
               Lihat Library Demo
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link href="/superadmin" className="secondary-button">
-              Dashboard Superadmin
-            </Link>
           </div>
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             {[

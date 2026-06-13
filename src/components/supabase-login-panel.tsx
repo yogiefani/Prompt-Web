@@ -3,34 +3,15 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { ArrowRight, CheckCircle2, Loader2, LogOut, ShieldCheck, UserRoundCheck } from "lucide-react";
-import { motion } from "framer-motion";
-import { FadeIn, Stagger, StaggerItem } from "@/components/motion-primitives";
+import { ArrowRight, Loader2, LogOut } from "lucide-react";
+import { FadeIn } from "@/components/motion-primitives";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
-
-const roleOptions = [
-  {
-    label: "Superadmin",
-    description: "Kelola link produk, prompt, kategori, user, dan analytics.",
-    path: "/superadmin",
-    icon: ShieldCheck,
-    tone: "violet",
-  },
-  {
-    label: "User Access",
-    description: "Buka semua prompt premium, cheat sheet, kategori, dan copy workflow.",
-    path: "/library",
-    icon: UserRoundCheck,
-    tone: "mint",
-  },
-];
 
 export function SupabaseLoginPanel() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
   const reason = searchParams.get("reason");
-  const initialRedirectPath = nextPath?.startsWith("/") ? nextPath : "/library";
   const initialMessage =
     reason === "auth-required"
       ? "Silakan login dulu untuk membuka halaman tersebut."
@@ -39,7 +20,6 @@ export function SupabaseLoginPanel() {
         : "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [redirectPath, setRedirectPath] = useState(initialRedirectPath);
   const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [message, setMessage] = useState(initialMessage);
@@ -59,6 +39,26 @@ export function SupabaseLoginPanel() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  async function handleRedirectAfterLogin(userId: string) {
+    if (!supabase) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .single();
+
+    // Jika parameter next ada, prioritaskan. Jika tidak, redirect ke /superadmin (jika superadmin) atau /library (jika member biasa)
+    const targetPath = nextPath?.startsWith("/")
+      ? nextPath
+      : profile?.role === "superadmin"
+        ? "/superadmin"
+        : "/library";
+
+    router.push(targetPath);
+    router.refresh();
+  }
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -85,8 +85,7 @@ export function SupabaseLoginPanel() {
     setUser(data.user);
     setStatus("success");
     setMessage("Login berhasil. Mengalihkan halaman...");
-    router.push(redirectPath);
-    router.refresh();
+    await handleRedirectAfterLogin(data.user.id);
   }
 
   async function handleOAuthLogin(provider: "google" | "github") {
@@ -99,10 +98,13 @@ export function SupabaseLoginPanel() {
 
     setStatus("loading");
 
+    // OAuth callback akan mengarahkan user ke /auth/callback
+    // Callback route akan mengarahkan ke parameter next yang kita berikan
+    const defaultNext = nextPath?.startsWith("/") ? nextPath : "/library";
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(defaultNext)}`,
       },
     });
 
@@ -119,52 +121,15 @@ export function SupabaseLoginPanel() {
     setMessage("Session sudah keluar.");
   }
 
+  async function handleLanjutkanState() {
+    if (!user) return;
+    setStatus("loading");
+    await handleRedirectAfterLogin(user.id);
+  }
+
   return (
     <div className="rounded-[28px] bg-[var(--color-arctic-mist)] p-6 md:p-8">
-      <Stagger className="grid gap-4 md:grid-cols-2">
-        {roleOptions.map((role) => {
-          const Icon = role.icon;
-          const isSelected = redirectPath === role.path;
-
-          return (
-            <StaggerItem key={role.label}>
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setRedirectPath(role.path)}
-                className={`login-role-card text-left ${isSelected ? "selected" : ""}`}
-              >
-                <span
-                  className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-                    role.tone === "violet"
-                      ? "bg-[var(--color-whisper-fade-violet)] text-[var(--color-deep-violet)]"
-                      : "bg-[var(--color-mint-glaze)] text-[var(--color-electric-blue)]"
-                  }`}
-                >
-                  <Icon className="h-5 w-5" aria-hidden="true" />
-                </span>
-                <h2>{role.label}</h2>
-                <p>{role.description}</p>
-                <span className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-electric-blue)]">
-                  {isSelected ? (
-                    <>
-                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                      Tujuan login dipilih
-                    </>
-                  ) : (
-                    <>
-                      Pilih tujuan login
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </>
-                  )}
-                </span>
-              </motion.button>
-            </StaggerItem>
-          );
-        })}
-      </Stagger>
-
-      <FadeIn className="mt-6 rounded-[24px] border border-white bg-white/80 p-5" delay={0.16}>
+      <FadeIn className="rounded-[24px] border border-white bg-white/80 p-5">
         {user ? (
           <div className="space-y-4">
             <div className="rounded-2xl bg-[var(--color-mint-glaze)] p-4">
@@ -175,14 +140,21 @@ export function SupabaseLoginPanel() {
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
-                className="primary-button flex-1"
+                className="primary-button flex-1 justify-center"
                 type="button"
-                onClick={() => router.push(redirectPath)}
+                onClick={handleLanjutkanState}
+                disabled={status === "loading"}
               >
-                Lanjutkan
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                {status === "loading" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <>
+                    Lanjutkan
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </>
+                )}
               </button>
-              <button className="secondary-button flex-1" type="button" onClick={handleLogout}>
+              <button className="secondary-button flex-1 justify-center" type="button" onClick={handleLogout} disabled={status === "loading"}>
                 <LogOut className="h-4 w-4" aria-hidden="true" />
                 Logout
               </button>
