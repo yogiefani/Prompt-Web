@@ -88,31 +88,7 @@ export function SupabaseLoginPanel() {
     await handleRedirectAfterLogin(data.user.id);
   }
 
-  async function handleOAuthLogin(provider: "google" | "github") {
-    setMessage("");
 
-    if (!isSupabaseConfigured || !supabase) {
-      setMessage("Layanan database belum dikonfigurasi. Hubungi administrator.");
-      return;
-    }
-
-    setStatus("loading");
-
-    // OAuth callback akan mengarahkan user ke /auth/callback
-    // Callback route akan mengarahkan ke parameter next yang kita berikan
-    const defaultNext = nextPath?.startsWith("/") ? nextPath : "/library";
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(defaultNext)}`,
-      },
-    });
-
-    if (error) {
-      setStatus("idle");
-      setMessage(error.message);
-    }
-  }
 
   async function handleLogout() {
     if (!supabase) return;
@@ -201,33 +177,7 @@ export function SupabaseLoginPanel() {
               {status === "loading" ? "Memeriksa akun..." : "Login Masuk"}
             </button>
 
-            <div className="relative my-4 flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[rgba(83,88,98,0.14)]"></div>
-              </div>
-              <span className="relative bg-white px-3 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--color-ash-gray)]">
-                atau masuk lewat
-              </span>
-            </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => handleOAuthLogin("google")}
-                disabled={status === "loading"}
-                className="secondary-button justify-center font-semibold"
-              >
-                Google
-              </button>
-              <button
-                type="button"
-                onClick={() => handleOAuthLogin("github")}
-                disabled={status === "loading"}
-                className="secondary-button justify-center font-semibold"
-              >
-                GitHub
-              </button>
-            </div>
           </form>
         )}
 
