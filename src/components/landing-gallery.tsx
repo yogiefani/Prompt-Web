@@ -18,6 +18,10 @@ export function LandingGallery() {
 
   useEffect(() => {
     async function fetchGallery() {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase
         .from("landing_gallery")
         .select("*")

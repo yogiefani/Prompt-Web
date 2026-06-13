@@ -26,6 +26,10 @@ export function GalleryCmsManager() {
   }, []);
 
   async function fetchGallery() {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase
       .from("landing_gallery")
@@ -54,6 +58,7 @@ export function GalleryCmsManager() {
 
   const handleCropComplete = async (croppedBase64: string) => {
     setCropImageSrc(null); // Close modal
+    if (!supabase) return;
     
     // Upload to DB
     const newItem = {
@@ -78,6 +83,7 @@ export function GalleryCmsManager() {
   };
 
   const toggleActive = async (id: string, current: boolean) => {
+    if (!supabase) return;
     const { error } = await supabase
       .from("landing_gallery")
       .update({ is_active: !current })
@@ -88,6 +94,7 @@ export function GalleryCmsManager() {
   };
 
   const deleteItem = async (id: string) => {
+    if (!supabase) return;
     if (!confirm("Yakin ingin menghapus foto ini?")) return;
     const { error } = await supabase.from("landing_gallery").delete().eq("id", id);
     if (!error) {
