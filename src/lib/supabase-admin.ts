@@ -8,6 +8,18 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
   console.warn("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables.");
 }
 
+export const isSupabaseAdminConfigured = Boolean(supabaseUrl && supabaseServiceRoleKey);
+
+export function createSupabaseAdminClient() {
+  if (!isSupabaseAdminConfigured) return null;
+  return createClient(supabaseUrl, supabaseServiceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
     autoRefreshToken: false,
