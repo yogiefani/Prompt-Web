@@ -67,6 +67,9 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   const [selectedModel, setSelectedModel] = useState("All");
   const [selectedTag, setSelectedTag] = useState("All");
   const [selectedPlaygroundPrompt, setSelectedPlaygroundPrompt] = useState<PromptView | null>(null);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [paletteQuery, setPaletteQuery] = useState("");
+  const [paletteSelectedIndex, setPaletteSelectedIndex] = useState(0);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -99,6 +102,81 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
     });
     return ["All", ...Array.from(tags)];
   }, [prompts]);
+
+  const isMac = typeof window !== "undefined" && navigator.userAgent.toLowerCase().includes("mac");
+
+  // Filtered prompts specifically for the command palette search
+  const paletteFilteredPrompts = useMemo(() => {
+    if (!paletteQuery.trim()) return prompts.slice(0, 8); // show first 8 items as suggestion
+    return prompts.filter((prompt) => {
+      const haystack = [prompt.title, prompt.category, prompt.body, prompt.model, ...prompt.tags]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(paletteQuery.toLowerCase());
+    });
+  }, [prompts, paletteQuery]);
+
+  // Reset index when query changes
+  useEffect(() => {
+    setPaletteSelectedIndex(0);
+  }, [paletteQuery]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Toggle palette: Cmd + K or Ctrl + K
+      if ((e.metaKey || e.ctrlKey) && e.key?.toLowerCase() === "k") {
+        e.preventDefault();
+        setIsPaletteOpen((prev) => !prev);
+        setPaletteQuery("");
+        return;
+      }
+
+      if (!isPaletteOpen) return;
+
+      // Escape to close
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setIsPaletteOpen(false);
+        return;
+      }
+
+      // Arrow Down
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setPaletteSelectedIndex((prev) =>
+          paletteFilteredPrompts.length === 0
+            ? 0
+            : (prev + 1) % paletteFilteredPrompts.length
+        );
+        return;
+      }
+
+      // Arrow Up
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setPaletteSelectedIndex((prev) =>
+          paletteFilteredPrompts.length === 0
+            ? 0
+            : (prev - 1 + paletteFilteredPrompts.length) % paletteFilteredPrompts.length
+        );
+        return;
+      }
+
+      // Enter key
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const activePrompt = paletteFilteredPrompts[paletteSelectedIndex];
+        if (activePrompt) {
+          setSelectedPlaygroundPrompt(activePrompt);
+          setIsPaletteOpen(false);
+        }
+        return;
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isPaletteOpen, paletteFilteredPrompts, paletteSelectedIndex]);
 
   function escapeHtml(text: string): string {
     return text
@@ -386,14 +464,19 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 items-center gap-3 rounded-full border border-[rgba(83,88,98,0.16)] bg-[var(--color-arctic-mist)] px-4 py-3">
-            <Search className="h-4 w-4 text-[var(--color-silver-pine)]" aria-hidden="true" />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari prompt, tag, kategori, atau model AI..."
-              className="w-full bg-transparent text-sm font-medium tracking-[-0.01em] text-[var(--color-obsidian)] outline-none placeholder:text-[var(--color-ash-gray)]"
-            />
+          <div className="flex flex-1 items-center justify-between gap-3 rounded-full border border-[rgba(83,88,98,0.16)] bg-[var(--color-arctic-mist)] px-4 py-3">
+            <div className="flex flex-1 items-center gap-3">
+              <Search className="h-4 w-4 text-[var(--color-silver-pine)]" aria-hidden="true" />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Cari prompt, tag, kategori, atau model AI..."
+                className="w-full bg-transparent text-sm font-medium tracking-[-0.01em] text-[var(--color-obsidian)] outline-none placeholder:text-[var(--color-ash-gray)]"
+              />
+            </div>
+            <span className="hidden md:inline-flex items-center gap-1 rounded-md border border-[rgba(83,88,98,0.15)] bg-white px-2 py-1 text-[10px] font-bold text-[var(--color-ash-gray)] shadow-sm pointer-events-none">
+              {isMac ? "⌘K" : "Ctrl+K"}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <motion.button
@@ -913,6 +996,103 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                 </div>
               </div>
             </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Command Palette Search Overlay */}
+      <AnimatePresence>
+        {isPaletteOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsPaletteOpen(false)}
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            />
+
+            {/* Dialog Container */}
+            <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-20 md:pt-32 pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: -20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: -20 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="w-full max-w-lg overflow-hidden rounded-[28px] border border-white/20 bg-white/95 p-3 shadow-2xl backdrop-blur-xl pointer-events-auto"
+              >
+                {/* Search Bar Input */}
+                <div className="flex items-center gap-3 border-b border-[rgba(83,88,98,0.12)] px-4 py-3">
+                  <Search className="h-5 w-5 text-[var(--color-silver-pine)]" />
+                  <input
+                    autoFocus
+                    value={paletteQuery}
+                    onChange={(e) => setPaletteQuery(e.target.value)}
+                    placeholder="Ketik kata kunci untuk mencari prompt..."
+                    className="w-full bg-transparent text-sm font-semibold tracking-[-0.01em] text-[var(--color-obsidian)] outline-none placeholder:text-[var(--color-ash-gray)]"
+                  />
+                  <span className="rounded-lg bg-[var(--color-sky-wash)] px-2 py-1 text-[10px] font-bold text-[var(--color-electric-blue)]">
+                    ESC
+                  </span>
+                </div>
+
+                {/* Results List */}
+                <div className="mt-2 max-h-72 overflow-y-auto no-scrollbar space-y-1">
+                  {paletteFilteredPrompts.length === 0 ? (
+                    <div className="p-8 text-center text-xs font-semibold text-[var(--color-silver-pine)]">
+                      Tidak ada prompt yang cocok dengan pencarian Anda.
+                    </div>
+                  ) : (
+                    paletteFilteredPrompts.map((prompt, index) => {
+                      const isSelected = index === paletteSelectedIndex;
+                      return (
+                        <button
+                          key={prompt.id}
+                          onClick={() => {
+                            setSelectedPlaygroundPrompt(prompt);
+                            setIsPaletteOpen(false);
+                          }}
+                          className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-all ${
+                            isSelected
+                              ? "bg-[var(--color-midnight-ink)] text-white shadow-md"
+                              : "hover:bg-[var(--color-arctic-mist)] text-[var(--color-obsidian)]"
+                          }`}
+                        >
+                          <div className="min-w-0">
+                            <h4 className="text-sm font-bold truncate">
+                              {prompt.title}
+                            </h4>
+                            <p className={`mt-0.5 text-[11px] font-semibold truncate ${
+                              isSelected ? "text-white/80" : "text-[var(--color-silver-pine)]"
+                            }`}>
+                              AI Target: {prompt.model}
+                            </p>
+                          </div>
+                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold shrink-0 ml-3 ${
+                            isSelected
+                              ? "bg-white/20 text-white"
+                              : "bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]"
+                          }`}>
+                            {prompt.category}
+                          </span>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Footer Instructions */}
+                <div className="flex items-center justify-between border-t border-[rgba(83,88,98,0.12)] mt-3 px-4 pt-3 text-[10px] font-bold text-[var(--color-ash-gray)] uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <span>↑↓ Navigasi</span>
+                    <span className="mx-1">•</span>
+                    <span>↵ Buka Playground</span>
+                  </div>
+                  <span>{paletteFilteredPrompts.length} hasil</span>
+                </div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
