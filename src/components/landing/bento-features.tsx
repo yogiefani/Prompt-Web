@@ -67,10 +67,10 @@ export function BentoFeatures() {
                 <LockKeyhole className="h-6 w-6" aria-hidden="true" />
               </span>
               <h3 className="font-aeonik text-2xl font-bold tracking-[-0.02em] text-[var(--color-obsidian)]">
-                Hak Akses Ganda
+                Akses Eksklusif & Terproteksi
               </h3>
               <p className="mt-3 text-base font-medium leading-relaxed text-[var(--color-silver-pine)]">
-                Superadmin untuk pengelola (Anda), dan Member Access untuk pembeli produk digital Anda. Aman dan terenkripsi.
+                Setiap member mendapatkan akun pribadi yang aman. Akses instan diberikan otomatis setelah pembelian terverifikasi.
               </p>
             </div>
           </LiftCard>

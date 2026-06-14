@@ -9,8 +9,8 @@ const faqs = [
     answer: "Tidak! Anda hanya perlu membeli lisensi satu kali (One-Time Payment) dan Anda bisa menikmati semua fitur ini selamanya tanpa biaya bulanan."
   },
   {
-    question: "Apakah saya bisa menjual akses ke member saya?",
-    answer: "Tentu saja! Sistem ini dirancang dengan Role 'Superadmin' dan 'Member'. Anda bebas memonetisasi akses ke Prompt Library Anda sendiri."
+    question: "Bagaimana cara saya mengakses prompt setelah membeli?",
+    answer: "Setelah pembelian selesai, Anda akan menerima email aktivasi secara instan. Anda dapat langsung login menggunakan email tersebut dan mengakses seluruh pustaka prompt premium."
   },
   {
     question: "Berapa kapasitas penyimpanan prompt-nya?",

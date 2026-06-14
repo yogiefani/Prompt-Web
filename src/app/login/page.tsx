@@ -29,11 +29,10 @@ export default async function LoginPage() {
             <LockKeyhole className="h-6 w-6" aria-hidden="true" />
           </span>
           <h1 className="font-aeonik text-4xl sm:text-5xl leading-tight tracking-[-0.02em] text-[var(--color-obsidian)]">
-            Login sesuai role akses {settings.brandName}.
+            Masuk ke Pustaka Prompt Anda.
           </h1>
           <p className="mt-5 max-w-xl text-base sm:text-lg font-medium leading-8 text-[var(--color-silver-pine)]">
-            Silakan masukkan email dan password terdaftar Anda. Superadmin akan dialihkan ke konsol manajemen,
-            sementara member akan masuk ke pustaka prompt premium.
+            Silakan masukkan email dan password terdaftar Anda untuk mulai mengakses seluruh library prompt premium.
           </p>
         </FadeIn>
 

@@ -23,7 +23,7 @@ export function HeroSection({ settings }: { settings: any }) {
         </h1>
         
         <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed tracking-[-0.01em] text-[var(--color-silver-pine)] sm:text-xl">
-          Simpan, kelola, dan temukan prompt rahasia Anda dalam 1 detik. Dilengkapi sistem <span className="font-bold text-[var(--color-obsidian)]">Superadmin</span> untuk menjual akses ke library prompt Anda!
+          Simpan, kelola, dan temukan prompt terbaik Anda dalam 1 detik. Dapatkan akses eksklusif ke seluruh pustaka prompt premium kami sekarang!
         </p>
         
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:items-start">

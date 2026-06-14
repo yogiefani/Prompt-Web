@@ -90,15 +90,14 @@ export function RequestPromptForm({ source }: RequestPromptFormProps) {
     if (error) {
       setStatus("error");
       setMessage(error.message);
-      return;
+    } else {
+      setStatus("success");
+      setMessage("Request Anda telah terkirim.");
+      setTitle("");
+      setTargetModel("All AI");
+      setDescription("");
+      fetchMyRequests();
     }
-
-    setStatus("success");
-    setMessage("Request terkirim ke superadmin.");
-    setTitle("");
-    setTargetModel("All AI");
-    setDescription("");
-    fetchMyRequests();
   }
 
   return (
