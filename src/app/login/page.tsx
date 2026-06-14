@@ -23,15 +23,15 @@ export default async function LoginPage() {
         </a>
       </div>
 
-      <section className="mx-auto grid min-h-[calc(100vh-112px)] max-w-6xl items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+      <section className="mx-auto grid min-h-0 py-8 lg:py-0 lg:min-h-[calc(100vh-112px)] max-w-6xl items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <FadeIn>
           <span className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[var(--color-electric-blue)] shadow-[var(--shadow-lg)]">
             <LockKeyhole className="h-6 w-6" aria-hidden="true" />
           </span>
-          <h1 className="font-aeonik text-5xl leading-tight tracking-[-0.02em]">
+          <h1 className="font-aeonik text-4xl sm:text-5xl leading-tight tracking-[-0.02em] text-[var(--color-obsidian)]">
             Login sesuai role akses {settings.brandName}.
           </h1>
-          <p className="mt-5 max-w-xl text-lg font-medium leading-8 text-[var(--color-silver-pine)]">
+          <p className="mt-5 max-w-xl text-base sm:text-lg font-medium leading-8 text-[var(--color-silver-pine)]">
             Silakan masukkan email dan password terdaftar Anda. Superadmin akan dialihkan ke konsol manajemen,
             sementara member akan masuk ke pustaka prompt premium.
           </p>

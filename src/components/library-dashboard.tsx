@@ -117,7 +117,7 @@ export function LibraryDashboard({
               <button className="icon-button hidden sm:flex" type="button" title="Notifications">
                 <Bell className="h-4 w-4" aria-hidden="true" />
               </button>
-              <LogoutButton className="secondary-button hidden sm:inline-flex" />
+              <LogoutButton className="secondary-button inline-flex py-2 px-3 text-xs sm:text-sm sm:py-2.5 sm:px-4" />
             </div>
           </div>
 

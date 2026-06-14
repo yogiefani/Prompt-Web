@@ -477,6 +477,48 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                 </div>
               ))
             )}
+
+            {/* Output Panel for Mobile (only visible on screens < lg) */}
+            {status === "done" && output && (
+              <div className="mt-8 rounded-2xl border border-[rgba(83,88,98,0.1)] bg-[var(--color-arctic-mist)] p-4 lg:hidden space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[rgba(83,88,98,0.08)]">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[var(--color-obsidian)]">Output Prompt</span>
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                      isJson
+                        ? "bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]"
+                        : "bg-[var(--color-mint-glaze)] text-[var(--color-obsidian)]"
+                    }`}>
+                      {isJson ? "JSON" : "TEXT"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-[rgba(83,88,98,0.08)] bg-white p-4 shadow-sm">
+                  {isJson ? <JsonOutput text={output} /> : (
+                    <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[var(--color-obsidian)]">{output}</pre>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={copyOutput}
+                    className="secondary-button flex-1 py-2 text-xs"
+                    type="button"
+                  >
+                    {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://chatgpt.com/?q=${encodeURIComponent(output)}`, "_blank")}
+                    className="primary-button flex-1 py-2 text-xs"
+                    type="button"
+                  >
+                    <ExternalLink className="h-4 w-4" /> Buka AI
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Generate Button */}
@@ -572,7 +614,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                   </div>
                   <div>
                     <p className="font-bold text-[var(--color-obsidian)] text-sm">Isi formulir lalu tekan</p>
-                    <p className="font-bold text-[var(--color-obsidian)] text-sm">"Generate Prompt"</p>
+                    <p className="font-bold text-[var(--color-obsidian)] text-sm">&quot;Generate Prompt&quot;</p>
                   </div>
                   <div className="font-mono text-xs text-[var(--color-silver-pine)] text-left space-y-1 mt-2">
                     <p><span className="text-green-600">✓</span> template : ready</p>
