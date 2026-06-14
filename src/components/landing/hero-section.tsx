@@ -59,10 +59,10 @@ export function HeroSection({ settings }: { settings: any }) {
         </div>
       </FadeIn>
 
-      <ScaleIn id="library" className="relative w-full" delay={0.12}>
-        <div style={{ perspective: "1000px" }}>
-          <div className="hero-rotate-card rounded-[32px] bg-white p-3 shadow-2xl transition-transform duration-700 hover:rotate-x-0 hover:rotate-y-0">
-            <div className="rounded-[28px] border border-[rgba(83,88,98,0.12)] bg-[var(--color-arctic-mist)] p-4 shadow-inner">
+      <ScaleIn id="library" className="relative w-full min-w-0" delay={0.12}>
+        <div className="w-full min-w-0" style={{ perspective: "1000px" }}>
+          <div className="hero-rotate-card w-full min-w-0 rounded-[32px] bg-white p-3 shadow-2xl transition-transform duration-700 hover:rotate-x-0 hover:rotate-y-0">
+            <div className="w-full min-w-0 rounded-[28px] border border-[rgba(83,88,98,0.12)] bg-[var(--color-arctic-mist)] p-4 shadow-inner overflow-hidden">
             <div className="flex flex-col gap-4 border-b border-[rgba(83,88,98,0.12)] pb-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold text-[var(--color-silver-pine)]">Member Library</p>
@@ -80,7 +80,7 @@ export function HeroSection({ settings }: { settings: any }) {
               </div>
             </div>
 
-            <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-2">
+            <div className="no-scrollbar mt-4 flex w-full max-w-full gap-2 overflow-x-auto pb-2">
               {promptCategories.slice(0, 4).map((category) => (
                 <span key={category.slug} className="flex shrink-0 items-center gap-2 rounded-full border border-[rgba(83,88,98,0.08)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-silver-pine)] shadow-sm">
                   <category.icon className="h-4 w-4 text-[var(--color-electric-blue)]" aria-hidden="true" />
