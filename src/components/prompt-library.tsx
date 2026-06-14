@@ -20,6 +20,7 @@ import {
   Star,
   WandSparkles,
   SlidersHorizontal,
+  X,
 } from "lucide-react";
 import type { IconName, PromptCategoryView, PromptView } from "@/lib/prompt-data";
 import { supabase } from "@/lib/supabase";
@@ -65,6 +66,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   const [showFilters, setShowFilters] = useState(false);
   const [selectedModel, setSelectedModel] = useState("All");
   const [selectedTag, setSelectedTag] = useState("All");
+  const [selectedPlaygroundPrompt, setSelectedPlaygroundPrompt] = useState<PromptView | null>(null);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -592,11 +594,12 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
             <motion.article
               layout
               key={prompt.id}
-              className={`prompt-card group ${viewMode === "list" ? "compact" : ""}`}
+              className={`prompt-card group cursor-pointer ${viewMode === "list" ? "compact" : ""}`}
               initial={{ opacity: 0, y: 14, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               whileHover={{ y: -4 }}
+              onClick={() => setSelectedPlaygroundPrompt(prompt)}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="flex items-start justify-between gap-3">
@@ -619,10 +622,13 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="relative">
+                  <div className="relative" onClick={(e) => e.stopPropagation()}>
                     <motion.button
                       whileTap={{ scale: 0.92 }}
-                      onClick={() => setShowAddToCollectionId(showAddToCollectionId === prompt.id ? "" : prompt.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowAddToCollectionId(showAddToCollectionId === prompt.id ? "" : prompt.id);
+                      }}
                       className={`icon-button ${collectionItems[prompt.id]?.size ? "active" : ""}`}
                       type="button"
                       title="Simpan ke koleksi"
@@ -654,11 +660,15 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                                   <label
                                     key={c.id}
                                     className="flex items-center gap-2 text-xs font-semibold text-[var(--color-silver-pine)] cursor-pointer hover:text-[var(--color-obsidian)]"
+                                    onClick={(e) => e.stopPropagation()}
                                   >
                                     <input
                                       type="checkbox"
                                       checked={isChecked}
-                                      onChange={() => togglePromptInCollection(prompt.id, c.id)}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        togglePromptInCollection(prompt.id, c.id);
+                                      }}
                                     />
                                     <span className="truncate">{c.name}</span>
                                   </label>
@@ -673,7 +683,10 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
 
                   <motion.button
                     whileTap={{ scale: 0.92 }}
-                    onClick={() => toggleFavorite(prompt.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(prompt.id);
+                    }}
                     className={`icon-button ${favoriteIds.has(prompt.id) ? "active" : ""}`}
                     type="button"
                     title={favoriteIds.has(prompt.id) ? "Remove favorite" : "Favorite"}
@@ -702,64 +715,41 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
               </div>
 
               <p
-                className={`text-sm font-medium leading-6 tracking-[-0.01em] text-[var(--color-silver-pine)] whitespace-pre-wrap ${
-                  viewMode === "grid" ? "min-h-32" : "line-clamp-3"
+                className={`text-sm font-medium leading-6 tracking-[-0.01em] text-[var(--color-silver-pine)] line-clamp-4 ${
+                  viewMode === "grid" ? "min-h-[6.5rem]" : ""
                 }`}
                 dangerouslySetInnerHTML={{ __html: getRenderedBody(prompt.body, prompt.id) }}
               />
 
-              {(() => {
-                const placeholders = extractPlaceholders(prompt.body);
-                if (placeholders.length === 0) return null;
-
-                return (
-                  <div className="mt-4 space-y-3 rounded-2xl bg-[var(--color-sky-wash)]/40 p-4 border border-[rgba(83,88,98,0.08)]">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
-                      Lengkapi Variabel Prompt:
-                    </p>
-                    <div className="grid gap-2.5 sm:grid-cols-2">
-                      {placeholders.map((placeholder) => (
-                        <div key={placeholder} className="flex flex-col gap-1">
-                          <span className="text-[11px] font-bold text-[var(--color-silver-pine)]/80">
-                            {placeholder.charAt(0).toUpperCase() + placeholder.slice(1)}
-                          </span>
-                          <input
-                            type="text"
-                            value={inputs[prompt.id]?.[placeholder] ?? ""}
-                            onChange={(e) => {
-                              setInputs((prev) => ({
-                                ...prev,
-                                [prompt.id]: {
-                                  ...(prev[prompt.id] ?? {}),
-                                  [placeholder]: e.target.value,
-                                },
-                              }));
-                            }}
-                            placeholder={`Isi ${placeholder}...`}
-                            className="w-full rounded-xl border border-[rgba(83,88,98,0.14)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-obsidian)] outline-none transition focus:border-[var(--color-electric-blue)]"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.98 }}
-                onClick={() => copyPrompt(prompt)}
-                className={`mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-midnight-ink)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-subtle)] transition hover:-translate-y-0.5 ${
-                  viewMode === "grid" ? "w-full" : "w-full sm:w-auto"
-                }`}
-              >
-                {copiedTitle === prompt.title ? (
-                  <Check className="h-4 w-4" aria-hidden="true" />
-                ) : (
-                  <Copy className="h-4 w-4" aria-hidden="true" />
-                )}
-                {copiedTitle === prompt.title ? "Copied" : "Copy Prompt"}
-              </motion.button>
+              <div className="mt-6 flex gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPlaygroundPrompt(prompt);
+                  }}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-midnight-ink)] px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-[var(--shadow-subtle)] transition hover:opacity-90 active:scale-95"
+                >
+                  <Sparkles className="h-4 w-4 text-[var(--color-sunburst-yellow)]" aria-hidden="true" />
+                  Playground
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyPrompt(prompt);
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-4 py-2.5 text-xs sm:text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)] active:scale-95"
+                  title="Copy Quick"
+                >
+                  {copiedTitle === prompt.title ? (
+                    <Check className="h-4 w-4 text-green-500" aria-hidden="true" />
+                  ) : (
+                    <Copy className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  {copiedTitle === prompt.title ? "Copied" : "Copy"}
+                </button>
+              </div>
             </motion.article>
           ))}
         </AnimatePresence>
@@ -770,6 +760,162 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
           Belum ada prompt yang cocok dengan filter ini.
         </div>
       ) : null}
+
+      {/* Playground Drawer Panel */}
+      <AnimatePresence>
+        {selectedPlaygroundPrompt && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedPlaygroundPrompt(null)}
+              className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+            />
+
+            {/* Sliding Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed bottom-0 right-0 top-0 z-50 flex h-full w-full flex-col bg-white shadow-2xl md:max-w-2xl border-l border-[rgba(83,88,98,0.12)]"
+            >
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between border-b border-[rgba(83,88,98,0.12)] p-6">
+                <div>
+                  <span className="rounded-full bg-[var(--color-mint-glaze)] px-3 py-1 text-xs font-semibold text-[var(--color-silver-pine)]">
+                    {selectedPlaygroundPrompt.category}
+                  </span>
+                  <h3 className="mt-2 font-aeonik text-xl font-bold tracking-[-0.02em] text-[var(--color-obsidian)]">
+                    {selectedPlaygroundPrompt.title}
+                  </h3>
+                  <p className="mt-1 text-xs font-medium text-[var(--color-ash-gray)]">
+                    AI Target: {selectedPlaygroundPrompt.model}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPlaygroundPrompt(null)}
+                  className="rounded-full bg-[var(--color-sky-wash)] p-2 text-[var(--color-silver-pine)] hover:bg-[var(--color-midnight-ink)] hover:text-white transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Drawer Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
+                {/* Variable inputs section */}
+                {(() => {
+                  const placeholders = extractPlaceholders(selectedPlaygroundPrompt.body);
+                  if (placeholders.length === 0) return null;
+
+                  return (
+                    <div className="space-y-4 rounded-3xl bg-[var(--color-sky-wash)]/50 p-5 border border-[rgba(83,88,98,0.12)]">
+                      <h4 className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
+                        Lengkapi Variabel Prompt:
+                      </h4>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {placeholders.map((placeholder) => (
+                          <div key={placeholder} className="flex flex-col gap-1.5">
+                            <span className="text-[11px] font-bold text-[var(--color-silver-pine)]/85">
+                              {placeholder.charAt(0).toUpperCase() + placeholder.slice(1)}
+                            </span>
+                            <input
+                              type="text"
+                              value={inputs[selectedPlaygroundPrompt.id]?.[placeholder] ?? ""}
+                              onChange={(e) => {
+                                setInputs((prev) => ({
+                                  ...prev,
+                                  [selectedPlaygroundPrompt.id]: {
+                                    ...(prev[selectedPlaygroundPrompt.id] ?? {}),
+                                    [placeholder]: e.target.value,
+                                  },
+                                }));
+                              }}
+                              placeholder={`Isi nilai untuk ${placeholder}...`}
+                              className="w-full rounded-2xl border border-[rgba(83,88,98,0.16)] bg-white px-4 py-2.5 text-sm font-semibold text-[var(--color-obsidian)] outline-none transition focus:border-[var(--color-electric-blue)] focus:ring-1 focus:ring-[var(--color-electric-blue)]"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Prompt Preview section */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)] flex items-center justify-between">
+                    Live Compiled Preview:
+                    {extractPlaceholders(selectedPlaygroundPrompt.body).length > 0 && (
+                      <span className="text-[10px] font-semibold text-[var(--color-electric-blue)] normal-case">
+                        *Terupdate otomatis saat mengetik
+                      </span>
+                    )}
+                  </h4>
+                  <div className="rounded-3xl border border-[rgba(83,88,98,0.14)] bg-[var(--color-arctic-mist)] p-6 shadow-inner">
+                    <p
+                      className="text-sm font-medium leading-relaxed tracking-[-0.01em] text-[var(--color-obsidian)] whitespace-pre-wrap selection:bg-[var(--color-whisper-fade-blue)]"
+                      dangerouslySetInnerHTML={{
+                        __html: getRenderedBody(selectedPlaygroundPrompt.body, selectedPlaygroundPrompt.id),
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Info and Tags */}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {selectedPlaygroundPrompt.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-[var(--color-sky-wash)] px-3 py-1 text-xs font-semibold text-[var(--color-silver-pine)] border border-[rgba(83,88,98,0.06)]"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Drawer Footer Actions */}
+              <div className="border-t border-[rgba(83,88,98,0.12)] p-6 bg-[var(--color-arctic-mist)]/50 flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => copyPrompt(selectedPlaygroundPrompt)}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-midnight-ink)] px-6 py-4 text-base font-bold text-white shadow-lg transition hover:opacity-95 hover:scale-[1.01] active:scale-[0.99]"
+                >
+                  {copiedTitle === selectedPlaygroundPrompt.title ? (
+                    <Check className="h-5 w-5 text-green-400" aria-hidden="true" />
+                  ) : (
+                    <Copy className="h-5 w-5" aria-hidden="true" />
+                  )}
+                  {copiedTitle === selectedPlaygroundPrompt.title ? "Compiled Prompt Copied!" : "Copy Compiled Prompt"}
+                </button>
+                
+                {/* External AI shortcuts */}
+                <div className="flex gap-2">
+                  <a
+                    href="https://chat.openai.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-5 py-4 text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)]"
+                  >
+                    ChatGPT
+                  </a>
+                  <a
+                    href="https://claude.ai"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-5 py-4 text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)]"
+                  >
+                    Claude
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

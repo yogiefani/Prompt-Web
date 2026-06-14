@@ -6,9 +6,15 @@ function loadEnvFile(filePath) {
   const entries = {};
 
   for (const line of content.split(/\r?\n/)) {
-    const trimmed = line.trim();
+    let cleanLine = line;
+    const commentIdx = line.indexOf("#");
+    if (commentIdx !== -1) {
+      cleanLine = line.substring(0, commentIdx);
+    }
+    
+    const trimmed = cleanLine.trim();
 
-    if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) continue;
+    if (!trimmed || !trimmed.includes("=")) continue;
 
     const [key, ...valueParts] = trimmed.split("=");
     const rawValue = valueParts.join("=").trim();
