@@ -33,11 +33,8 @@ export function LandingHeader({ productUrl }: { productUrl: string }) {
           </a>
         </div>
 
-        {/* Mobile Header Buttons */}
+        {/* Mobile Header Toggle Menu Button */}
         <div className="flex items-center gap-2 md:hidden">
-          <a href={productUrl} className="primary-button py-2 px-3 text-xs">
-            Beli Access
-          </a>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="icon-button h-9 w-9 flex items-center justify-center p-0"
@@ -73,7 +70,7 @@ export function LandingHeader({ productUrl }: { productUrl: string }) {
           >
             Tutorials
           </Link>
-          <div className="border-t border-[rgba(83,88,98,0.1)] pt-3">
+          <div className="border-t border-[rgba(83,88,98,0.1)] pt-3 flex flex-col gap-2">
             <Link
               href="/login"
               onClick={() => setMobileMenuOpen(false)}
@@ -81,6 +78,14 @@ export function LandingHeader({ productUrl }: { productUrl: string }) {
             >
               Login
             </Link>
+            <a
+              href={productUrl}
+              onClick={() => setMobileMenuOpen(false)}
+              className="primary-button w-full justify-center py-3 text-sm font-bold"
+            >
+              Beli Access
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
           </div>
         </div>
       )}

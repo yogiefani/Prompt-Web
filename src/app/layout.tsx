@@ -32,7 +32,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${aeonikFallback.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
     >
-      <body className="min-h-full">
+      <body className="min-h-full overflow-x-hidden">
         <PhantomUIProvider />
         <MotionProvider>{children}</MotionProvider>
       </body>

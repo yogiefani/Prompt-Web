@@ -17,7 +17,7 @@ export function HeroSection({ settings }: { settings: any }) {
           Prompt manager premium #1 di Indonesia
         </div>
         
-        <h1 className="font-aeonik text-5xl font-bold leading-[1.1] tracking-[-0.02em] text-[var(--color-obsidian)] sm:text-6xl lg:text-[4.5rem]">
+        <h1 className="font-aeonik text-4xl font-bold leading-[1.1] tracking-[-0.02em] text-[var(--color-obsidian)] sm:text-6xl lg:text-[4.5rem]">
           Stop Kehilangan <br className="hidden lg:block"/>
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-electric-blue)] to-[var(--color-midnight-ink)]">Prompt Terbaik</span> Anda.
         </h1>
@@ -61,7 +61,7 @@ export function HeroSection({ settings }: { settings: any }) {
 
       <ScaleIn id="library" className="relative w-full" delay={0.12}>
         <div style={{ perspective: "1000px" }}>
-          <div className="rounded-[32px] bg-white p-3 shadow-2xl transition-transform duration-700 hover:rotate-x-0 hover:rotate-y-0" style={{ transform: "rotateY(-5deg) rotateX(5deg)" }}>
+          <div className="hero-rotate-card rounded-[32px] bg-white p-3 shadow-2xl transition-transform duration-700 hover:rotate-x-0 hover:rotate-y-0">
             <div className="rounded-[28px] border border-[rgba(83,88,98,0.12)] bg-[var(--color-arctic-mist)] p-4 shadow-inner">
             <div className="flex flex-col gap-4 border-b border-[rgba(83,88,98,0.12)] pb-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
