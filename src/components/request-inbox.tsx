@@ -59,6 +59,20 @@ export function RequestInbox({ initialRequests, source }: RequestInboxProps) {
       return;
     }
 
+    // Insert Notification
+    if (status === "approved" || status === "done") {
+      const request = requests.find((r) => r.id === requestId);
+      if (request?.userId) {
+        await supabase.from("notifications").insert({
+          user_id: request.userId,
+          title: "Request Prompt Selesai",
+          message: `Request Anda "${request.title}" telah diproses dan statusnya kini: ${status}.`,
+          type: "request_update",
+          is_read: false
+        });
+      }
+    }
+
     setMessage("Status request berhasil diperbarui.");
   }
 

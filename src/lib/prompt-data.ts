@@ -58,6 +58,7 @@ export type PromptRequestView = {
   status: string;
   requesterEmail: string;
   createdAt: string;
+  userId: string;
 };
 
 export type PromptInsightView = {
@@ -147,6 +148,7 @@ type PromptRequestRow = {
   target_model: string | null;
   status: string | null;
   created_at: string;
+  user_id: string;
   profiles:
     | {
         email: string | null;
@@ -313,6 +315,7 @@ function normalizePromptRequest(row: PromptRequestRow): PromptRequestView {
     status: row.status ?? "pending",
     requesterEmail: profile?.email ?? "Unknown member",
     createdAt: row.created_at,
+    userId: row.user_id,
   };
 }
 
@@ -390,7 +393,7 @@ export async function getPromptWorkspaceData(): Promise<PromptWorkspaceData> {
           .gte("created_at", monthStart.toISOString()),
         supabase
           .from("prompt_requests")
-          .select("id,title,description,target_model,status,created_at,profiles(email)")
+          .select("id,user_id,title,description,target_model,status,created_at,profiles(email)")
           .order("created_at", { ascending: false })
           .limit(12),
         supabase

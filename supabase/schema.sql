@@ -320,3 +320,33 @@ on public.landing_gallery for all
 to authenticated
 using (public.is_superadmin())
 with check (public.is_superadmin());
+
+-- Notifications
+create table public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  title text not null,
+  message text not null,
+  type text not null default 'system', -- 'announcement', 'request_update', 'system'
+  is_read boolean not null default false,
+  link_url text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.notifications enable row level security;
+
+create policy "notifications_read_own"
+on public.notifications for select
+to authenticated
+using (user_id = auth.uid() or public.is_superadmin());
+
+create policy "notifications_update_own"
+on public.notifications for update
+to authenticated
+using (user_id = auth.uid() or public.is_superadmin())
+with check (user_id = auth.uid() or public.is_superadmin());
+
+create policy "notifications_insert_superadmin"
+on public.notifications for insert
+to authenticated
+with check (public.is_superadmin());

@@ -28,6 +28,7 @@ import { PromptCmsManager } from "@/components/prompt-cms-manager";
 import { BlogCmsManager } from "@/components/blog-cms-manager";
 import { StudioCmsManager } from "@/components/studio-cms-manager";
 import { GalleryCmsManager } from "@/components/gallery-cms-manager";
+import { NotificationBlastManager } from "@/components/notification-blast-manager";
 import { featurePhases } from "@/lib/content";
 import type { PromptWorkspaceData, IconName } from "@/lib/prompt-data";
 
@@ -49,7 +50,7 @@ const iconMap: Record<IconName, typeof Sparkles> = {
 };
 
 export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "settings" | "roadmap">(
+  const [activeTab, setActiveTab] = useState<"overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "notifications" | "settings" | "roadmap">(
     "overview"
   );
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -78,7 +79,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
     (request) => request.status === "pending" || request.status === "reviewing"
   ).length;
 
-  type TabId = "overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "settings" | "roadmap";
+  type TabId = "overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "notifications" | "settings" | "roadmap";
 
   const sidebarMenu: { id: TabId; label: string; icon: typeof LayoutDashboard; badge?: number }[] = [
     { id: "overview", label: "Overview & Analitik", icon: LayoutDashboard },
@@ -88,6 +89,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
     { id: "gallery", label: "Galeri Landing", icon: Sparkles },
     { id: "access", label: "Akses Member", icon: ShieldCheck },
     { id: "requests", label: "Permintaan Prompt", icon: Inbox, badge: pendingRequestsCount },
+    { id: "notifications", label: "Blast Notifikasi", icon: Sparkles },
     { id: "settings", label: "Pengaturan Publik", icon: Settings },
     { id: "roadmap", label: "Roadmap Fitur", icon: Compass },
   ];
@@ -291,6 +293,12 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
                 <p className="mt-1 text-sm font-medium text-[var(--color-silver-pine)]">Lihat request dari member untuk rilis prompt baru.</p>
               </div>
               <RequestInbox initialRequests={workspace.requests} source={workspace.source} />
+            </ScaleIn>
+          )}
+
+          {activeTab === "notifications" && (
+            <ScaleIn className="space-y-6">
+              <NotificationBlastManager />
             </ScaleIn>
           )}
 

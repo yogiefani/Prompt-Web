@@ -23,6 +23,7 @@ import { BlogList } from "@/components/blog-list";
 import { PromptStudio } from "@/components/prompt-studio";
 import { MemberCollections } from "@/components/member-collections";
 import { MemberRequests } from "@/components/member-requests";
+import { NotificationBell } from "@/components/notification-bell";
 import { cheatSheetRows, promptKeywords, toneRows } from "@/lib/content";
 import type { PromptWorkspaceData } from "@/lib/prompt-data";
 import type { BlogPostListItem } from "@/lib/blog-data";
@@ -169,9 +170,7 @@ export function LibraryDashboard({
                   <span className="hidden sm:inline">Admin Panel</span>
                 </Link>
               )}
-              <button className="icon-button hidden sm:flex" type="button" title="Notifications">
-                <Bell className="h-4 w-4" aria-hidden="true" />
-              </button>
+              <NotificationBell />
               
               {/* Theme Toggle Button (Mobile) */}
               <button

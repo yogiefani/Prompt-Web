@@ -94,3 +94,37 @@ Fitur premium bagi member untuk mengatur *prompt* favorit mereka ke dalam sistem
 3. **Integrasi ke Supabase Database**
    - Setiap pengguna menyimpan dan mengatur *folder*-nya masing-masing di database awan (`prompt_collections`).
    - Ini memastikan koleksi folder yang dibuat tidak hilang meskipun member *login* menggunakan laptop atau HP lain.
+
+---
+
+# Request Prompt Dedicated Tab 📬
+
+Merespon kebutuhan interaksi dua arah antara Member dan Superadmin secara lebih profesional, fitur "Request Prompt" yang sebelumnya hanya berupa _popup_ telah dirombak total menjadi Halaman Tab Khusus di dasbor.
+
+## Peningkatan UI/UX:
+1. **Layout Layar Penuh yang Lega**
+   - Form pengisian _request_ berada di sisi kiri dengan kolom yang lebar, sehingga member bisa lebih nyaman menjelaskan konteks _prompt_ yang mereka butuhkan.
+   - Di sisi kanan, tersedia daftar **Riwayat Request** lengkap dengan _badge_ penanda status yang menarik secara visual (`pending`, `approved`, `done`).
+
+2. **Sistem Rate-Limiting Anti Spam**
+   - Menambahkan perlindungan spam otomatis. Jika seorang member memiliki 3 _request_ aktif yang berstatus `"pending"`, formulir pengiriman akan terkunci sementara.
+   - Tombol kirim otomatis digantikan oleh kotak peringatan kuning _(warning box)_ elegan, meminta mereka bersabar menunggu antrean.
+
+---
+
+# Sistem Notifikasi Real-time & Blast 🔔
+
+Untuk membuat PromptVault OS lebih interaktif dan memudahkan komunikasi satu arah maupun dua arah, kami telah merancang ulang tombol lonceng statis menjadi **Sistem Notifikasi Penuh**.
+
+## Fitur Utama:
+1. **Dropdown Notifikasi Interaktif (Member)**
+   - Ikon lonceng kini memiliki indikator titik merah (*red badge*) yang berdenyut jika ada notifikasi baru.
+   - Saat diklik, panel bergaya *glassmorphism* akan muncul, menampilkan daftar notifikasi (pengumuman sistem, info akses, maupun _update_ request).
+   - Mengklik notifikasi akan otomatis menandainya sebagai "Sudah Dibaca". Tersedia juga tombol praktis "Tandai Semua Dibaca".
+
+2. **Form Blast Notifikasi (Superadmin)**
+   - Tersedia menu baru **"Blast Notifikasi"** di Superadmin Dashboard.
+   - Memungkinkan admin mengirimkan pengumuman masif ke **seluruh member aktif** secara instan dengan label spesifik (Info/Pengumuman). Member akan langsung melihatnya di lonceng notifikasi mereka.
+
+3. **Otomatisasi Status Request**
+   - Menghemat waktu operasional admin: ketika Superadmin mengubah status request dari `pending` ke `approved` atau `done`, sistem secara ajaib akan men-*generate* dan mengirimkan notifikasi personal langsung ke dasbor member yang mengajukan request tersebut.
