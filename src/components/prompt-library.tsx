@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSearchParams, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -70,6 +71,11 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [paletteQuery, setPaletteQuery] = useState("");
   const [paletteSelectedIndex, setPaletteSelectedIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -780,8 +786,9 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
       ) : null}
 
       {/* Playground Drawer Panel */}
-      <AnimatePresence>
-        {selectedPlaygroundPrompt && (
+      {mounted && createPortal(
+        <AnimatePresence>
+          {selectedPlaygroundPrompt && (
           <>
             {/* Backdrop */}
             <motion.div
@@ -924,7 +931,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                     href="https://claude.ai"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-5 py-4 text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-5 py-4 text-sm font-bold text-[var(--color-obsidian)] dark:text-white transition hover:bg-[var(--color-arctic-mist)] dark:hover:bg-white/5"
                   >
                     Claude
                   </a>
@@ -933,11 +940,14 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
             </motion.div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
 
       {/* Command Palette Search Overlay */}
-      <AnimatePresence>
-        {isPaletteOpen && (
+      {mounted && createPortal(
+        <AnimatePresence>
+          {isPaletteOpen && (
           <>
             {/* Backdrop */}
             <motion.div
@@ -990,7 +1000,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                           }}
                           className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-all ${
                             isSelected
-                              ? "bg-[var(--color-midnight-ink)] text-white shadow-md"
+                              ? "bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] shadow-md"
                               : "hover:bg-[var(--color-arctic-mist)] text-[var(--color-obsidian)]"
                           }`}
                         >
@@ -999,14 +1009,14 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                               {prompt.title}
                             </h4>
                             <p className={`mt-0.5 text-[11px] font-semibold truncate ${
-                              isSelected ? "text-white/80" : "text-[var(--color-silver-pine)]"
+                              isSelected ? "text-white/80 dark:text-[var(--color-sky-wash)]/80" : "text-[var(--color-silver-pine)]"
                             }`}>
                               AI Target: {prompt.model}
                             </p>
                           </div>
                           <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold shrink-0 ml-3 ${
                             isSelected
-                              ? "bg-white/20 text-white"
+                              ? "bg-white/20 text-white dark:bg-black/10 dark:text-[var(--color-sky-wash)]"
                               : "bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]"
                           }`}>
                             {prompt.category}
@@ -1030,7 +1040,9 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
             </div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
     </section>
   );
 }
