@@ -136,25 +136,6 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
           })}
         </nav>
 
-        <div className="mt-auto pt-5 border-t border-[rgba(83,88,98,0.12)] dark:border-white/10">
-          <div className="flex flex-col gap-2">
-            <Link href="/library" className="secondary-button w-full justify-center">
-              Member Library
-            </Link>
-            <button
-              onClick={toggleTheme}
-              className="flex w-full items-center justify-between rounded-full bg-[var(--color-midnight-ink)] px-4 py-2.5 text-xs font-bold text-white shadow-[var(--shadow-subtle)] transition hover:opacity-90 active:scale-95 dark:text-[var(--color-sky-wash)]"
-            >
-              <span className="flex items-center gap-2">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 dark:bg-black/20">
-                  {theme === "light" ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
-                </div>
-                {theme === "light" ? "Mode Gelap" : "Mode Terang"}
-              </span>
-            </button>
-            <LogoutButton className="secondary-button w-full justify-center" />
-          </div>
-        </div>
       </aside>
 
       {/* Main Content Area */}
@@ -173,13 +154,17 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
               </h1>
             </div>
 
-            <div className="flex items-center gap-2 lg:hidden">
-              <button onClick={toggleTheme} className="icon-button">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTheme}
+                className="icon-button"
+                title={theme === "light" ? "Mode Gelap" : "Mode Terang"}
+              >
                 {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               </button>
               <div className="flex gap-2">
                 <Link href="/library" className="secondary-button py-2 px-3 text-xs hidden sm:flex">
-                  Library
+                  Member Library
                 </Link>
                 <LogoutButton className="secondary-button py-2 px-3 text-xs" />
               </div>
