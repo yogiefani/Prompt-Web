@@ -69,6 +69,7 @@ function ImageUploader({ value, onChange, label, placeholder }: { value: string;
 }
 import { supabase } from "@/lib/supabase";
 import type { PromptGeneratorView } from "@/lib/prompt-data";
+import { MarkdownEditor } from "@/components/markdown-editor";
 
 type FormField = {
   id: string;
@@ -375,11 +376,12 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
                   {allFields.length === 0 && <span className="text-xs text-[var(--color-silver-pine)]">Belum ada field di Form Builder.</span>}
                 </div>
               </div>
-              <textarea
-                className="form-input min-h-[440px] font-mono text-sm leading-relaxed"
+              <MarkdownEditor
                 value={editingGen.prompt_template}
-                onChange={(e) => setEditingGen({ ...editingGen, prompt_template: e.target.value })}
+                onChange={(value) => setEditingGen({ ...editingGen, prompt_template: value })}
                 placeholder={`Tulis prompt master Anda di sini...\n\nContoh:\n{\n  "task": "generate_banner",\n  "brand": "{{nama_brand}}",\n  "style": "{{gaya_desain}}"\n}`}
+                rows={14}
+                variableSyntax="handlebars"
               />
             </div>
           )}

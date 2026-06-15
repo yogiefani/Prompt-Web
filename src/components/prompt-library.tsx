@@ -13,15 +13,20 @@ import {
   Folder,
   FolderKanban,
   Grid2X2,
+  Heart,
   LayoutList,
   MessageSquareText,
   Plus,
   Search,
+  Settings,
   Sparkles,
   Star,
+  ThumbsDown,
+  ThumbsUp,
   WandSparkles,
   SlidersHorizontal,
   X,
+  Zap,
 } from "lucide-react";
 import type { IconName, PromptCategoryView, PromptView } from "@/lib/prompt-data";
 import { supabase } from "@/lib/supabase";
@@ -72,10 +77,56 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   const [paletteQuery, setPaletteQuery] = useState("");
   const [paletteSelectedIndex, setPaletteSelectedIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
+  
+  // Feedback state
+  const [feedback, setFeedback] = useState<"up" | "down" | "none">("none");
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Fetch feedback when opening playground
+  useEffect(() => {
+    if (selectedPlaygroundPrompt && isSupabaseConfigured && supabase) {
+      const fetchFeedback = async () => {
+         const { data: { user } } = await supabase.auth.getUser();
+         if (!user) return;
+         const { data } = await supabase
+            .from("prompt_feedback")
+            .select("is_positive")
+            .eq("prompt_id", selectedPlaygroundPrompt.id)
+            .eq("user_id", user.id)
+            .single();
+         if (data) setFeedback(data.is_positive ? "up" : "down");
+         else setFeedback("none");
+      };
+      setFeedback("none");
+      fetchFeedback();
+    }
+  }, [selectedPlaygroundPrompt]);
+
+  const handleFeedback = async (isPositive: boolean) => {
+    if (!isSupabaseConfigured || !supabase || submittingFeedback || !selectedPlaygroundPrompt) return;
+    setSubmittingFeedback(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      alert("Anda harus login untuk memberi rating.");
+      setSubmittingFeedback(false);
+      return;
+    }
+
+    const { error } = await supabase.from("prompt_feedback").upsert({
+      prompt_id: selectedPlaygroundPrompt.id,
+      user_id: user.id,
+      is_positive: isPositive
+    }, { onConflict: 'prompt_id,user_id' });
+
+    if (!error) {
+      setFeedback(isPositive ? "up" : "down");
+    }
+    setSubmittingFeedback(false);
+  };
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -820,13 +871,42 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                     AI Target: {selectedPlaygroundPrompt.model}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedPlaygroundPrompt(null)}
-                  className="rounded-full bg-[var(--color-sky-wash)] p-2 text-[var(--color-silver-pine)] hover:bg-[var(--color-midnight-ink)] hover:text-white transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleFeedback(true)}
+                    disabled={submittingFeedback}
+                    className={`rounded-full p-2.5 transition-colors ${
+                      feedback === "up" 
+                        ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400" 
+                        : "bg-[var(--color-sky-wash)] text-[var(--color-silver-pine)] hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20"
+                    }`}
+                    title="Prompt ini bagus"
+                  >
+                    <ThumbsUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleFeedback(false)}
+                    disabled={submittingFeedback}
+                    className={`rounded-full p-2.5 transition-colors ${
+                      feedback === "down" 
+                        ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" 
+                        : "bg-[var(--color-sky-wash)] text-[var(--color-silver-pine)] hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                    }`}
+                    title="Prompt ini butuh perbaikan"
+                  >
+                    <ThumbsDown className="h-4 w-4" />
+                  </button>
+                  <div className="w-px h-6 bg-[rgba(83,88,98,0.12)] mx-1" />
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPlaygroundPrompt(null)}
+                    className="rounded-full bg-[var(--color-sky-wash)] p-2 text-[var(--color-silver-pine)] hover:bg-[var(--color-midnight-ink)] hover:text-white transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Drawer Content */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { Loader2, Search, Send, ShieldCheck, Trash2, Mail } from "lucide-react";
+import { Loader2, Search, Send, ShieldCheck, Trash2, Mail, Ban, CheckCircle } from "lucide-react";
 import type { AccessGrantView } from "@/lib/prompt-data";
 
 type AccessManagerProps = {
@@ -21,6 +21,7 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [revokingId, setRevokingId] = useState("");
   const [sendingInviteEmail, setSendingInviteEmail] = useState("");
+  const [suspendingId, setSuspendingId] = useState("");
 
   // Filter daftar grants berdasarkan input pencarian
   const filteredGrants = useMemo(() => {
@@ -126,6 +127,49 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
     } catch {
       setRevokingId("");
       setMessage("Terjadi kesalahan jaringan saat mencabut akses.");
+    }
+  }
+
+  async function toggleSuspendAccess(grantId: string, memberEmail: string, memberUserId: string, currentStatus: string) {
+    const action = currentStatus === "suspended" ? "activate" : "suspend";
+    const confirmed = window.confirm(
+      action === "suspend" 
+        ? `Apakah Anda yakin ingin menangguhkan (suspend) akses untuk "${memberEmail}"? Mereka tidak akan bisa masuk ke Library.`
+        : `Apakah Anda yakin ingin mengaktifkan kembali akses untuk "${memberEmail}"?`
+    );
+    if (!confirmed) return;
+
+    setSuspendingId(grantId);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/access/suspend", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          grantId,
+          email: memberEmail,
+          userId: memberUserId,
+          action,
+        }),
+      });
+
+      const result = (await response.json()) as { error?: string; ok?: boolean; newStatus?: string };
+      setSuspendingId("");
+
+      if (!response.ok) {
+        setMessage(result.error ?? `Gagal ${action === "suspend" ? "menangguhkan" : "mengaktifkan"} akses.`);
+        return;
+      }
+
+      setMessage(`Akses untuk ${memberEmail} berhasil ${action === "suspend" ? "ditangguhkan" : "diaktifkan kembali"}.`);
+      // Update dari state lokal
+      setGrants((prev) => prev.map((g) => g.id === grantId ? { ...g, status: result.newStatus ?? "granted" } : g));
+    } catch {
+      setSuspendingId("");
+      setMessage(`Terjadi kesalahan jaringan saat ${action === "suspend" ? "menangguhkan" : "mengaktifkan"} akses.`);
     }
   }
 
@@ -295,10 +339,12 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
                       className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold ${
                         grant.status === "invited"
                           ? "bg-[var(--color-whisper-fade-violet)] text-[var(--color-deep-violet)]"
+                          : grant.status === "suspended"
+                          ? "bg-orange-100 text-orange-700"
                           : "bg-[var(--color-mint-glaze)] text-[var(--color-silver-pine)]"
                       }`}
                     >
-                      {grant.status === "invited" ? "✉️ Undangan Terkirim" : "✅ Akses Aktif"}
+                      {grant.status === "invited" ? "✉️ Undangan Terkirim" : grant.status === "suspended" ? "⏸️ Suspended" : "✅ Akses Aktif"}
                     </span>
                   </td>
                   <td className="p-4 text-gray-400">
@@ -323,6 +369,27 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <Mail className="h-4 w-4" />
+                        )}
+                      </button>
+                    )}
+                    {(grant.status === "granted" || grant.status === "suspended") && (
+                      <button
+                        onClick={() => toggleSuspendAccess(grant.id, grant.email, grant.userId, grant.status)}
+                        disabled={suspendingId === grant.id}
+                        className={`inline-flex h-8 w-8 items-center justify-center rounded-xl border transition mr-2 ${
+                          grant.status === "suspended" 
+                            ? "border-green-100 text-green-500 hover:bg-green-50" 
+                            : "border-orange-100 text-orange-500 hover:bg-orange-50"
+                        }`}
+                        type="button"
+                        title={grant.status === "suspended" ? "Aktifkan kembali akses" : "Tangguhkan (Suspend) Akses"}
+                      >
+                        {suspendingId === grant.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : grant.status === "suspended" ? (
+                          <CheckCircle className="h-4 w-4" />
+                        ) : (
+                          <Ban className="h-4 w-4" />
                         )}
                       </button>
                     )}

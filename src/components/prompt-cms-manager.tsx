@@ -6,6 +6,7 @@ import { Edit3, Loader2, Save, Trash2, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { PromptCategoryView, PromptView } from "@/lib/prompt-data";
+import { MarkdownEditor } from "@/components/markdown-editor";
 
 type PromptCmsManagerProps = {
   initialCategories: PromptCategoryView[];
@@ -627,13 +628,10 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
             </div>
 
             <label className="mt-4 block text-sm font-semibold">
-              Prompt
-              <textarea
-                className="admin-textarea mt-2"
+              Prompt (Gunakan [Variabel] untuk fitur interaktif)
+              <MarkdownEditor
                 value={promptForm.body}
-                onChange={(event) => setPromptForm((current) => ({ ...current, body: event.target.value }))}
-                rows={7}
-                required
+                onChange={(value) => setPromptForm((current) => ({ ...current, body: value }))}
               />
             </label>
 
