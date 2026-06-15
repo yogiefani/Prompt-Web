@@ -49,3 +49,48 @@ Sistem *Dark Mode* dan pergantian tema telah sukses dibuat dengan desain yang pr
 
 > [!NOTE]
 > *Semua update terkait copy-text "Superadmin hanya saya" juga telah disembunyikan dan dibersihkan pada seluruh file tampilan publik (Login page, Reset Password, Landing Page, dan Register), agar terlihat sangat profesional dan aman untuk user.*
+
+---
+
+# Fitur Dasbor Analitik Interaktif (Superadmin) 📈
+
+Halaman Dasbor Superadmin telah direkonstruksi dari yang tadinya berupa daftar teks sederhana, menjadi panel analitik grafis (*Data Visualization*) yang interaktif menggunakan `recharts`. Hal ini memungkinkan admin untuk memantau performa penjualan dan penggunaan produk secara visual.
+
+## 3 Grafik Utama yang Ditambahkan:
+
+1. **Pertumbuhan Member (AreaChart)**
+   - Grafik area yang melacak penambahan total akses member baru (berdasarkan *Webhook Lynk.id*) dari hari ke hari.
+   - Menampilkan tren kumulatif konversi penjualan secara nyata.
+
+2. **Kategori Terpopuler (PieChart / DonutChart)**
+   - Distribusi berbentuk diagram lingkaran yang mengelompokkan kategori prompt mana saja yang paling banyak di-_copy_ oleh pengguna.
+   - Sangat berguna untuk mengetahui topik apa yang paling laku dan fokus produksi konten berikutnya.
+
+3. **Tren Copy Prompt (BarChart)**
+   - Diagram batang horizontal yang memberikan peringkat (*leaderboard*) pada setiap *prompt*.
+   - Semakin panjang batangnya, semakin tinggi utilitas *prompt* tersebut di kalangan member.
+
+## Desain & Responsivitas:
+- Semua grafik dilengkapi dengan **Tooltip Hover Interaktif** yang responsif.
+- Memanfaatkan variabel warna sistem (seperti `electric-blue`, `zesty-orange`) sehingga palet grafik secara otomatis **berbaur dengan sempurna** dalam transisi antara *Light Mode* dan *Dark Mode*.
+
+---
+
+# Fitur Custom Folders (Koleksi Saya) 📁
+
+Fitur premium bagi member untuk mengatur *prompt* favorit mereka ke dalam sistem folder *(Collections)* secara pribadi.
+
+## Yang telah dikerjakan:
+1. **Pembuatan Tab Baru "Koleksi Saya"**
+   - Menghapus bar filter folder dari atas grid *Library* utama agar tidak berantakan.
+   - Menambahkan menu baru "Koleksi Saya" dengan ikon *FolderKanban* di navigasi sisi kiri.
+
+2. **Panel Pengaturan Folder Interaktif**
+   - Halaman **Koleksi Saya** memiliki desain mirip Notion/Google Drive:
+     - **Sebelah Kiri**: Daftar folder (bisa bikin nama folder baru & menghapusnya).
+     - **Sebelah Kanan**: Menampilkan kartu-kartu *prompt* yang tersimpan dalam folder tersebut secara dinamis.
+   - Menyediakan fitur "Keluarkan dari Folder" (Remove from collection) yang bisa diakses langsung pada halaman tersebut.
+
+3. **Integrasi ke Supabase Database**
+   - Setiap pengguna menyimpan dan mengatur *folder*-nya masing-masing di database awan (`prompt_collections`).
+   - Ini memastikan koleksi folder yang dibuat tidak hilang meskipun member *login* menggunakan laptop atau HP lain.

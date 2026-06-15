@@ -236,7 +236,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
               </Stagger>
 
               {/* Analytics Panel */}
-              <PromptAnalyticsPanel insights={workspace.insights} />
+              <PromptAnalyticsPanel insights={workspace.insights} grants={workspace.grants} />
             </FadeIn>
           )}
 

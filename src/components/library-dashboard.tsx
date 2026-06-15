@@ -12,6 +12,8 @@ import {
   Sparkles,
   Sun,
   Moon,
+  LayoutDashboard,
+  FolderKanban,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { LogoutButton } from "@/components/logout-button";
@@ -20,11 +22,12 @@ import { PromptLibrary } from "@/components/prompt-library";
 import { RequestPromptForm } from "@/components/request-prompt-form";
 import { BlogList } from "@/components/blog-list";
 import { PromptStudio } from "@/components/prompt-studio";
+import { MemberCollections } from "@/components/member-collections";
 import { cheatSheetRows, promptKeywords, toneRows } from "@/lib/content";
 import type { PromptWorkspaceData } from "@/lib/prompt-data";
 import type { BlogPostListItem } from "@/lib/blog-data";
 
-type TabId = "library" | "studio" | "tutorials" | "cheat-sheet" | "tone";
+type TabId = "library" | "collections" | "studio" | "tutorials" | "cheat-sheet" | "tone";
 
 export function LibraryDashboard({
   workspace,
@@ -65,7 +68,8 @@ export function LibraryDashboard({
   }, [theme]);
 
   const sidebarMenu: { id: TabId; label: string; icon: typeof FileText; badge?: number }[] = [
-    { id: "library", label: "Prompt Library", icon: FileText },
+    { id: "library", label: "Prompt Library", icon: LayoutDashboard },
+    { id: "collections", label: "Koleksi Saya", icon: FolderKanban },
     { id: "studio", label: "AI Prompt Studio", icon: Sparkles },
     { id: "tutorials", label: "Tutorials", icon: BookText, badge: blogPosts.length > 0 ? blogPosts.length : undefined },
     { id: "cheat-sheet", label: "Cheat Sheet", icon: BookOpen },
@@ -221,31 +225,37 @@ export function LibraryDashboard({
           ) : (
             <>
               {activeTab === "library" && (
-            <FadeIn className="space-y-8">
-              <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
-                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                  <div>
-                    <span className="rounded-full bg-[var(--color-mint-glaze)] px-4 py-2 text-xs font-semibold text-[var(--color-silver-pine)]">
-                      Premium Knowledge Base
-                    </span>
-                    <h2 className="mt-5 max-w-3xl font-aeonik text-4xl leading-tight tracking-[-0.02em]">
-                      Semua prompt tersimpan rapi berdasarkan tujuan, model AI, dan workflow.
-                    </h2>
-                    <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-[var(--color-silver-pine)]">
-                      Layout dibuat lebih operasional dari Notion: cepat dicari, mudah difilter,
-                      dan setiap prompt punya tombol copy langsung.
-                    </p>
+                <FadeIn className="space-y-8">
+                  <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                      <div>
+                        <span className="rounded-full bg-[var(--color-mint-glaze)] px-4 py-2 text-xs font-semibold text-[var(--color-silver-pine)]">
+                          Premium Knowledge Base
+                        </span>
+                        <h2 className="mt-5 max-w-3xl font-aeonik text-4xl leading-tight tracking-[-0.02em]">
+                          Semua prompt tersimpan rapi berdasarkan tujuan, model AI, dan workflow.
+                        </h2>
+                        <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-[var(--color-silver-pine)]">
+                          Layout dibuat lebih operasional dari Notion: cepat dicari, mudah difilter,
+                          dan setiap prompt punya tombol copy langsung.
+                        </p>
+                      </div>
+                      {!isSuperadmin && <RequestPromptForm source={workspace.source} />}
+                    </div>
                   </div>
-                  {!isSuperadmin && <RequestPromptForm source={workspace.source} />}
-                </div>
-              </div>
-              <PromptLibrary
-                categories={workspace.categories}
-                prompts={workspace.prompts}
-                source={workspace.source}
-              />
-            </FadeIn>
-          )}
+                  <PromptLibrary
+                    categories={workspace.categories}
+                    prompts={workspace.prompts}
+                    source={workspace.source}
+                  />
+                </FadeIn>
+              )}
+
+              {activeTab === "collections" && (
+                <FadeIn className="h-full">
+                  <MemberCollections prompts={workspace.prompts} source={workspace.source} />
+                </FadeIn>
+              )}
 
           {activeTab === "studio" && (
             <FadeIn key="studio" className="h-full">

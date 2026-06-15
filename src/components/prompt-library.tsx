@@ -568,72 +568,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
         </AnimatePresence>
       </motion.div>
 
-      {/* Folder Collections Manager */}
-      {userId && (
-        <div id="collections-section" className="flex flex-wrap items-center gap-4 rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-5 shadow-[var(--shadow-lg)] dark:bg-[var(--color-canvas-white)]">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
-            <FolderKanban className="h-4 w-4 text-[var(--color-electric-blue)]" />
-            Folder Koleksi:
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setSelectedCollectionId("All")}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold border ${
-                selectedCollectionId === "All"
-                  ? "bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] border-transparent"
-                  : "bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.16)] hover:bg-[var(--color-arctic-mist)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
-              }`}
-            >
-              Semua Koleksi
-            </button>
-            {collections.map((c) => (
-              <span
-                key={c.id}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border ${
-                  selectedCollectionId === c.id
-                    ? "bg-[var(--color-electric-blue)] text-white border-transparent"
-                    : "bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.16)] hover:bg-[var(--color-arctic-mist)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
-                }`}
-              >
-                <button type="button" onClick={() => setSelectedCollectionId(c.id)}>
-                  📁 {c.name}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => deleteCollection(c.id)}
-                  className="hover:text-red-500 font-bold ml-1 text-[10px]"
-                  title="Hapus Koleksi"
-                >
-                  ✕
-                </button>
-              </span>
-            ))}
-          </div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              createCollection(newCollectionName);
-            }}
-            className="flex items-center gap-2 ml-auto"
-          >
-            <input
-              type="text"
-              value={newCollectionName}
-              onChange={(e) => setNewCollectionName(e.target.value)}
-              placeholder="Nama Koleksi..."
-              className="rounded-xl border border-[rgba(83,88,98,0.18)] px-3 py-1.5 text-xs font-semibold text-[var(--color-obsidian)] outline-none dark:bg-[var(--color-canvas-white)] dark:border-white/10"
-              required
-            />
-            <button
-              type="submit"
-              className="inline-flex items-center justify-center p-1.5 rounded-xl bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] hover:opacity-90"
-              title="Tambah Koleksi"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          </form>
-        </div>
-      )}
+      {/* Folder Collections Manager moved to its own tab */}
 
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         <motion.button
