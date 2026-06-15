@@ -19,15 +19,15 @@ import { BrandMark } from "@/components/brand-mark";
 import { LogoutButton } from "@/components/logout-button";
 import { FadeIn } from "@/components/motion-primitives";
 import { PromptLibrary } from "@/components/prompt-library";
-import { RequestPromptForm } from "@/components/request-prompt-form";
 import { BlogList } from "@/components/blog-list";
 import { PromptStudio } from "@/components/prompt-studio";
 import { MemberCollections } from "@/components/member-collections";
+import { MemberRequests } from "@/components/member-requests";
 import { cheatSheetRows, promptKeywords, toneRows } from "@/lib/content";
 import type { PromptWorkspaceData } from "@/lib/prompt-data";
 import type { BlogPostListItem } from "@/lib/blog-data";
 
-type TabId = "library" | "collections" | "studio" | "tutorials" | "cheat-sheet" | "tone";
+type TabId = "library" | "collections" | "requests" | "studio" | "tutorials" | "cheat-sheet" | "tone";
 
 export function LibraryDashboard({
   workspace,
@@ -70,6 +70,7 @@ export function LibraryDashboard({
   const sidebarMenu: { id: TabId; label: string; icon: typeof FileText; badge?: number }[] = [
     { id: "library", label: "Prompt Library", icon: LayoutDashboard },
     { id: "collections", label: "Koleksi Saya", icon: FolderKanban },
+    { id: "requests", label: "Request Prompt", icon: MessageSquareText },
     { id: "studio", label: "AI Prompt Studio", icon: Sparkles },
     { id: "tutorials", label: "Tutorials", icon: BookText, badge: blogPosts.length > 0 ? blogPosts.length : undefined },
     { id: "cheat-sheet", label: "Cheat Sheet", icon: BookOpen },
@@ -240,7 +241,6 @@ export function LibraryDashboard({
                           dan setiap prompt punya tombol copy langsung.
                         </p>
                       </div>
-                      {!isSuperadmin && <RequestPromptForm source={workspace.source} />}
                     </div>
                   </div>
                   <PromptLibrary
@@ -257,18 +257,24 @@ export function LibraryDashboard({
                 </FadeIn>
               )}
 
-          {activeTab === "studio" && (
-            <FadeIn key="studio" className="h-full">
-              <PromptStudio generators={workspace.generators || []} />
-            </FadeIn>
-          )}
+              {activeTab === "requests" && (
+                <FadeIn className="h-full">
+                  <MemberRequests source={workspace.source} />
+                </FadeIn>
+              )}
 
-          {activeTab === "tutorials" && (
-            <FadeIn className="space-y-8">
-              <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
-                <div className="flex flex-col gap-2">
-                  <span className="w-fit rounded-full bg-[var(--color-whisper-fade-blue)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
-                    Tutorial & Panduan
+              {activeTab === "studio" && (
+                <FadeIn key="studio" className="h-full">
+                  <PromptStudio generators={workspace.generators || []} />
+                </FadeIn>
+              )}
+
+              {activeTab === "tutorials" && (
+                <FadeIn className="space-y-8">
+                  <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
+                    <div className="flex flex-col gap-2">
+                      <span className="w-fit rounded-full bg-[var(--color-whisper-fade-blue)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
+                        Tutorial & Panduan
                   </span>
                   <h2 className="mt-3 max-w-2xl font-aeonik text-4xl leading-tight tracking-[-0.02em]">
                     Pelajari cara kerja AI prompting dari nol sampai mahir.
