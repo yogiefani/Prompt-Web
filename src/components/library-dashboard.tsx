@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Bell,
@@ -10,6 +10,8 @@ import {
   MessageSquareText,
   ShieldCheck,
   Sparkles,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { LogoutButton } from "@/components/logout-button";
@@ -34,6 +36,29 @@ export function LibraryDashboard({
   blogPosts: BlogPostListItem[];
 }) {
   const [activeTab, setActiveTab] = useState<TabId>("library");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Read theme on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
+    }
+  }, []);
+
+  // Sync theme with DOM and localStorage
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [theme]);
 
   const sidebarMenu: { id: TabId; label: string; icon: typeof FileText; badge?: number }[] = [
     { id: "library", label: "Prompt Library", icon: FileText },
@@ -44,9 +69,9 @@ export function LibraryDashboard({
   ];
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
+    <div className="grid min-h-screen lg:grid-cols-[280px_1fr] dark:bg-[var(--color-sky-wash)]">
       {/* Sidebar Kiri (Desktop) */}
-      <aside className="sticky top-0 hidden h-screen flex-col border-r border-white/80 bg-white/75 p-5 backdrop-blur-xl lg:flex">
+      <aside className="sticky top-0 hidden h-screen flex-col border-r border-white/80 bg-white/75 p-5 backdrop-blur-xl lg:flex dark:bg-[var(--color-canvas-white)]/75 dark:border-white/10">
         <Link href="/" className="mb-8 block">
           <BrandMark />
         </Link>
@@ -87,12 +112,33 @@ export function LibraryDashboard({
             Semua prompt premium terbuka untuk akun ini.
           </p>
         </div>
+
+        {/* Theme Toggle Button (Desktop) */}
+        <div className="mt-4 border-t border-[rgba(83,88,98,0.12)] dark:border-white/10 pt-4">
+          <button
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            type="button"
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-silver-pine)] transition-all hover:bg-white hover:text-[var(--color-obsidian)] dark:hover:bg-[var(--color-canvas-white)]/40"
+          >
+            {theme === "light" ? (
+              <>
+                <Moon className="h-4.5 w-4.5" />
+                <span>Mode Gelap</span>
+              </>
+            ) : (
+              <>
+                <Sun className="h-4.5 w-4.5 text-[var(--color-sunburst-yellow)]" />
+                <span>Mode Terang</span>
+              </>
+            )}
+          </button>
+        </div>
       </aside>
 
       {/* Main Content Area */}
       <section className="flex min-w-0 flex-col">
         {/* Header & Navigasi Mobile */}
-        <header className="sticky top-0 z-30 border-b border-white/80 bg-[rgba(235,245,255,0.86)] px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 border-b border-white/80 bg-[rgba(235,245,255,0.86)] px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8 dark:bg-[rgba(15,23,42,0.86)] dark:border-white/10">
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-[var(--color-silver-pine)]">
@@ -117,6 +163,21 @@ export function LibraryDashboard({
               <button className="icon-button hidden sm:flex" type="button" title="Notifications">
                 <Bell className="h-4 w-4" aria-hidden="true" />
               </button>
+              
+              {/* Theme Toggle Button (Mobile) */}
+              <button
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                type="button"
+                className="icon-button lg:hidden"
+                title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+              >
+                {theme === "light" ? (
+                  <Moon className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Sun className="h-4 w-4 text-[var(--color-sunburst-yellow)]" aria-hidden="true" />
+                )}
+              </button>
+
               <LogoutButton className="secondary-button inline-flex py-2 px-3 text-xs sm:text-sm sm:py-2.5 sm:px-4" />
             </div>
           </div>

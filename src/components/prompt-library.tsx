@@ -458,7 +458,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   return (
     <section className="space-y-6">
       <motion.div
-        className="flex flex-col gap-4 rounded-[32px] bg-white p-4 shadow-[var(--shadow-lg)]"
+        className="flex flex-col gap-4 rounded-[32px] bg-white p-4 shadow-[var(--shadow-lg)] dark:bg-[var(--color-canvas-white)]"
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -570,7 +570,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
 
       {/* Folder Collections Manager */}
       {userId && (
-        <div id="collections-section" className="flex flex-wrap items-center gap-4 rounded-[32px] bg-white p-5 shadow-[var(--shadow-lg)]">
+        <div id="collections-section" className="flex flex-wrap items-center gap-4 rounded-[32px] bg-white p-5 shadow-[var(--shadow-lg)] dark:bg-[var(--color-canvas-white)]">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
             <FolderKanban className="h-4 w-4 text-[var(--color-electric-blue)]" />
             Folder Koleksi:
@@ -581,7 +581,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
               className={`rounded-full px-3.5 py-1.5 text-xs font-semibold border ${
                 selectedCollectionId === "All"
                   ? "bg-[var(--color-midnight-ink)] text-white border-transparent"
-                  : "bg-white text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.16)] hover:bg-[var(--color-arctic-mist)]"
+                  : "bg-white text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.16)] hover:bg-[var(--color-arctic-mist)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
               }`}
             >
               Semua Koleksi
@@ -592,7 +592,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                 className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border ${
                   selectedCollectionId === c.id
                     ? "bg-[var(--color-electric-blue)] text-white border-transparent"
-                    : "bg-white text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.16)] hover:bg-[var(--color-arctic-mist)]"
+                    : "bg-white text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.16)] hover:bg-[var(--color-arctic-mist)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
                 }`}
               >
                 <button type="button" onClick={() => setSelectedCollectionId(c.id)}>
@@ -665,7 +665,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
       </div>
 
       {favoritesOnly ? (
-        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)] shadow-[var(--shadow-lg)]">
+        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)] shadow-[var(--shadow-lg)] dark:bg-[var(--color-canvas-white)]">
           <Star className="h-4 w-4" fill="currentColor" aria-hidden="true" />
           Menampilkan prompt favorit
         </div>
@@ -722,7 +722,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                     <AnimatePresence>
                       {showAddToCollectionId === prompt.id && (
                         <motion.div
-                          className="absolute right-0 top-12 z-20 w-48 rounded-2xl border border-[rgba(83,88,98,0.14)] bg-white p-3 text-left shadow-[var(--shadow-lg)]"
+                          className="absolute right-0 top-12 z-20 w-48 rounded-2xl border border-[rgba(83,88,98,0.14)] bg-white p-3 text-left shadow-[var(--shadow-lg)] dark:bg-[var(--color-canvas-white)] dark:border-white/10"
                           initial={{ opacity: 0, y: 5, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 3, scale: 0.95 }}
@@ -822,7 +822,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                     e.stopPropagation();
                     copyPrompt(prompt);
                   }}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-4 py-2.5 text-xs sm:text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)] active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-4 py-2.5 text-xs sm:text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)] active:scale-95 dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
                   title="Copy Quick"
                 >
                   {copiedTitle === prompt.title ? (
@@ -839,7 +839,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
       </div>
 
       {filteredPrompts.length === 0 ? (
-        <div className="rounded-[32px] bg-white p-8 text-center text-sm font-semibold text-[var(--color-silver-pine)] shadow-[var(--shadow-lg)]">
+        <div className="rounded-[32px] bg-white p-8 text-center text-sm font-semibold text-[var(--color-silver-pine)] shadow-[var(--shadow-lg)] dark:bg-[var(--color-canvas-white)]">
           Belum ada prompt yang cocok dengan filter ini.
         </div>
       ) : null}
@@ -863,7 +863,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed bottom-0 right-0 top-0 z-50 flex h-full w-full flex-col bg-white shadow-2xl md:max-w-2xl border-l border-[rgba(83,88,98,0.12)]"
+              className="fixed bottom-0 right-0 top-0 z-50 flex h-full w-full flex-col bg-white shadow-2xl md:max-w-2xl border-l border-[rgba(83,88,98,0.12)] dark:bg-[var(--color-canvas-white)] dark:border-white/10"
             >
               {/* Drawer Header */}
               <div className="flex items-center justify-between border-b border-[rgba(83,88,98,0.12)] p-6">
@@ -918,7 +918,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                                 }));
                               }}
                               placeholder={`Isi nilai untuk ${placeholder}...`}
-                              className="w-full rounded-2xl border border-[rgba(83,88,98,0.16)] bg-white px-4 py-2.5 text-sm font-semibold text-[var(--color-obsidian)] outline-none transition focus:border-[var(--color-electric-blue)] focus:ring-1 focus:ring-[var(--color-electric-blue)]"
+                              className="w-full rounded-2xl border border-[rgba(83,88,98,0.16)] bg-white px-4 py-2.5 text-sm font-semibold text-[var(--color-obsidian)] outline-none transition focus:border-[var(--color-electric-blue)] focus:ring-1 focus:ring-[var(--color-electric-blue)] dark:bg-[var(--color-canvas-white)] dark:border-white/20"
                             />
                           </div>
                         ))}
@@ -981,7 +981,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                     href="https://chat.openai.com"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-5 py-4 text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)]"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-5 py-4 text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
                   >
                     ChatGPT
                   </a>
@@ -989,7 +989,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                     href="https://claude.ai"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-5 py-4 text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)]"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-white px-5 py-4 text-sm font-bold text-[var(--color-obsidian)] transition hover:bg-[var(--color-arctic-mist)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
                   >
                     Claude
                   </a>
@@ -1020,7 +1020,7 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96, y: -20 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="w-full max-w-lg overflow-hidden rounded-[28px] border border-white/20 bg-white/95 p-3 shadow-2xl backdrop-blur-xl pointer-events-auto"
+                className="w-full max-w-lg overflow-hidden rounded-[28px] border border-white/20 bg-white/95 p-3 shadow-2xl backdrop-blur-xl pointer-events-auto dark:bg-[var(--color-canvas-white)]/95 dark:border-white/10"
               >
                 {/* Search Bar Input */}
                 <div className="flex items-center gap-3 border-b border-[rgba(83,88,98,0.12)] px-4 py-3">

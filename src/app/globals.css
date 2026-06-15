@@ -120,7 +120,7 @@ a {
   min-height: 420px;
   border-radius: 28px;
   border: 1px solid rgba(83, 88, 98, 0.12);
-  background: white;
+  background: var(--color-canvas-white);
   padding: 24px;
   box-shadow: var(--shadow-lg);
 }
@@ -560,4 +560,44 @@ phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
   .hero-rotate-card {
     transform: rotateY(-5deg) rotateX(5deg);
   }
+}
+
+.dark {
+  --color-midnight-ink: #f0f4f8;
+  --color-arctic-mist: #161c26;
+  --color-canvas-white: #0d121b;
+  --color-obsidian: #f3f4f6;
+  --color-silver-pine: #9ca3af;
+  --color-ash-gray: #6b7280;
+  --color-sky-wash: #080b10;
+  --color-ghostly-blue: #1e293b;
+  --color-electric-blue: #3b82f6;
+  --color-whisper-fade-blue: #172554;
+  --color-whisper-fade-yellow: #422006;
+  --color-whisper-fade-orange: #451a03;
+  --color-whisper-fade-violet: #2e1065;
+  --shadow-lg: rgba(0, 0, 0, 0.4) 0px 14px 20px 4px;
+  --shadow-subtle: rgba(255, 255, 255, 0.1) 0px 1px 2px 0px, rgba(255, 255, 255, 0.2) 0px 0px 0px 1px;
+}
+
+.dark .category-pill {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: var(--color-canvas-white);
+}
+
+.dark .icon-button {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(21, 26, 36, 0.84);
+}
+
+.dark .prompt-card {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .admin-select,
+.dark .form-input,
+.dark .admin-textarea {
+  background-color: var(--color-canvas-white);
+  color: var(--color-obsidian);
+  border-color: rgba(255, 255, 255, 0.1);
 }
