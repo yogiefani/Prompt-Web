@@ -28,3 +28,24 @@ Sistem webhook untuk **Lynk.id** telah berhasil diimplementasikan! Sekarang seti
 
 > [!TIP]
 > Jika ada yang perlu disesuaikan (misal Anda ingin mengubah password defaultnya menjadi yang lain), Anda bisa mengubahnya langsung di file `src/app/api/webhooks/lynk/route.ts` pada baris ke-26.
+
+---
+
+# Fitur Dark Mode Selesai 🌙
+
+Sistem *Dark Mode* dan pergantian tema telah sukses dibuat dengan desain yang premium sesuai request! Tema ini akan menyesuaikan dengan latar belakang dan secara spesifik diatur warna *text* dan *border*-nya agar tetap elegan di Mode Gelap. Pilihan pengguna (Dark/Light) juga akan otomatis tersimpan di *browser* (`localStorage`), sehingga saat buka halaman lagi tidak perlu disetel ulang.
+
+## Implementasi & Tampilan:
+
+- **Desktop**: Tombol Mode Gelap/Mode Terang diletakkan di *sidebar* sebelah kiri bawah.
+- **Mobile**: Tombol *toggle* otomatis berpindah ke *header* atas (di samping tombol Logout), agar tidak bertabrakan dengan navigasi menu.
+- **Background & Card**: Komponen library dan playground secara otomatis beralih dari terang ke latar *slate/dark-blue* pekat yang premium tanpa masalah teks bertabrakan.
+
+````carousel
+![Tampilan Desktop Mode Gelap](file:///C:/Users/yogiy/.gemini/antigravity-ide/brain/fc6bd408-09e4-4192-9a9c-944426f5b72f/desktop_dark_mode_1781497528150.png)
+<!-- slide -->
+![Tampilan Mobile Mode Terang dengan Toggle di Header](file:///C:/Users/yogiy/.gemini/antigravity-ide/brain/fc6bd408-09e4-4192-9a9c-944426f5b72f/mobile_light_mode_1781497546673.png)
+````
+
+> [!NOTE]
+> *Semua update terkait copy-text "Superadmin hanya saya" juga telah disembunyikan dan dibersihkan pada seluruh file tampilan publik (Login page, Reset Password, Landing Page, dan Register), agar terlihat sangat profesional dan aman untuk user.*

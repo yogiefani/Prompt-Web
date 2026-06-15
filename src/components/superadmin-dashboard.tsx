@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart3,
   BookOpen,
@@ -13,6 +13,8 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Moon,
+  Sun,
 } from "lucide-react";
 import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
@@ -50,6 +52,27 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "settings" | "roadmap">(
     "overview"
   );
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   const pendingRequestsCount = workspace.requests.filter(
     (request) => request.status === "pending" || request.status === "reviewing"
@@ -72,7 +95,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
   return (
     <div className="grid min-h-screen lg:grid-cols-[290px_1fr]">
       {/* Sidebar Kiri */}
-      <aside className="sticky top-0 hidden h-screen flex-col border-r border-white/80 bg-white/75 p-5 backdrop-blur-xl lg:flex">
+      <aside className="sticky top-0 hidden h-screen flex-col border-r border-white/80 bg-white/75 p-5 backdrop-blur-xl lg:flex dark:bg-[var(--color-canvas-white)]/75 dark:border-white/10">
         <Link href="/" className="mb-8 block">
           <BrandMark />
         </Link>
@@ -89,8 +112,8 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
                 type="button"
                 className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all ${
                   isActive
-                    ? "bg-[var(--color-midnight-ink)] text-white shadow-[var(--shadow-subtle)]"
-                    : "text-[var(--color-silver-pine)] hover:bg-white hover:text-[var(--color-obsidian)]"
+                    ? "bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] shadow-[var(--shadow-subtle)]"
+                    : "text-[var(--color-silver-pine)] hover:bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-[var(--color-canvas-white)] hover:text-[var(--color-obsidian)]"
                 }`}
               >
                 <span className="flex items-center gap-3">
@@ -111,12 +134,23 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
           })}
         </nav>
 
-        <div className="mt-auto pt-5 border-t border-[rgba(83,88,98,0.12)]">
+        <div className="mt-auto pt-5 border-t border-[rgba(83,88,98,0.12)] dark:border-white/10">
           <div className="flex flex-col gap-2">
-            <Link href="/library" className="secondary-button w-full">
+            <Link href="/library" className="secondary-button w-full justify-center">
               Member Library
             </Link>
-            <LogoutButton className="secondary-button w-full" />
+            <button
+              onClick={toggleTheme}
+              className="flex w-full items-center justify-between rounded-full bg-[var(--color-midnight-ink)] px-4 py-2.5 text-xs font-bold text-white shadow-[var(--shadow-subtle)] transition hover:opacity-90 active:scale-95 dark:text-[var(--color-sky-wash)]"
+            >
+              <span className="flex items-center gap-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 dark:bg-black/20">
+                  {theme === "light" ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
+                </div>
+                {theme === "light" ? "Mode Gelap" : "Mode Terang"}
+              </span>
+            </button>
+            <LogoutButton className="secondary-button w-full justify-center" />
           </div>
         </div>
       </aside>
@@ -124,7 +158,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
       {/* Main Content Area */}
       <div className="flex flex-col">
         {/* Header mobile/tablet & desktop bar */}
-        <header className="sticky top-0 z-30 border-b border-white/80 bg-[rgba(235,245,255,0.86)] px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 border-b border-white/80 bg-[rgba(235,245,255,0.86)] px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8 dark:bg-[rgba(15,23,42,0.86)] dark:border-white/10">
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold text-[var(--color-silver-pine)] uppercase tracking-[0.06em]">
@@ -138,10 +172,15 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
             </div>
 
             <div className="flex items-center gap-2 lg:hidden">
-              <Link href="/library" className="secondary-button py-2 px-3 text-xs">
-                Library
-              </Link>
-              <LogoutButton className="secondary-button py-2 px-3 text-xs" />
+              <button onClick={toggleTheme} className="icon-button">
+                {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              </button>
+              <div className="flex gap-2">
+                <Link href="/library" className="secondary-button py-2 px-3 text-xs hidden sm:flex">
+                  Library
+                </Link>
+                <LogoutButton className="secondary-button py-2 px-3 text-xs" />
+              </div>
             </div>
           </div>
 
@@ -158,8 +197,8 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
                   type="button"
                   className={`flex items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-2 text-xs font-bold transition-all border ${
                     isActive
-                      ? "bg-[var(--color-midnight-ink)] text-white border-transparent"
-                      : "bg-white text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.12)]"
+                      ? "bg-[var(--color-midnight-ink)] text-white border-transparent dark:text-[var(--color-sky-wash)]"
+                      : "bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.12)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -185,7 +224,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
                   const Icon = iconMap[stat.iconName] || FileText;
 
                   return (
-                    <LiftCard key={stat.label} className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] border border-white/50">
+                    <LiftCard key={stat.label} className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] border border-white/50 dark:bg-[var(--color-canvas-white)] dark:border-white/10">
                       <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]">
                         <Icon className="h-5 w-5" aria-hidden="true" />
                       </span>
@@ -267,14 +306,14 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
           )}
 
           {activeTab === "roadmap" && (
-            <FadeIn className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8 border border-white/50">
+            <FadeIn className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 border border-white/50 dark:bg-[var(--color-canvas-white)] dark:border-white/10">
               <h2 className="font-aeonik text-2xl tracking-[-0.02em] text-[var(--color-obsidian)]">Tahapan Fitur</h2>
               <p className="mt-2 text-sm font-medium text-[var(--color-silver-pine)]">Rencana rilis dan peta jalan produk digital.</p>
               
               <Stagger className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                 {featurePhases.map((phase) => (
                   <LiftCard key={phase.title} className="rounded-3xl bg-[var(--color-arctic-mist)] p-5 border border-gray-100">
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[var(--color-electric-blue)] shadow-sm">
+                    <span className="rounded-full bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-1 text-xs font-semibold text-[var(--color-electric-blue)] shadow-sm dark:bg-[var(--color-canvas-white)] dark:border dark:border-white/10">
                       {phase.status}
                     </span>
                     <h3 className="mt-4 font-aeonik text-lg leading-tight tracking-[-0.02em] text-[var(--color-obsidian)]">

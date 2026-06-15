@@ -59,7 +59,7 @@ export function SuperadminConsole({
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-      <section className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+      <section className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8">
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]">
             <Link2 className="h-5 w-5" aria-hidden="true" />
@@ -154,7 +154,7 @@ export function SuperadminConsole({
           {adminTasks.map((task) => (
             <li
               key={task}
-              className="rounded-2xl border border-white bg-white/70 px-4 py-3 text-sm font-medium leading-6 text-[var(--color-silver-pine)]"
+              className="rounded-2xl border border-[rgba(83,88,98,0.1)] bg-white/70 dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-4 py-3 text-sm font-medium leading-6 text-[var(--color-silver-pine)] dark:text-gray-300"
             >
               {task}
             </li>

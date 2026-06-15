@@ -219,14 +219,14 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
       {editingGen ? (
         <div className="grid gap-6">
           {/* ── Editor Header ── */}
-          <div className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-[var(--shadow-md)]">
+          <div className="flex items-center justify-between rounded-2xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-4 shadow-[var(--shadow-md)]">
             <div className="flex flex-1 items-center gap-3">
               <div className="relative">
                 <button onClick={() => setShowIconPicker(!showIconPicker)} className="icon-button">
                   <DynamicIcon name={editingGen.icon as string} className="h-5 w-5 text-[var(--color-obsidian)]" />
                 </button>
                 {showIconPicker && (
-                  <div className="absolute top-12 left-0 z-50 p-3 bg-white rounded-2xl shadow-[var(--shadow-lg)] border border-[rgba(83,88,98,0.1)] w-64 grid grid-cols-6 gap-2">
+                  <div className="absolute top-12 left-0 z-50 p-3 bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 rounded-2xl shadow-[var(--shadow-lg)] border border-[rgba(83,88,98,0.1)] w-64 grid grid-cols-6 gap-2">
                     {Object.keys(ICONS).map(name => (
                       <button key={name} onClick={() => { setEditingGen({...editingGen, icon: name}); setShowIconPicker(false); }} className={`p-2 rounded-xl flex justify-center items-center ${editingGen.icon === name ? 'bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)]' : 'text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)] hover:text-[var(--color-electric-blue)]'}`} title={name}>
                         <DynamicIcon name={name} className="h-4 w-4" />
@@ -265,7 +265,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 rounded-lg py-2 text-sm font-bold capitalize transition-all ${
-                  activeTab === tab ? "bg-white shadow text-[var(--color-obsidian)]" : "text-[var(--color-silver-pine)] hover:text-[var(--color-obsidian)]"
+                  activeTab === tab ? "bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 shadow text-[var(--color-obsidian)]" : "text-[var(--color-silver-pine)] hover:text-[var(--color-obsidian)]"
                 }`}
               >
                 {tab === "builder" ? "Form Builder" : tab === "template" ? "Output Template" : "Pengaturan & Demo"}
@@ -277,7 +277,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
           {activeTab === "builder" && (
             <div className="space-y-4">
               {sections.map((section, sIdx) => (
-                <div key={section.id} className="rounded-2xl border border-[rgba(83,88,98,0.12)] bg-white overflow-hidden shadow-sm">
+                <div key={section.id} className="rounded-2xl border border-[rgba(83,88,98,0.12)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 overflow-hidden shadow-sm">
                   <div className="flex items-center gap-3 bg-[var(--color-arctic-mist)] px-4 py-3 border-b border-[rgba(83,88,98,0.08)]">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--color-midnight-ink)] text-white text-xs font-bold">
                       {"ABCDEFGHIJ"[sIdx] ?? sIdx + 1}
@@ -301,11 +301,11 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
                         <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto]">
                           <div>
                             <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Label UI</label>
-                            <input className="form-input text-sm bg-white" value={field.label} onChange={(e) => updateField(section.id, field.id, { label: e.target.value })} placeholder="Label yang dilihat user" />
+                            <input className="form-input text-sm bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10" value={field.label} onChange={(e) => updateField(section.id, field.id, { label: e.target.value })} placeholder="Label yang dilihat user" />
                           </div>
                           <div>
                             <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Tipe Input</label>
-                            <select className="form-input text-sm bg-white" value={field.type} onChange={(e) => updateField(section.id, field.id, { type: e.target.value as FormField["type"] })}>
+                            <select className="form-input text-sm bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10" value={field.type} onChange={(e) => updateField(section.id, field.id, { type: e.target.value as FormField["type"] })}>
                               {Object.entries(FIELD_TYPE_LABELS).map(([val, label]) => (
                                 <option key={val} value={val}>{label}</option>
                               ))}
@@ -313,7 +313,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
                           </div>
                           <div>
                             <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Variabel <code className="text-[var(--color-electric-blue)]">{"{{x}}"}</code></label>
-                            <input className="form-input text-sm bg-white font-mono text-[var(--color-electric-blue)]" value={field.name} onChange={(e) => updateField(section.id, field.id, { name: e.target.value.replace(/[^a-zA-Z0-9_]/g, "") })} placeholder="nama_var" />
+                            <input className="form-input text-sm bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 font-mono text-[var(--color-electric-blue)]" value={field.name} onChange={(e) => updateField(section.id, field.id, { name: e.target.value.replace(/[^a-zA-Z0-9_]/g, "") })} placeholder="nama_var" />
                           </div>
                           <div className="flex items-end pb-1">
                             <button onClick={() => removeField(section.id, field.id)} className="p-2 text-[var(--color-silver-pine)] hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
@@ -323,7 +323,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
                         {(field.type === "select") && (
                           <div>
                             <label className="mb-1 text-xs font-bold text-[var(--color-silver-pine)]">Opsi (pisahkan dengan koma)</label>
-                            <input className="form-input text-sm bg-white" value={field.options || ""} onChange={(e) => updateField(section.id, field.id, { options: e.target.value })} placeholder="Opsi A, Opsi B, Opsi C" />
+                            <input className="form-input text-sm bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10" value={field.options || ""} onChange={(e) => updateField(section.id, field.id, { options: e.target.value })} placeholder="Opsi A, Opsi B, Opsi C" />
                           </div>
                         )}
                         {/* Reference URL for select */}
@@ -363,12 +363,12 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
 
           {/* ── TAB: Output Template ── */}
           {activeTab === "template" && (
-            <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)] space-y-4">
+            <div className="rounded-2xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-md)] space-y-4">
               <div className="rounded-xl bg-[var(--color-arctic-mist)] p-4">
                 <p className="text-sm font-bold text-[var(--color-obsidian)] mb-2">Variabel yang tersedia dari Form Builder:</p>
                 <div className="flex flex-wrap gap-2">
                   {allFields.map((f) => (
-                    <span key={f.id} className="font-mono text-xs bg-white px-2 py-1 rounded border border-[rgba(0,0,0,0.07)] text-[var(--color-electric-blue)] font-bold cursor-pointer select-all">
+                    <span key={f.id} className="font-mono text-xs bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-2 py-1 rounded border border-[rgba(0,0,0,0.07)] text-[var(--color-electric-blue)] font-bold cursor-pointer select-all">
                       {`{{${f.name}}}`}
                     </span>
                   ))}
@@ -388,7 +388,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
           {activeTab === "settings" && (
             <div className="space-y-6">
               {/* Output Format */}
-              <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
+              <div className="rounded-2xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-md)]">
                 <h3 className="font-bold text-[var(--color-obsidian)] mb-4 flex items-center gap-2"><Code2 className="h-5 w-5 text-[var(--color-electric-blue)]" /> Format Output</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {(["text", "json"] as const).map((fmt) => (
@@ -409,7 +409,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
               </div>
 
               {/* Preview Image */}
-              <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
+              <div className="rounded-2xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-md)]">
                 <h3 className="font-bold text-[var(--color-obsidian)] mb-4 flex items-center gap-2"><ImageIcon className="h-5 w-5 text-[var(--color-electric-blue)]" /> Preview Image (Mockup)</h3>
                 <ImageUploader
                   label="URL Gambar Preview"
@@ -423,7 +423,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
               </div>
 
               {/* Demo Values */}
-              <div className="rounded-2xl bg-white p-6 shadow-[var(--shadow-md)]">
+              <div className="rounded-2xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-md)]">
                 <h3 className="font-bold text-[var(--color-obsidian)] mb-1 flex items-center gap-2">
                   {editingGen.output_format === "json" ? <ToggleRight className="h-5 w-5 text-[var(--color-electric-blue)]" /> : <ToggleLeft className="h-5 w-5 text-[var(--color-electric-blue)]" />}
                   Nilai Demo (Randomize Demo)
@@ -462,7 +462,7 @@ export function StudioCmsManager({ initialGenerators }: { initialGenerators: Pro
             </div>
           )}
           {generators.map((gen) => (
-            <div key={gen.id} className="flex flex-col justify-between rounded-3xl bg-white p-6 shadow-[var(--shadow-md)] border border-[rgba(83,88,98,0.05)]">
+            <div key={gen.id} className="flex flex-col justify-between rounded-3xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-md)] border border-[rgba(83,88,98,0.05)]">
               <div>
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-arctic-mist)] text-[var(--color-electric-blue)]">

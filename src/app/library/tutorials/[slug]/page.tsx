@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock, Tag } from "lucide-react";
-import { getBlogPostBySlug } from "@/lib/blog-data";
+import { getBlogPostBySlug, getBlogPosts } from "@/lib/blog-data";
+import { getPromptWorkspaceData } from "@/lib/prompt-data";
+import { createCookieSupabaseClient } from "@/lib/supabase-server";
+import { LibraryDashboard } from "@/components/library-dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -17,16 +20,35 @@ export default async function TutorialDetailPage({ params }: Props) {
     notFound();
   }
 
+  const [workspace, allBlogPosts, supabase] = await Promise.all([
+    getPromptWorkspaceData(),
+    getBlogPosts(),
+    createCookieSupabaseClient(),
+  ]);
+
+  let isSuperadmin = false;
+  if (supabase) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+      isSuperadmin = profile?.role === "superadmin";
+    }
+  }
+
+  const blogPosts = isSuperadmin ? allBlogPosts : allBlogPosts.filter((p) => p.status === "published");
+
   return (
-    <article className="mx-auto max-w-3xl space-y-8">
-      {/* Back */}
-      <Link
-        href="/library/tutorials"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-silver-pine)] transition-colors hover:text-[var(--color-obsidian)]"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Kembali ke Tutorial
-      </Link>
+    <main className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)]">
+      <LibraryDashboard workspace={workspace} isSuperadmin={isSuperadmin} blogPosts={blogPosts} initialTab="tutorials">
+        <article className="mx-auto max-w-3xl space-y-8">
+          {/* Back */}
+          <Link
+            href="/library?tab=tutorials"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-silver-pine)] transition-colors hover:text-[var(--color-obsidian)]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Kembali ke Tutorial
+          </Link>
 
       {/* Cover */}
       {post.coverUrl && (
@@ -40,7 +62,7 @@ export default async function TutorialDetailPage({ params }: Props) {
       )}
 
       {/* Header */}
-      <div className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-10">
+      <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-10">
         {/* Tags */}
         {post.tags.length > 0 && (
           <div className="mb-5 flex flex-wrap gap-2">
@@ -87,23 +109,25 @@ export default async function TutorialDetailPage({ params }: Props) {
 
       {/* Content */}
       <div
-        className="blog-content rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-10"
+        className="blog-content rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-10"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 
       {/* Footer CTA */}
-      <div className="rounded-[32px] bg-[var(--color-midnight-ink)] p-6 text-center text-white shadow-[var(--shadow-lg)] md:p-8">
+      <div className="rounded-[32px] bg-[var(--color-midnight-ink)] p-6 text-center text-white dark:text-[var(--color-sky-wash)] shadow-[var(--shadow-lg)] md:p-8">
         <p className="font-aeonik text-2xl tracking-[-0.02em]">Sudah paham konsepnya?</p>
-        <p className="mt-2 text-sm font-medium text-white/70">
+        <p className="mt-2 text-sm font-medium text-white/70 dark:text-[var(--color-sky-wash)]/70">
           Coba langsung gunakan prompt yang ada di library untuk praktik nyata.
         </p>
         <Link
           href="/library"
-          className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-[var(--color-midnight-ink)] transition-all hover:bg-[var(--color-electric-blue)] hover:text-white"
+          className="mt-5 inline-flex items-center gap-2 rounded-full bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-6 py-3 text-sm font-bold text-[var(--color-midnight-ink)] transition-all hover:bg-[var(--color-electric-blue)] hover:text-white"
         >
           Buka Prompt Library →
         </Link>
       </div>
     </article>
+      </LibraryDashboard>
+    </main>
   );
 }

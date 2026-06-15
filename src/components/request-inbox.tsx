@@ -63,7 +63,7 @@ export function RequestInbox({ initialRequests, source }: RequestInboxProps) {
   }
 
   return (
-    <section className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+    <section className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full bg-[var(--color-whisper-fade-blue)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
@@ -107,7 +107,7 @@ export function RequestInbox({ initialRequests, source }: RequestInboxProps) {
                 <select
                   value={request.status}
                   onChange={(event) => updateStatus(request.id, event.target.value)}
-                  className="admin-select min-w-36 bg-white"
+                  className="admin-select min-w-36 bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10"
                 >
                   {statusOptions.map((status) => (
                     <option key={status} value={status}>
@@ -122,7 +122,7 @@ export function RequestInbox({ initialRequests, source }: RequestInboxProps) {
               <span className="rounded-full bg-[var(--color-mint-glaze)] px-3 py-1 text-xs font-semibold text-[var(--color-silver-pine)]">
                 {request.targetModel}
               </span>
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[var(--color-electric-blue)]">
+              <span className="rounded-full bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-1 text-xs font-semibold text-[var(--color-electric-blue)]">
                 {request.status}
               </span>
             </div>

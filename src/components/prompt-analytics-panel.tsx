@@ -10,7 +10,7 @@ export function PromptAnalyticsPanel({ insights }: PromptAnalyticsPanelProps) {
   const maxCopyCount = Math.max(...insights.map((insight) => insight.copyCount), 1);
 
   return (
-    <FadeIn className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+    <FadeIn className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full bg-[var(--color-whisper-fade-yellow)] px-4 py-2 text-xs font-semibold text-[var(--color-sunburst-yellow)]">
@@ -44,7 +44,7 @@ export function PromptAnalyticsPanel({ insights }: PromptAnalyticsPanelProps) {
                       {insight.title}
                     </h3>
                   </div>
-                  <span className="inline-flex min-w-16 items-center justify-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-bold text-[var(--color-electric-blue)]">
+                  <span className="inline-flex min-w-16 items-center justify-center gap-2 rounded-full bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-2 text-sm font-bold text-[var(--color-electric-blue)]">
                     <Copy className="h-4 w-4" aria-hidden="true" />
                     {insight.copyCount}
                   </span>
@@ -54,12 +54,12 @@ export function PromptAnalyticsPanel({ insights }: PromptAnalyticsPanelProps) {
                   <span className="rounded-full bg-[var(--color-mint-glaze)] px-3 py-1 text-xs font-semibold text-[var(--color-silver-pine)]">
                     {insight.category}
                   </span>
-                  <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[var(--color-silver-pine)]">
+                  <span className="rounded-full bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-1 text-xs font-semibold text-[var(--color-silver-pine)]">
                     {insight.model}
                   </span>
                 </div>
 
-                <div className="mt-5 h-3 overflow-hidden rounded-full bg-white">
+                <div className="mt-5 h-3 overflow-hidden rounded-full bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10">
                   <div className="h-full rounded-full bg-[var(--color-electric-blue)]" style={{ width }} />
                 </div>
               </LiftCard>

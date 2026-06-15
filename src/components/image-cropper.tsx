@@ -109,7 +109,7 @@ export function ImageCropper({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="flex flex-col bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-2xl max-h-[90vh]">
+      <div className="flex flex-col bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl w-full max-w-2xl max-h-[90vh]">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)]">
@@ -144,7 +144,7 @@ export function ImageCropper({
         </div>
 
         {/* Controls */}
-        <div className="p-6 bg-white flex flex-col gap-6">
+        <div className="p-6 bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 flex flex-col gap-6">
           <div className="flex items-center gap-4 px-4">
             <ZoomOut className="h-5 w-5 text-[var(--color-silver-pine)]" />
             <input

@@ -116,7 +116,7 @@ export function RequestPromptForm({ source }: RequestPromptFormProps) {
         {isOpen ? (
           <motion.form
             onSubmit={handleSubmit}
-            className="absolute right-0 top-14 z-20 w-[min(92vw,420px)] space-y-4 rounded-[28px] border border-[rgba(83,88,98,0.14)] bg-white p-5 text-left shadow-[var(--shadow-lg)] max-h-[85vh] overflow-y-auto no-scrollbar"
+            className="absolute right-0 top-14 z-20 w-[min(92vw,420px)] space-y-4 rounded-[28px] border border-[rgba(83,88,98,0.14)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-5 text-left shadow-[var(--shadow-lg)] max-h-[85vh] overflow-y-auto no-scrollbar"
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}

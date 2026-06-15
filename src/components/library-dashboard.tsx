@@ -30,12 +30,16 @@ export function LibraryDashboard({
   workspace,
   isSuperadmin,
   blogPosts,
+  initialTab = "library",
+  children,
 }: {
   workspace: PromptWorkspaceData;
   isSuperadmin: boolean;
   blogPosts: BlogPostListItem[];
+  initialTab?: TabId;
+  children?: React.ReactNode;
 }) {
-  const [activeTab, setActiveTab] = useState<TabId>("library");
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   // Read theme on mount
@@ -85,8 +89,8 @@ export function LibraryDashboard({
                 type="button"
                 className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all ${
                   isActive
-                    ? "bg-[var(--color-midnight-ink)] text-white shadow-[var(--shadow-subtle)]"
-                    : "text-[var(--color-silver-pine)] hover:bg-white hover:text-[var(--color-obsidian)]"
+                    ? "bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] shadow-[var(--shadow-subtle)]"
+                    : "text-[var(--color-silver-pine)] hover:bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5 hover:text-[var(--color-obsidian)]"
                 }`}
               >
                 <span className="flex items-center gap-3">
@@ -118,7 +122,7 @@ export function LibraryDashboard({
           <button
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             type="button"
-            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-silver-pine)] transition-all hover:bg-white hover:text-[var(--color-obsidian)] dark:hover:bg-[var(--color-canvas-white)]/40"
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-silver-pine)] transition-all hover:bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 hover:text-[var(--color-obsidian)] dark:hover:bg-[var(--color-canvas-white)]/40"
           >
             {theme === "light" ? (
               <>
@@ -193,8 +197,8 @@ export function LibraryDashboard({
                   type="button"
                   className={`flex items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold transition-all ${
                     isActive
-                      ? "border-transparent bg-[var(--color-midnight-ink)] text-white"
-                      : "border-[rgba(83,88,98,0.12)] bg-white text-[var(--color-silver-pine)]"
+                      ? "border-transparent bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)]"
+                      : "border-[rgba(83,88,98,0.12)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 text-[var(--color-silver-pine)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
                   }`}
                 >
                   <item.icon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -212,9 +216,13 @@ export function LibraryDashboard({
 
         {/* Dynamic Tab Body */}
         <div className="w-full max-w-7xl flex-1 space-y-8 p-4 sm:p-6 lg:p-8">
-          {activeTab === "library" && (
+          {children && activeTab === initialTab ? (
+            <FadeIn key="children" className="space-y-8">{children}</FadeIn>
+          ) : (
+            <>
+              {activeTab === "library" && (
             <FadeIn className="space-y-8">
-              <div className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+              <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                   <div>
                     <span className="rounded-full bg-[var(--color-mint-glaze)] px-4 py-2 text-xs font-semibold text-[var(--color-silver-pine)]">
@@ -247,7 +255,7 @@ export function LibraryDashboard({
 
           {activeTab === "tutorials" && (
             <FadeIn className="space-y-8">
-              <div className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+              <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
                 <div className="flex flex-col gap-2">
                   <span className="w-fit rounded-full bg-[var(--color-whisper-fade-blue)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)]">
                     Tutorial & Panduan
@@ -260,13 +268,13 @@ export function LibraryDashboard({
                   </p>
                 </div>
               </div>
-              <BlogList posts={blogPosts} />
+              <BlogList posts={blogPosts} basePath="/library/tutorials" />
             </FadeIn>
           )}
 
           {activeTab === "cheat-sheet" && (
             <FadeIn className="space-y-6">
-              <div className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+              <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
                 <h2 className="font-aeonik text-2xl tracking-[-0.02em]">
                   AI Prompting Cheat Sheet
                 </h2>
@@ -297,7 +305,7 @@ export function LibraryDashboard({
                 </div>
               </div>
 
-              <div className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+              <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
                 <h2 className="font-aeonik text-2xl tracking-[-0.02em]">
                   Top Keywords for AI Prompting
                 </h2>
@@ -318,7 +326,7 @@ export function LibraryDashboard({
 
           {activeTab === "tone" && (
             <FadeIn>
-              <div className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+              <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 dark:bg-[var(--color-canvas-white)]">
                 <h2 className="font-aeonik text-2xl tracking-[-0.02em]">Tone Library</h2>
                 <div className="mt-6 overflow-x-auto rounded-2xl border border-[rgba(83,88,98,0.16)]">
                   <table className="min-w-[500px] w-full text-left text-sm font-medium text-[var(--color-silver-pine)]">
@@ -336,6 +344,8 @@ export function LibraryDashboard({
                 </div>
               </div>
             </FadeIn>
+          )}
+            </>
           )}
         </div>
       </section>

@@ -161,7 +161,7 @@ function ReferenceModal({ url, onClose }: { url: string; onClose: () => void }) 
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="relative max-w-3xl w-full rounded-3xl overflow-hidden shadow-2xl bg-white"
+        className="relative max-w-3xl w-full rounded-3xl overflow-hidden shadow-2xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -194,7 +194,7 @@ function HistoryDrawer({
       animate={{ x: 0 }}
       exit={{ x: "100%" }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="absolute inset-0 z-20 flex flex-col bg-white rounded-3xl border border-[rgba(83,88,98,0.12)] shadow-[var(--shadow-lg)] overflow-hidden"
+      className="absolute inset-0 z-20 flex flex-col bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 rounded-3xl border border-[rgba(83,88,98,0.12)] shadow-[var(--shadow-lg)] overflow-hidden"
     >
       <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)]">
         <div className="flex items-center gap-2 font-bold text-[var(--color-obsidian)] text-sm">
@@ -307,7 +307,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
   // ── Empty state ──────────────────────────
   if (published.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-[400px] rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)]">
+      <div className="flex flex-col items-center justify-center h-[400px] rounded-3xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)]">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-whisper-fade-yellow)] mb-4">
           <Sparkles className="h-8 w-8 text-[var(--color-sunburst-yellow)]" />
         </div>
@@ -333,7 +333,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: 60, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              className="flex flex-col items-center gap-2 rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] py-4 overflow-hidden shrink-0"
+              className="flex flex-col items-center gap-2 rounded-3xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] py-4 overflow-hidden shrink-0"
             >
               {published.map((g) => (
                 <button
@@ -342,8 +342,8 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                   title={g.title}
                   className={`group relative flex h-11 w-11 items-center justify-center rounded-2xl transition-all ${
                     g.id === activeId
-                      ? "bg-[var(--color-midnight-ink)] text-white shadow-[var(--shadow-subtle)]"
-                      : "text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)] hover:text-[var(--color-electric-blue)]"
+                      ? "bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] shadow-[var(--shadow-subtle)]"
+                      : "text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)] hover:text-[var(--color-electric-blue)] dark:hover:bg-[var(--color-canvas-white)] dark:hover:text-[var(--color-electric-blue)]"
                   }`}
                 >
                   <DynamicIcon name={g.icon as string} className="h-5 w-5" />
@@ -360,7 +360,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
         </AnimatePresence>
 
         {/* ── Form Panel (Left) ── */}
-        <div className="flex-1 flex flex-col rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] overflow-hidden">
+        <div className="flex-1 flex flex-col rounded-3xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] overflow-hidden">
           {/* Form Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)] shrink-0">
             <div className="flex items-center gap-3">
@@ -399,7 +399,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                 <div key={section.id ?? sIdx}>
                   {/* Section Header */}
                   <div className="flex items-center gap-2.5 mb-4">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[var(--color-midnight-ink)] text-white text-xs font-black shrink-0">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] text-xs font-black shrink-0">
                       {"ABCDEFGHIJ"[sIdx] ?? sIdx + 1}
                     </div>
                     <h3 className="text-xs font-black uppercase tracking-wider text-[var(--color-silver-pine)]">
@@ -452,7 +452,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                               type="color"
                               value={formValues[field.name] ?? "#0069e0"}
                               onChange={(e) => handleChange(field.name, e.target.value)}
-                              className="h-11 w-14 rounded-xl border border-[rgba(83,88,98,0.16)] bg-white cursor-pointer p-1"
+                              className="h-11 w-14 rounded-xl border border-[rgba(83,88,98,0.16)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 cursor-pointer p-1"
                             />
                             <input
                               type="text"
@@ -494,7 +494,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-[rgba(83,88,98,0.08)] bg-white p-4 shadow-sm">
+                <div className="rounded-xl border border-[rgba(83,88,98,0.08)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-4 shadow-sm">
                   {isJson ? <JsonOutput text={output} /> : (
                     <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[var(--color-obsidian)]">{output}</pre>
                   )}
@@ -546,24 +546,24 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
         </div>
 
         {/* ── Output Panel (Right) ── */}
-        <div className="w-[420px] flex-col rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] overflow-hidden relative shrink-0 hidden lg:flex">
+        <div className="w-[420px] flex-col rounded-3xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-lg)] overflow-hidden relative shrink-0 hidden lg:flex">
           {/* Preview Area */}
           <div className="h-[170px] bg-[var(--color-midnight-ink)] border-b border-[rgba(83,88,98,0.08)] relative overflow-hidden shrink-0 rounded-t-3xl">
             {gen?.preview_image_url ? (
               <img src={gen.preview_image_url} alt="Preview" className="h-full w-full object-cover" />
             ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-white dark:text-[var(--color-sky-wash)]">
                 <div
-                  className="absolute inset-0 opacity-[0.04]"
-                  style={{ backgroundImage: "radial-gradient(white 1px, transparent 1px)", backgroundSize: "18px 18px" }}
+                  className="absolute inset-0 opacity-[0.04] dark:opacity-[0.1]"
+                  style={{ backgroundImage: "radial-gradient(currentColor 1px, transparent 1px)", backgroundSize: "18px 18px" }}
                 />
-                <Layers className="h-6 w-6 text-white/20" />
-                <div className="space-y-2 w-full max-w-[160px]">
-                  <div className="h-1.5 w-full bg-white/10 rounded-full" />
-                  <div className="h-1.5 w-3/4 bg-white/10 rounded-full" />
-                  <div className="h-1.5 w-1/2 bg-white/10 rounded-full" />
+                <Layers className="h-6 w-6 opacity-20" />
+                <div className="space-y-2 w-full max-w-[160px] opacity-10">
+                  <div className="h-1.5 w-full bg-current rounded-full" />
+                  <div className="h-1.5 w-3/4 bg-current rounded-full" />
+                  <div className="h-1.5 w-1/2 bg-current rounded-full" />
                 </div>
-                <p className="text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">Mockup Preview</p>
+                <p className="text-[9px] font-black opacity-20 tracking-[0.2em] uppercase">Mockup Preview</p>
               </div>
             )}
           </div>
@@ -642,7 +642,7 @@ export function PromptStudio({ generators }: { generators: PromptGeneratorView[]
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-2xl border border-[rgba(83,88,98,0.1)] bg-white p-4 shadow-sm"
+                  className="rounded-2xl border border-[rgba(83,88,98,0.1)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-4 shadow-sm"
                 >
                   {isJson ? <JsonOutput text={output} /> : (
                     <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-[var(--color-obsidian)]">{output}</pre>

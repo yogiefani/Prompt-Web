@@ -141,13 +141,13 @@ export function GalleryCmsManager() {
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-md)] overflow-hidden">
+      <div className="rounded-3xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 border border-[rgba(83,88,98,0.1)] shadow-[var(--shadow-md)] overflow-hidden">
         <div className="flex border-b border-[rgba(83,88,98,0.08)] bg-[var(--color-arctic-mist)]">
           <button
             onClick={() => setActiveRowTab(1)}
             className={`flex-1 py-4 text-sm font-bold text-center transition-colors ${
               activeRowTab === 1
-                ? "text-[var(--color-electric-blue)] bg-white border-b-2 border-[var(--color-electric-blue)]"
+                ? "text-[var(--color-electric-blue)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 border-b-2 border-[var(--color-electric-blue)]"
                 : "text-[var(--color-silver-pine)] hover:text-[var(--color-obsidian)] hover:bg-white/50"
             }`}
           >
@@ -157,7 +157,7 @@ export function GalleryCmsManager() {
             onClick={() => setActiveRowTab(2)}
             className={`flex-1 py-4 text-sm font-bold text-center transition-colors ${
               activeRowTab === 2
-                ? "text-[var(--color-electric-blue)] bg-white border-b-2 border-[var(--color-electric-blue)]"
+                ? "text-[var(--color-electric-blue)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 border-b-2 border-[var(--color-electric-blue)]"
                 : "text-[var(--color-silver-pine)] hover:text-[var(--color-obsidian)] hover:bg-white/50"
             }`}
           >
@@ -196,7 +196,7 @@ export function GalleryCmsManager() {
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
                         <button
                           onClick={() => toggleActive(item.id, item.is_active)}
-                          className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-bold text-[var(--color-obsidian)] hover:bg-[var(--color-electric-blue)] hover:text-white transition-colors"
+                          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 rounded-xl text-sm font-bold text-[var(--color-obsidian)] hover:bg-[var(--color-electric-blue)] hover:text-white transition-colors"
                         >
                           {item.is_active ? (
                             <><EyeOff className="h-4 w-4" /> Sembunyikan</>

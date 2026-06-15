@@ -165,7 +165,7 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
   return (
     <div className="space-y-6">
       {/* Kartu Form Input Grant Access */}
-      <section className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8 border border-white/50">
+      <section className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 border border-white/50">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex items-start gap-3">
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-mint-glaze)] text-[var(--color-electric-blue)] shadow-sm">
@@ -207,7 +207,7 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
           <label className="block text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-silver-pine)]">
             Provider Pembayaran
             <select
-              className="form-input mt-2 bg-white"
+              className="form-input mt-2 bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10"
               value={provider}
               onChange={(event) => setProvider(event.target.value)}
             >
@@ -244,7 +244,7 @@ export function AccessManager({ source, initialGrants }: AccessManagerProps) {
       </section>
 
       {/* Tabel & Pencarian Member */}
-      <section className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8 border border-white/50 space-y-6">
+      <section className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8 border border-white/50 space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h3 className="font-aeonik text-2xl tracking-[-0.02em] text-[var(--color-obsidian)]">Daftar Member Aktif</h3>

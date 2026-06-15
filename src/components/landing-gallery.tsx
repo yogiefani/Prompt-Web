@@ -81,7 +81,7 @@ export function LandingGallery() {
 
   return (
     <phantom-ui loading={loading ? "true" : undefined}>
-      <section className="py-20 overflow-hidden bg-white">
+      <section className="py-20 overflow-hidden bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10">
         <div className="container-custom mb-12 text-center max-w-3xl mx-auto">
           <h2 className="font-aeonik text-4xl md:text-5xl font-bold text-[var(--color-obsidian)] leading-tight mb-4">
             Segala Jenis <span className="text-gradient">Produk Brand Dan Jasa</span>

@@ -347,7 +347,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
   }
 
   return (
-    <div className="flex flex-col gap-0 rounded-[32px] overflow-hidden bg-white shadow-[var(--shadow-lg)] border border-[rgba(83,88,98,0.1)]">
+    <div className="flex flex-col gap-0 rounded-[32px] overflow-hidden bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 shadow-[var(--shadow-lg)] border border-[rgba(83,88,98,0.1)]">
       <input type="file" ref={coverInputRef} className="hidden" accept="image/*" onChange={handleCoverUpload} />
       <input type="file" ref={inlineInputRef} className="hidden" accept="image/*" onChange={handleInlineUpload} />
       {/* Top Bar */}
@@ -379,7 +379,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
               type="button"
               onClick={() => setMode("write")}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all ${
-                mode === "write" ? "bg-[var(--color-midnight-ink)] text-white" : "bg-white text-[var(--color-silver-pine)]"
+                mode === "write" ? "bg-[var(--color-midnight-ink)] text-white" : "bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 text-[var(--color-silver-pine)]"
               }`}
             >
               <AlignLeft className="h-3.5 w-3.5" /> Tulis
@@ -388,7 +388,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
               type="button"
               onClick={() => setMode("preview")}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all ${
-                mode === "preview" ? "bg-[var(--color-midnight-ink)] text-white" : "bg-white text-[var(--color-silver-pine)]"
+                mode === "preview" ? "bg-[var(--color-midnight-ink)] text-white" : "bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 text-[var(--color-silver-pine)]"
               }`}
             >
               <Eye className="h-3.5 w-3.5" /> Preview
@@ -398,7 +398,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
           <button
             type="button"
             onClick={() => setShowMetadata((v) => !v)}
-            className="flex items-center gap-1.5 rounded-xl border border-[rgba(83,88,98,0.14)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-silver-pine)] transition-all hover:text-[var(--color-obsidian)]"
+            className="flex items-center gap-1.5 rounded-xl border border-[rgba(83,88,98,0.14)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-1.5 text-xs font-semibold text-[var(--color-silver-pine)] transition-all hover:text-[var(--color-obsidian)]"
           >
             <Tag className="h-3.5 w-3.5" />
             Metadata
@@ -430,7 +430,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
           <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.07em] text-[var(--color-silver-pine)]">
             Cover Image
             {coverUrl ? (
-              <div className="flex items-center gap-3 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white p-2">
+              <div className="flex items-center gap-3 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={coverUrl} alt="Cover Mini" className="h-10 w-16 rounded object-cover" />
                 <span className="flex-1 truncate text-xs font-semibold normal-case tracking-normal text-[var(--color-obsidian)]">
@@ -448,7 +448,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
                 type="button"
                 onClick={() => coverInputRef.current?.click()}
                 disabled={uploadingCover}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(83,88,98,0.3)] bg-white px-4 py-3 text-sm font-semibold normal-case tracking-normal text-[var(--color-silver-pine)] transition-colors hover:border-[var(--color-electric-blue)] hover:text-[var(--color-electric-blue)] disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[rgba(83,88,98,0.3)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-[var(--color-silver-pine)] transition-colors hover:border-[var(--color-electric-blue)] hover:text-[var(--color-electric-blue)] disabled:opacity-50"
               >
                 {uploadingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : <Image className="h-4 w-4" />}
                 {uploadingCover ? "Mengunggah..." : "Upload Cover Image"}
@@ -538,9 +538,9 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
           {selectedImage && (
             <div className="flex items-center gap-3 border-b border-[rgba(83,88,98,0.1)] bg-[var(--color-sky-wash)] px-5 py-2 text-xs font-semibold text-[var(--color-obsidian)]">
               <span className="text-[var(--color-silver-pine)]">Ukuran Gambar:</span>
-              <button type="button" onClick={() => applyImageSize("blog-img-small")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Kecil</button>
-              <button type="button" onClick={() => applyImageSize("blog-img-medium")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Sedang</button>
-              <button type="button" onClick={() => applyImageSize("blog-img-full")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Penuh</button>
+              <button type="button" onClick={() => applyImageSize("blog-img-small")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Kecil</button>
+              <button type="button" onClick={() => applyImageSize("blog-img-medium")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Sedang</button>
+              <button type="button" onClick={() => applyImageSize("blog-img-full")} className="rounded-lg border border-[rgba(83,88,98,0.2)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-1.5 transition-colors hover:bg-[var(--color-arctic-mist)] hover:text-[var(--color-electric-blue)]">Penuh</button>
             </div>
           )}
 
@@ -593,7 +593,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
       {/* Prompt Search Modal */}
       {showPromptModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-obsidian)]/40 p-4 backdrop-blur-sm">
-          <div className="flex h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl">
+          <div className="flex h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 shadow-2xl">
             <div className="flex items-center justify-between border-b border-[rgba(83,88,98,0.1)] px-6 py-5">
               <h3 className="font-aeonik text-xl font-bold tracking-[-0.02em] text-[var(--color-obsidian)]">
                 Pilih Prompt
@@ -607,7 +607,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
               </button>
             </div>
             <div className="border-b border-[rgba(83,88,98,0.1)] bg-[var(--color-arctic-mist)] p-4">
-              <div className="flex items-center gap-3 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white px-4 py-2.5 focus-within:border-[var(--color-electric-blue)] focus-within:ring-1 focus-within:ring-[var(--color-electric-blue)]">
+              <div className="flex items-center gap-3 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-4 py-2.5 focus-within:border-[var(--color-electric-blue)] focus-within:ring-1 focus-within:ring-[var(--color-electric-blue)]">
                 <Search className="h-4 w-4 text-[var(--color-silver-pine)]" />
                 <input
                   // eslint-disable-next-line jsx-a11y/no-autofocus

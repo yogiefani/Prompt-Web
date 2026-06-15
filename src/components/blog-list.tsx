@@ -9,9 +9,10 @@ import type { BlogPostListItem } from "@/lib/blog-data";
 type BlogListProps = {
   posts: BlogPostListItem[];
   maxItems?: number; // Optional prop to limit items (e.g. for landing page)
+  basePath?: string; // Base path for tutorial links
 };
 
-export function BlogList({ posts, maxItems }: BlogListProps) {
+export function BlogList({ posts, maxItems, basePath = "/tutorials" }: BlogListProps) {
   const [search, setSearch] = useState("");
   const [activeTag, setActiveTag] = useState("All");
 
@@ -29,7 +30,7 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-[32px] bg-white py-24 shadow-[var(--shadow-lg)]">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 py-24 shadow-[var(--shadow-lg)]">
         <BookOpen className="h-12 w-12 text-[var(--color-ash-gray)]" />
         <div className="text-center">
           <p className="font-aeonik text-xl text-[var(--color-obsidian)]">Belum ada tutorial</p>
@@ -50,8 +51,8 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
     <div className="space-y-10">
       {/* Search + tag filter (Hide on landing page) */}
       {!isLandingPage && (
-        <div className="flex flex-col gap-4 rounded-[32px] bg-white p-4 shadow-[var(--shadow-lg)] md:flex-row md:items-center">
-          <div className="flex flex-1 items-center gap-3 rounded-full border border-[rgba(83,88,98,0.16)] bg-[var(--color-arctic-mist)] px-4 py-3 transition-colors focus-within:border-[var(--color-electric-blue)] focus-within:bg-white">
+        <div className="flex flex-col gap-4 rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-4 shadow-[var(--shadow-lg)] md:flex-row md:items-center">
+          <div className="flex flex-1 items-center gap-3 rounded-full border border-[rgba(83,88,98,0.16)] bg-[var(--color-arctic-mist)] px-4 py-3 transition-colors focus-within:border-[var(--color-electric-blue)] focus-within:bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10">
             <Search className="h-4 w-4 text-[var(--color-silver-pine)]" />
             <input
               value={search}
@@ -70,7 +71,7 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
                   className={`flex-shrink-0 rounded-full px-4 py-2.5 text-sm font-bold transition-all ${
                     activeTag === tag
                       ? "bg-[var(--color-obsidian)] text-white"
-                      : "bg-white text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)]"
+                      : "bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)]"
                   }`}
                 >
                   {tag === "All" ? "Semua Topik" : `#${tag}`}
@@ -82,7 +83,7 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
       )}
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-[32px] bg-white py-16 shadow-[var(--shadow-lg)]">
+        <div className="flex flex-col items-center justify-center gap-4 rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 py-16 shadow-[var(--shadow-lg)]">
           <Search className="h-10 w-10 text-[var(--color-ash-gray)]" />
           <p className="text-sm font-semibold text-[var(--color-silver-pine)]">Tidak ada hasil pencarian.</p>
         </div>
@@ -96,7 +97,7 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="group relative flex flex-col overflow-hidden rounded-[32px] bg-white shadow-[var(--shadow-lg)] transition-all hover:shadow-xl md:flex-row"
+                className="group relative flex flex-col overflow-hidden rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 shadow-[var(--shadow-lg)] transition-all hover:shadow-xl md:flex-row"
               >
                 {/* Cover */}
                 <div className="relative h-64 w-full flex-shrink-0 md:h-auto md:w-1/2 lg:w-3/5">
@@ -128,7 +129,7 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
                   </div>
 
                   <h2 className="font-aeonik text-2xl font-bold leading-tight tracking-[-0.02em] text-[var(--color-obsidian)] md:text-4xl">
-                    <Link href={`/tutorials/${featuredPost.slug}`} className="hover:underline">
+                    <Link href={`${basePath}/${featuredPost.slug}`} className="hover:underline">
                       {featuredPost.title}
                     </Link>
                   </h2>
@@ -141,8 +142,8 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
 
                   <div className="mt-8">
                     <Link
-                      href={`/tutorials/${featuredPost.slug}`}
-                      className="inline-flex items-center gap-2 rounded-full bg-[var(--color-midnight-ink)] px-6 py-3 text-sm font-bold text-white transition-all hover:bg-[var(--color-electric-blue)]"
+                      href={`${basePath}/${featuredPost.slug}`}
+                      className="inline-flex items-center gap-2 rounded-full bg-[var(--color-midnight-ink)] px-6 py-3 text-sm font-bold text-white dark:text-[var(--color-sky-wash)] transition-all hover:bg-[var(--color-electric-blue)]"
                     >
                       Baca Selengkapnya
                       <ArrowRight className="h-4 w-4" />
@@ -164,7 +165,7 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
                     exit={{ opacity: 0, y: 10, scale: 0.98 }}
                     whileHover={{ y: -4 }}
                     transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1], delay: i * 0.04 }}
-                    className="group flex flex-col overflow-hidden rounded-[28px] bg-white shadow-sm ring-1 ring-[rgba(83,88,98,0.1)] transition-all hover:shadow-[var(--shadow-lg)]"
+                    className="group flex flex-col overflow-hidden rounded-[28px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 shadow-sm ring-1 ring-[rgba(83,88,98,0.1)] transition-all hover:shadow-[var(--shadow-lg)]"
                   >
                     {/* Cover */}
                     {post.coverUrl ? (
@@ -213,7 +214,7 @@ export function BlogList({ posts, maxItems }: BlogListProps) {
                           </span>
                         </div>
                         <Link
-                          href={`/tutorials/${post.slug}`}
+                          href={`${basePath}/${post.slug}`}
                           className="inline-flex items-center justify-center rounded-full bg-[var(--color-arctic-mist)] p-2 text-[var(--color-obsidian)] transition-colors hover:bg-[var(--color-electric-blue)] hover:text-white"
                         >
                           <ArrowRight className="h-4 w-4" />

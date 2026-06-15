@@ -155,7 +155,7 @@ export function BlogCmsManager() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-3 rounded-[24px] bg-white p-4 shadow-[var(--shadow-lg)] sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 rounded-[24px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-4 shadow-[var(--shadow-lg)] sm:flex-row sm:items-center">
         <div className="flex flex-1 items-center gap-2 rounded-full border border-[rgba(83,88,98,0.16)] bg-[var(--color-arctic-mist)] px-4 py-2.5">
           <Search className="h-4 w-4 text-[var(--color-silver-pine)]" />
           <input
@@ -171,10 +171,10 @@ export function BlogCmsManager() {
               key={s}
               type="button"
               onClick={() => setFilterStatus(s)}
-              className={`rounded-full px-4 py-2 text-xs font-bold transition-all ${
+              className={`rounded-full px-4 py-2 text-xs font-bold transition-all border ${
                 filterStatus === s
-                  ? "bg-[var(--color-midnight-ink)] text-white"
-                  : "bg-[var(--color-arctic-mist)] text-[var(--color-silver-pine)] hover:bg-[var(--color-sky-wash)]"
+                  ? "bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] border-transparent"
+                  : "bg-[var(--color-arctic-mist)] text-[var(--color-silver-pine)] border-[rgba(83,88,98,0.12)] hover:bg-[var(--color-sky-wash)] dark:bg-[var(--color-canvas-white)] dark:border-white/10 dark:hover:bg-white/5"
               }`}
             >
               {s === "all" ? "Semua" : s === "published" ? "Published" : "Draft"}
@@ -190,7 +190,7 @@ export function BlogCmsManager() {
           { label: "Published", value: posts.filter((p) => p.status === "published").length, icon: Globe, color: "emerald" },
           { label: "Draft", value: posts.filter((p) => p.status === "draft").length, icon: Edit2, color: "amber" },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-[24px] bg-white p-5 shadow-[var(--shadow-lg)]">
+          <div key={stat.label} className="rounded-[24px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-5 shadow-[var(--shadow-lg)]">
             <p className="text-sm font-semibold text-[var(--color-silver-pine)]">{stat.label}</p>
             <p className="mt-2 font-aeonik text-4xl tracking-[-0.02em] text-[var(--color-obsidian)]">{stat.value}</p>
           </div>
@@ -202,7 +202,7 @@ export function BlogCmsManager() {
         {loading ? (
           <div className="space-y-3">
             {Array(4).fill(0).map((_, i) => (
-              <div key={`skel-${i}`} className="group flex items-start gap-4 rounded-[24px] bg-white p-5 shadow-[var(--shadow-lg)]">
+              <div key={`skel-${i}`} className="group flex items-start gap-4 rounded-[24px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-5 shadow-[var(--shadow-lg)]">
                 <div className="h-20 w-28 flex-shrink-0 rounded-2xl bg-[var(--color-arctic-mist)]" />
                 <div className="flex min-w-0 flex-1 flex-col gap-3 pt-1">
                   <div className="h-3 w-24 rounded bg-[var(--color-arctic-mist)]" />
@@ -213,7 +213,7 @@ export function BlogCmsManager() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 rounded-[32px] bg-white py-20 shadow-[var(--shadow-lg)]">
+          <div className="flex flex-col items-center justify-center gap-4 rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 py-20 shadow-[var(--shadow-lg)]">
             <BookOpen className="h-12 w-12 text-[var(--color-ash-gray)]" />
             <div className="text-center">
               <p className="font-aeonik text-xl text-[var(--color-obsidian)]">Belum ada artikel</p>
@@ -230,7 +230,7 @@ export function BlogCmsManager() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.98 }}
-                className="group flex items-start gap-4 rounded-[24px] bg-white p-5 shadow-[var(--shadow-lg)] transition-all hover:shadow-[var(--shadow-lg)]"
+                className="group flex items-start gap-4 rounded-[24px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-5 shadow-[var(--shadow-lg)] transition-all hover:shadow-[var(--shadow-lg)]"
               >
                 {/* Cover thumb */}
                 {post.coverUrl ? (

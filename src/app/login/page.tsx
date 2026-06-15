@@ -25,7 +25,7 @@ export default async function LoginPage() {
 
       <section className="mx-auto grid min-h-0 py-8 lg:py-0 lg:min-h-[calc(100vh-112px)] max-w-6xl items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <FadeIn>
-          <span className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[var(--color-electric-blue)] shadow-[var(--shadow-lg)]">
+          <span className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 text-[var(--color-electric-blue)] shadow-[var(--shadow-lg)]">
             <LockKeyhole className="h-6 w-6" aria-hidden="true" />
           </span>
           <h1 className="font-aeonik text-4xl sm:text-5xl leading-tight tracking-[-0.02em] text-[var(--color-obsidian)]">
@@ -36,7 +36,7 @@ export default async function LoginPage() {
           </p>
         </FadeIn>
 
-        <ScaleIn className="rounded-[32px] bg-white p-4 shadow-[var(--shadow-lg)]" delay={0.1}>
+        <ScaleIn className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-4 shadow-[var(--shadow-lg)]" delay={0.1}>
           <Suspense fallback={<div className="rounded-[28px] bg-[var(--color-arctic-mist)] p-8 text-sm font-semibold text-[var(--color-silver-pine)]">Loading login...</div>}>
             <SupabaseLoginPanel />
           </Suspense>

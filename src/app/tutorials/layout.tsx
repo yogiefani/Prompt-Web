@@ -30,7 +30,7 @@ export default async function TutorialsLayout({ children }: { children: React.Re
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {children}
       </main>
-      <footer className="border-t border-[rgba(83,88,98,0.1)] bg-white py-8 text-center text-sm font-medium text-[var(--color-silver-pine)]">
+      <footer className="border-t border-[rgba(83,88,98,0.1)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 py-8 text-center text-sm font-medium text-[var(--color-silver-pine)]">
         &copy; {new Date().getFullYear()} {settings.brandName}. All rights reserved.
       </footer>
     </div>

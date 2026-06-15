@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --color-midnight-ink: #181d27;
@@ -585,6 +586,11 @@ phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
   background: var(--color-canvas-white);
 }
 
+.dark .category-pill.active {
+  background: var(--color-midnight-ink);
+  color: var(--color-sky-wash);
+}
+
 .dark .icon-button {
   border-color: rgba(255, 255, 255, 0.08);
   background: rgba(21, 26, 36, 0.84);
@@ -600,4 +606,29 @@ phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
   background-color: var(--color-canvas-white);
   color: var(--color-obsidian);
   border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .bg-white {
+  background-color: var(--color-canvas-white) !important;
+}
+
+.dark .border-\[rgba\(83\,88\,98\,0\.12\)\] {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .primary-button {
+  color: var(--color-sky-wash);
+}
+
+.dark .secondary-button {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.dark .category-pill.active {
+  color: var(--color-sky-wash);
+}
+
+.dark .blog-prompt-link {
+  color: var(--color-sky-wash) !important;
 }

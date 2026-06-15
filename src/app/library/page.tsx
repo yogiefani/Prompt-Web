@@ -5,7 +5,10 @@ import { LibraryDashboard } from "@/components/library-dashboard";
 
 export const dynamic = "force-dynamic";
 
-export default async function LibraryPage() {
+export default async function LibraryPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  const { tab } = await searchParams;
+  const initialTab = (tab as any) || "library";
+
   const [workspace, allBlogPosts, supabase] = await Promise.all([
     getPromptWorkspaceData(),
     getBlogPosts(),
@@ -36,7 +39,7 @@ export default async function LibraryPage() {
 
   return (
     <main className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)]">
-      <LibraryDashboard workspace={workspace} isSuperadmin={isSuperadmin} blogPosts={blogPosts} />
+      <LibraryDashboard workspace={workspace} isSuperadmin={isSuperadmin} blogPosts={blogPosts} initialTab={initialTab} />
     </main>
   );
 }

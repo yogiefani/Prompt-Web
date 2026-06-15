@@ -10,7 +10,7 @@ export default async function TutorialsPage() {
 
   return (
     <FadeIn className="space-y-8">
-      <div className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+      <div className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8">
         <div className="flex flex-col gap-2">
           <span className="rounded-full bg-[var(--color-whisper-fade-blue)] px-4 py-2 text-xs font-semibold text-[var(--color-electric-blue)] w-fit">
             Tutorial & Panduan

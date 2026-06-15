@@ -455,7 +455,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
   }
 
   return (
-    <section className="rounded-[32px] bg-white p-6 shadow-[var(--shadow-lg)] md:p-8">
+    <section className="rounded-[32px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-6 shadow-[var(--shadow-lg)] md:p-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h2 className="font-aeonik text-2xl tracking-[-0.02em]">Prompt CMS</h2>
@@ -549,7 +549,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
 
           <div className="mt-6 space-y-2">
             {categories.map((category) => (
-              <div key={category.id} className="flex items-center justify-between gap-3 rounded-2xl bg-white p-3">
+              <div key={category.id} className="flex items-center justify-between gap-3 rounded-2xl bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-3">
                 <div>
                   <p className="text-sm font-semibold">{category.name}</p>
                   <p className="text-xs font-medium text-[var(--color-ash-gray)]">{category.slug}</p>
@@ -659,7 +659,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
             <h3 className="font-aeonik text-xl tracking-[-0.02em] text-[var(--color-obsidian)]">
               Daftar Prompt
             </h3>
-            <div className="flex flex-1 items-center gap-2 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white px-3 py-2 focus-within:border-[var(--color-electric-blue)] focus-within:ring-1 focus-within:ring-[var(--color-electric-blue)]">
+            <div className="flex flex-1 items-center gap-2 rounded-xl border border-[rgba(83,88,98,0.18)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-3 py-2 focus-within:border-[var(--color-electric-blue)] focus-within:ring-1 focus-within:ring-[var(--color-electric-blue)]">
               <Search className="h-4 w-4 text-[var(--color-silver-pine)]" />
               <input
                 type="text"
@@ -671,7 +671,7 @@ export function PromptCmsManager({ initialCategories, initialPrompts, source }: 
             </div>
           </div>
 
-          <div className="mt-4 overflow-hidden rounded-2xl border border-[rgba(83,88,98,0.14)] bg-white">
+          <div className="mt-4 overflow-hidden rounded-2xl border border-[rgba(83,88,98,0.14)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10">
             {filteredPrompts.length === 0 ? (
               <div className="p-8 text-center text-sm font-medium text-[var(--color-silver-pine)]">
                 Tidak ada prompt yang ditemukan.
