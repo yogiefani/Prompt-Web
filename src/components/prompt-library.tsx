@@ -90,9 +90,10 @@ export function PromptLibrary({ categories, prompts, source }: PromptLibraryProp
   useEffect(() => {
     if (selectedPlaygroundPrompt && isSupabaseConfigured && supabase) {
       const fetchFeedback = async () => {
-         const { data: { user } } = await supabase.auth.getUser();
+         // Using non-null assertion since we check it above
+         const { data: { user } } = await supabase!.auth.getUser();
          if (!user) return;
-         const { data } = await supabase
+         const { data } = await supabase!
             .from("prompt_feedback")
             .select("is_positive")
             .eq("prompt_id", selectedPlaygroundPrompt.id)
