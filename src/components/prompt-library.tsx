@@ -29,7 +29,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { IconName, PromptCategoryView, PromptView } from "@/lib/prompt-data";
-import { supabase } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 const iconMap: Record<IconName, typeof Sparkles> = {
   "bar-chart": Sparkles,
