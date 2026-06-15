@@ -16,6 +16,7 @@ type GalleryItem = {
 export function GalleryCmsManager() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const [activeRowTab, setActiveRowTab] = useState<1 | 2>(1);
 
   // Cropper State
@@ -60,6 +61,8 @@ export function GalleryCmsManager() {
     setCropImageSrc(null); // Close modal
     if (!supabase) return;
     
+    setIsUploading(true);
+    
     // Upload to DB
     const newItem = {
       image_url: croppedBase64,
@@ -80,6 +83,8 @@ export function GalleryCmsManager() {
     } else {
       setItems([...items, data as GalleryItem]);
     }
+    
+    setIsUploading(false);
   };
 
   const toggleActive = async (id: string, current: boolean) => {
@@ -102,7 +107,15 @@ export function GalleryCmsManager() {
     }
   };
 
-  const filteredItems = items.filter(i => i.row_index === activeRowTab);
+  const filteredItems = items
+    .filter(i => i.row_index === activeRowTab)
+    .sort((a, b) => {
+      // Yang aktif di atas, tersembunyi di bawah
+      if (a.is_active && !b.is_active) return -1;
+      if (!a.is_active && b.is_active) return 1;
+      // Yang paling baru (sort_order terbesar) di atas
+      return b.sort_order - a.sort_order;
+    });
 
   // Removed early return for loading
   return (
@@ -133,10 +146,18 @@ export function GalleryCmsManager() {
             accept="image/*"
             className="hidden"
             onChange={handleFileSelect}
+            disabled={isUploading}
           />
-          <label htmlFor="gallery-upload" className="primary-button flex items-center gap-2 cursor-pointer">
-            <Plus className="h-5 w-5" />
-            Tambah Foto Baru
+          <label 
+            htmlFor={isUploading ? undefined : "gallery-upload"} 
+            className={`primary-button flex items-center gap-2 ${isUploading ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+          >
+            {isUploading ? (
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ) : (
+              <Plus className="h-5 w-5" />
+            )}
+            {isUploading ? "Mengunggah..." : "Tambah Foto Baru"}
           </label>
         </div>
       </div>
