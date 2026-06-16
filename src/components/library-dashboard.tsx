@@ -14,6 +14,7 @@ import {
   Moon,
   LayoutDashboard,
   FolderKanban,
+  KeyRound,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { LogoutButton } from "@/components/logout-button";
@@ -24,11 +25,12 @@ import { PromptStudio } from "@/components/prompt-studio";
 import { MemberCollections } from "@/components/member-collections";
 import { MemberRequests } from "@/components/member-requests";
 import { NotificationBell } from "@/components/notification-bell";
+import { ProfileSettings } from "@/components/profile-settings";
 import { cheatSheetRows, promptKeywords, toneRows } from "@/lib/content";
 import type { PromptWorkspaceData } from "@/lib/prompt-data";
 import type { BlogPostListItem } from "@/lib/blog-data";
 
-type TabId = "library" | "collections" | "requests" | "studio" | "tutorials" | "cheat-sheet" | "tone";
+type TabId = "library" | "collections" | "requests" | "studio" | "tutorials" | "cheat-sheet" | "tone" | "profile";
 
 export function LibraryDashboard({
   workspace,
@@ -76,6 +78,7 @@ export function LibraryDashboard({
     { id: "tutorials", label: "Tutorials", icon: BookText, badge: blogPosts.length > 0 ? blogPosts.length : undefined },
     { id: "cheat-sheet", label: "Cheat Sheet", icon: BookOpen },
     { id: "tone", label: "Tone Library", icon: MessageSquareText },
+    { id: "profile", label: "Ubah Password", icon: KeyRound },
   ];
 
   return (
@@ -358,6 +361,12 @@ export function LibraryDashboard({
                   </table>
                 </div>
               </div>
+            </FadeIn>
+          )}
+
+          {activeTab === "profile" && (
+            <FadeIn>
+              <ProfileSettings />
             </FadeIn>
           )}
             </>
