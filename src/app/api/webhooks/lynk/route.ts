@@ -17,23 +17,53 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("Webhook payload received:", body);
 
-    // Lynk.id payload schema might vary, we try to safely extract email and name
-    const email = body.buyer_email || body.email || body.customer?.email;
-    const name = body.buyer_name || body.name || body.customer?.name || "Member";
-    const productName = body.product_name || body.item_name || "PromptVault Access";
+    // Lynk.id payload schema might vary (can be flat or nested under data.message_data)
+    const msgData = body.data?.message_data || body;
+    const customer = msgData.customer || {};
+    const items = msgData.items || [];
+
+    const email = msgData.buyer_email || msgData.email || customer.email || body.buyer_email || body.email || body.customer?.email;
+    const name = msgData.buyer_name || msgData.name || customer.name || body.buyer_name || body.name || body.customer?.name || "Member";
+    
+    let productName = msgData.product_name || msgData.item_name || body.product_name || body.item_name || "";
+    
+    if (!productName && Array.isArray(items) && items.length > 0) {
+      // Find the first item name
+      productName = items[0].name || items[0].product_name || items[0].item_name || "";
+    }
 
     if (!email) {
       return NextResponse.json({ error: "No email provided in payload" }, { status: 400 });
     }
 
     // 2.5 Filter Produk (Agar tidak semua produk Lynk.id membuka akses ke sini)
-    // Ganti "Prompting OS" dengan nama produk Anda yang seharusnya memberikan akses.
-    // Jika ada lebih dari satu, pisahkan dengan koma di dalam array.
     const allowedProducts = ["PromptVault OS"];
     
-    const isAllowedProduct = allowedProducts.some((allowedKeyword) => 
-      productName.toLowerCase().includes(allowedKeyword.toLowerCase())
-    );
+    // Check if the main product name or any items match the keyword
+    let isAllowedProduct = false;
+    if (productName && allowedProducts.some((allowedKeyword) => productName.toLowerCase().includes(allowedKeyword.toLowerCase()))) {
+      isAllowedProduct = true;
+    } else if (Array.isArray(items)) {
+      isAllowedProduct = items.some((item: any) => {
+        const nameToCheck = item.name || item.product_name || item.item_name || "";
+        return allowedProducts.some((allowedKeyword) => nameToCheck.toLowerCase().includes(allowedKeyword.toLowerCase()));
+      });
+
+      // If matched, extract the matched product name
+      if (isAllowedProduct && items.length > 0) {
+        const matchedItem = items.find((item: any) => {
+          const nameToCheck = item.name || item.product_name || item.item_name || "";
+          return allowedProducts.some((allowedKeyword) => nameToCheck.toLowerCase().includes(allowedKeyword.toLowerCase()));
+        });
+        if (matchedItem) {
+          productName = matchedItem.name || matchedItem.product_name || matchedItem.item_name || productName;
+        }
+      }
+    }
+
+    if (!productName) {
+      productName = "PromptVault Access";
+    }
 
     if (!isAllowedProduct) {
       console.log(`Webhook diabaikan. Produk "${productName}" tidak termasuk produk yang memberi akses.`);
