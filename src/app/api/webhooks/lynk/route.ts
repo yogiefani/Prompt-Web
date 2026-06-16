@@ -26,6 +26,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No email provided in payload" }, { status: 400 });
     }
 
+    // 2.5 Filter Produk (Agar tidak semua produk Lynk.id membuka akses ke sini)
+    // Ganti "Prompting OS" dengan nama produk Anda yang seharusnya memberikan akses.
+    // Jika ada lebih dari satu, pisahkan dengan koma di dalam array.
+    const allowedProducts = ["PromptVault OS"];
+    
+    const isAllowedProduct = allowedProducts.some((allowedKeyword) => 
+      productName.toLowerCase().includes(allowedKeyword.toLowerCase())
+    );
+
+    if (!isAllowedProduct) {
+      console.log(`Webhook diabaikan. Produk "${productName}" tidak termasuk produk yang memberi akses.`);
+      return NextResponse.json({ message: "Ignored: Product does not grant access" });
+    }
+
     // 3. Auto-Create Supabase User
     // We use a default password. The user should be instructed to use this via Lynk.id thank you page.
     const defaultPassword = "Prompt2024!";
