@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     // 2. Parse Webhook Payload
     const body = await req.json();
-    console.log("Webhook payload received:", body);
+    console.log("Webhook payload received:", JSON.stringify(body, null, 2));
 
     // Lynk.id payload schema might vary (can be flat or nested under data.message_data)
     const msgData = body.data?.message_data || body;
@@ -26,11 +26,6 @@ export async function POST(req: Request) {
     const name = msgData.buyer_name || msgData.name || customer.name || body.buyer_name || body.name || body.customer?.name || "Member";
     
     let productName = msgData.product_name || msgData.item_name || body.product_name || body.item_name || "";
-    
-    if (!productName && Array.isArray(items) && items.length > 0) {
-      // Find the first item name
-      productName = items[0].name || items[0].product_name || items[0].item_name || "";
-    }
 
     if (!email) {
       return NextResponse.json({ error: "No email provided in payload" }, { status: 400 });
@@ -39,24 +34,43 @@ export async function POST(req: Request) {
     // 2.5 Filter Produk (Agar tidak semua produk Lynk.id membuka akses ke sini)
     const allowedProducts = ["PromptVault OS"];
     
-    // Check if the main product name or any items match the keyword
+    // Check if the main product name matches the keyword
     let isAllowedProduct = false;
     if (productName && allowedProducts.some((allowedKeyword) => productName.toLowerCase().includes(allowedKeyword.toLowerCase()))) {
       isAllowedProduct = true;
-    } else if (Array.isArray(items)) {
+    } 
+    
+    // Fallback: Scan all string values inside each item object in items array (extremely robust)
+    if (!isAllowedProduct && Array.isArray(items) && items.length > 0) {
       isAllowedProduct = items.some((item: any) => {
-        const nameToCheck = item.name || item.product_name || item.item_name || "";
-        return allowedProducts.some((allowedKeyword) => nameToCheck.toLowerCase().includes(allowedKeyword.toLowerCase()));
+        if (!item || typeof item !== 'object') return false;
+        return Object.values(item).some((val) => 
+          typeof val === 'string' && allowedProducts.some((allowedKeyword) => 
+            val.toLowerCase().includes(allowedKeyword.toLowerCase())
+          )
+        );
       });
 
       // If matched, extract the matched product name
-      if (isAllowedProduct && items.length > 0) {
+      if (isAllowedProduct) {
         const matchedItem = items.find((item: any) => {
-          const nameToCheck = item.name || item.product_name || item.item_name || "";
-          return allowedProducts.some((allowedKeyword) => nameToCheck.toLowerCase().includes(allowedKeyword.toLowerCase()));
+          if (!item || typeof item !== 'object') return false;
+          return Object.values(item).some((val) => 
+            typeof val === 'string' && allowedProducts.some((allowedKeyword) => 
+              val.toLowerCase().includes(allowedKeyword.toLowerCase())
+            )
+          );
         });
         if (matchedItem) {
-          productName = matchedItem.name || matchedItem.product_name || matchedItem.item_name || productName;
+          // Find the string value that contains the keyword
+          const matchedStringValue = Object.values(matchedItem).find((val) => 
+            typeof val === 'string' && allowedProducts.some((allowedKeyword) => 
+              val.toLowerCase().includes(allowedKeyword.toLowerCase())
+            )
+          );
+          if (matchedStringValue) {
+            productName = matchedStringValue as string;
+          }
         }
       }
     }
