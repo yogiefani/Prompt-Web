@@ -1,3 +1,23 @@
+# Fitur Profile & Ubah Password Selesai 🔐
+
+Halaman pengaturan profil dan fitur untuk mengubah password pengguna kini telah berhasil ditambahkan langsung ke dalam dasbor utama `/library` Anda.
+
+## Yang Telah Dibuat:
+
+1. **Tab Baru "Ubah Password" (Profil):**
+   - Menambahkan menu navigasi baru dengan ikon `KeyRound` di sidebar dasbor `/library`.
+   - Tab ini dapat diakses oleh semua pengguna terautentikasi (baik Superadmin maupun Premium Member).
+
+2. **Komponen Pengaturan Profil (`ProfileSettings`):**
+   - **Detail Akun**: Menampilkan nama lengkap pembeli, alamat email keanggotaan yang terdaftar, serta label tipe akses (misalnya: `Premium Member` atau `Superadmin`).
+   - **Ubah Password**: Menyediakan form aman untuk mengganti kata sandi secara instan dengan validasi minimal 6 karakter. Proses penggantian password memanfaatkan Supabase Auth Client secara real-time.
+
+3. **Integrasi & Pembersihan:**
+   - Menyelesaikan masalah build TypeScript compiler terkait pemeriksaan tipe data non-null pada client Supabase.
+   - Pustaka terintegrasi secara modular dan responsif pada perangkat desktop maupun mobile.
+
+---
+
 # Webhook Lynk.id & Auto-Access Selesai 🚀
 
 Sistem webhook untuk **Lynk.id** telah berhasil diimplementasikan! Sekarang setiap transaksi dari Lynk.id akan secara instan membukakan akun dan memberikan hak akses ke aplikasi Anda tanpa pengguna harus repot memverifikasi email melalui Gmail.
