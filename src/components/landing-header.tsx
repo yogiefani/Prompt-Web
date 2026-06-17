@@ -4,12 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function LandingHeader({ productUrl }: { productUrl: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/70 bg-[rgba(235,245,255,0.82)] backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-white/70 bg-[rgba(235,245,255,0.82)] backdrop-blur-xl dark:border-white/10 dark:bg-[rgba(9,13,20,0.88)]">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link href="/" className="shrink-0">
           <BrandMark />
@@ -24,6 +25,7 @@ export function LandingHeader({ productUrl }: { productUrl: string }) {
 
         {/* Desktop CTAs */}
         <div className="hidden items-center gap-2 md:flex">
+          <ThemeToggle />
           <Link href="/login" className="secondary-button">
             Login
           </Link>
@@ -35,6 +37,7 @@ export function LandingHeader({ productUrl }: { productUrl: string }) {
 
         {/* Mobile Header Toggle Menu Button */}
         <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle className="icon-button h-9 w-9" />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="icon-button h-9 w-9 flex items-center justify-center p-0"
@@ -48,7 +51,7 @@ export function LandingHeader({ productUrl }: { productUrl: string }) {
 
       {/* Mobile Menu Dropdown Panel */}
       {mobileMenuOpen && (
-        <div className="border-t border-white/50 bg-[rgba(235,245,255,0.95)] px-4 py-4 backdrop-blur-xl md:hidden space-y-3 shadow-lg">
+        <div className="space-y-3 border-t border-white/50 bg-[rgba(235,245,255,0.95)] px-4 py-4 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-[rgba(9,13,20,0.96)] md:hidden">
           <a
             href="#features"
             onClick={() => setMobileMenuOpen(false)}

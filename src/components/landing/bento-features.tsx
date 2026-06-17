@@ -3,7 +3,7 @@ import { Stagger, LiftCard } from "@/components/motion-primitives";
 
 export function BentoFeatures() {
   return (
-    <section className="bg-white py-24 sm:py-32" id="features">
+    <section className="bg-white py-24 dark:bg-[var(--color-canvas-white)] sm:py-32" id="features">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-aeonik text-base font-bold uppercase tracking-widest text-[var(--color-electric-blue)]">
@@ -20,7 +20,7 @@ export function BentoFeatures() {
         <Stagger className="mt-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* Feature 1: Dynamic Variables (Span 2) */}
           <LiftCard className="feature-card group relative overflow-hidden sm:col-span-2">
-            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-sky-wash)] to-white opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-sky-wash)] to-white opacity-50 dark:to-[var(--color-canvas-white)]" />
             <div className="relative z-10 flex h-full flex-col">
               <span className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-whisper-fade-blue)] text-[var(--color-electric-blue)] shadow-sm">
                 <Code2 className="h-6 w-6" aria-hidden="true" />

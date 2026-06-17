@@ -1,6 +1,7 @@
 import { createCookieSupabaseClient } from "@/lib/supabase-server";
 
 export type BlogPostStatus = "draft" | "published";
+export type BlogPostVisibility = "public" | "members";
 
 export type BlogPostView = {
   id: string;
@@ -12,6 +13,7 @@ export type BlogPostView = {
   tags: string[];
   readTime: number;
   status: BlogPostStatus;
+  visibility: BlogPostVisibility;
   authorId: string | null;
   publishedAt: string | null;
   createdAt: string;
@@ -31,6 +33,7 @@ function mapRow(row: Record<string, unknown>): BlogPostView {
     tags: (row.tags as string[]) ?? [],
     readTime: (row.read_time as number) ?? 1,
     status: (row.status as BlogPostStatus) ?? "draft",
+    visibility: (row.visibility as BlogPostVisibility) ?? "public",
     authorId: (row.author_id as string) ?? null,
     publishedAt: (row.published_at as string) ?? null,
     createdAt: row.created_at as string,
@@ -45,7 +48,8 @@ export async function getBlogPosts(): Promise<BlogPostListItem[]> {
 
   const { data, error } = await supabase
     .from("blog_posts")
-    .select("id, title, slug, excerpt, cover_url, tags, read_time, status, author_id, published_at, created_at, updated_at")
+    .select("id, title, slug, excerpt, cover_url, tags, read_time, status, visibility, author_id, published_at, created_at, updated_at")
+    .eq("status", "published")
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];

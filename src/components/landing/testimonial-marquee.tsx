@@ -69,7 +69,7 @@ export function TestimonialMarquee() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`https://i.pravatar.cc/100?img=${t.img}`} alt={t.author} className="h-12 w-12 rounded-full object-cover" />
                 <div>
-                  <h4 className="font-aeonik text-base font-bold tracking-[-0.01em] text-[var(--color-midnight-ink)]">{t.author}</h4>
+                  <h4 className="font-aeonik text-base font-bold tracking-[-0.01em] text-[var(--color-obsidian)]">{t.author}</h4>
                   <p className="text-sm font-medium text-[var(--color-silver-pine)]">{t.role}</p>
                 </div>
               </div>

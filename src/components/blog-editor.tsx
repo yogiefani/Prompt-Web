@@ -18,6 +18,7 @@ import {
   Link,
   List,
   ListOrdered,
+  LockKeyhole,
   Loader2,
   Minus,
   Quote,
@@ -30,6 +31,7 @@ import {
 import { supabase } from "@/lib/supabase";
 
 type BlogPostStatus = "draft" | "published";
+type BlogPostVisibility = "public" | "members";
 
 type BlogEditorProps = {
   initialPost?: {
@@ -42,6 +44,7 @@ type BlogEditorProps = {
     tags: string[];
     readTime: number;
     status: BlogPostStatus;
+    visibility: BlogPostVisibility;
   } | null;
   onSaved: () => void;
   onCancel: () => void;
@@ -100,6 +103,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
   const [excerpt, setExcerpt] = useState(initialPost?.excerpt ?? "");
   const [coverUrl, setCoverUrl] = useState(initialPost?.coverUrl ?? "");
   const [status, setStatus] = useState<BlogPostStatus>(initialPost?.status ?? "draft");
+  const [visibility, setVisibility] = useState<BlogPostVisibility>(initialPost?.visibility ?? "public");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>(initialPost?.tags ?? []);
   const [saving, setSaving] = useState(false);
@@ -327,6 +331,7 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
       tags,
       read_time: readTime,
       status,
+      visibility,
       published_at: status === "published" ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     };
@@ -370,7 +375,11 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
             }`}
           >
             <span className={`h-2 w-2 rounded-full ${status === "published" ? "bg-emerald-500" : "bg-amber-500"}`} />
-            {status === "published" ? "Published" : "Draft"}
+            {status === "published"
+              ? visibility === "public"
+                ? "Published: Public"
+                : "Published: Member"
+              : "Draft"}
           </button>
 
           {/* View toggle */}
@@ -464,6 +473,37 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
               placeholder="Deskripsi singkat artikel ini..."
             />
           </label>
+          <div className="col-span-full flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-[0.07em] text-[var(--color-silver-pine)]">
+              Audience saat dipublish
+            </span>
+            <div className="grid max-w-xl grid-cols-2 gap-2 rounded-2xl bg-[var(--color-arctic-mist)] p-1.5">
+              <button
+                type="button"
+                onClick={() => setVisibility("public")}
+                className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                  visibility === "public"
+                    ? "bg-white text-[var(--color-electric-blue)] shadow-sm dark:bg-[var(--color-canvas-white)]"
+                    : "text-[var(--color-silver-pine)]"
+                }`}
+              >
+                <Globe className="h-4 w-4" />
+                Public
+              </button>
+              <button
+                type="button"
+                onClick={() => setVisibility("members")}
+                className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                  visibility === "members"
+                    ? "bg-white text-[var(--color-deep-violet)] shadow-sm dark:bg-[var(--color-canvas-white)]"
+                    : "text-[var(--color-silver-pine)]"
+                }`}
+              >
+                <LockKeyhole className="h-4 w-4" />
+                Member Only
+              </button>
+            </div>
+          </div>
           <div className="col-span-full flex flex-col gap-1.5">
             <span className="text-xs font-bold uppercase tracking-[0.07em] text-[var(--color-silver-pine)]">Tags</span>
             <div className="flex flex-wrap items-center gap-2">
@@ -576,7 +616,11 @@ export function BlogEditor({ initialPost, onSaved, onCancel }: BlogEditorProps) 
         ) : (
           <p className="text-xs font-medium text-[var(--color-silver-pine)]">
             <Globe className="mr-1.5 inline h-3.5 w-3.5" />
-            {status === "published" ? "Artikel akan langsung terlihat oleh semua member." : "Simpan sebagai draft — hanya superadmin yang bisa melihat."}
+            {status === "published"
+              ? visibility === "public"
+                ? "Artikel dapat dibaca publik. Link prompt tetap meminta login."
+                : "Artikel hanya dapat dibaca oleh user yang sudah login."
+              : "Simpan sebagai draft - hanya superadmin yang bisa melihat di CMS."}
           </p>
         )}
         <div className="flex items-center gap-2">

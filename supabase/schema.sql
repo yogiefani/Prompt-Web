@@ -279,6 +279,7 @@ create table public.blog_posts (
   tags         text[] not null default '{}',
   read_time    int not null default 1,
   status       text not null default 'draft',
+  visibility   text not null default 'public' check (visibility in ('public', 'members')),
   author_id    uuid references public.profiles(id) on delete set null,
   published_at timestamptz,
   created_at   timestamptz not null default now(),
@@ -287,7 +288,12 @@ create table public.blog_posts (
 
 alter table public.blog_posts enable row level security;
 
-create policy "blog_posts_read_published"
+create policy "blog_posts_read_public"
+on public.blog_posts for select
+to anon
+using (status = 'published' and visibility = 'public');
+
+create policy "blog_posts_read_authenticated"
 on public.blog_posts for select
 to authenticated
 using (status = 'published' or public.is_superadmin());

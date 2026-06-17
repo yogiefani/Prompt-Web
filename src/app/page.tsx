@@ -70,7 +70,7 @@ export default async function Home() {
             Bergabunglah dengan ribuan kreator dan profesional yang telah menghemat ratusan jam kerja menggunakan PromptVault OS.
           </p>
           <div className="mt-10 flex justify-center">
-            <a href={settings.productUrl} className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-8 py-4 text-base font-bold text-[var(--color-midnight-ink)] transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+            <a href={settings.productUrl} className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-8 py-4 text-base font-bold text-[var(--color-midnight-ink)] transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] dark:bg-[var(--color-electric-blue)] dark:text-[#07111f]">
               <span className="relative z-10 flex items-center gap-2">
                 Dapatkan Akses Sekarang
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />

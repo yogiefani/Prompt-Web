@@ -564,15 +564,15 @@ phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
 }
 
 .dark {
-  --color-midnight-ink: #f0f4f8;
-  --color-arctic-mist: #161c26;
-  --color-canvas-white: #0d121b;
-  --color-obsidian: #f3f4f6;
-  --color-silver-pine: #9ca3af;
-  --color-ash-gray: #6b7280;
-  --color-sky-wash: #080b10;
-  --color-ghostly-blue: #1e293b;
-  --color-electric-blue: #3b82f6;
+  --color-midnight-ink: #141b27;
+  --color-arctic-mist: #151c28;
+  --color-canvas-white: #0f1621;
+  --color-obsidian: #f7f9fc;
+  --color-silver-pine: #bdc7d5;
+  --color-ash-gray: #8c98aa;
+  --color-sky-wash: #090e16;
+  --color-ghostly-blue: #1b2a40;
+  --color-electric-blue: #5da2ff;
   --color-whisper-fade-blue: #172554;
   --color-whisper-fade-yellow: #422006;
   --color-whisper-fade-orange: #451a03;
@@ -617,7 +617,9 @@ phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
 }
 
 .dark .primary-button {
-  color: var(--color-sky-wash);
+  background: var(--color-electric-blue);
+  color: #07111f;
+  box-shadow: 0 0 0 1px rgba(125, 181, 255, 0.25), 0 8px 24px rgba(40, 120, 230, 0.2);
 }
 
 .dark .secondary-button {
@@ -626,11 +628,13 @@ phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
 }
 
 .dark .category-pill.active {
-  color: var(--color-sky-wash);
+  background: var(--color-electric-blue);
+  color: #07111f;
 }
 
 .dark .blog-prompt-link {
-  color: var(--color-sky-wash) !important;
+  background: var(--color-electric-blue) !important;
+  color: #07111f !important;
 }
 
 /* Driver.js Dark Mode Fix */

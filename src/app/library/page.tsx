@@ -34,10 +34,8 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
     }
   }
 
-  // Users only see published posts; superadmin sees all
-  const blogPosts = isSuperadmin
-    ? allBlogPosts
-    : allBlogPosts.filter((p) => p.status === "published");
+  // Member mode always shows published tutorials only, including for superadmin accounts.
+  const blogPosts = allBlogPosts;
 
   return (
     <main className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)]">

@@ -3,7 +3,7 @@ import { Sparkles } from "lucide-react";
 export function BrandMark() {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-[var(--color-midnight-ink)] text-white dark:text-[var(--color-sky-wash)] shadow-[var(--shadow-subtle)]">
+      <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-[var(--color-midnight-ink)] text-white shadow-[var(--shadow-subtle)] dark:bg-[var(--color-electric-blue)] dark:text-[#07111f]">
         <Sparkles className="h-4.5 w-4.5 sm:h-5 sm:w-5" aria-hidden="true" />
       </div>
       <div>

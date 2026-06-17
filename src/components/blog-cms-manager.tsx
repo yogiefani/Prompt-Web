@@ -10,6 +10,7 @@ import {
   Eye,
   EyeOff,
   Globe,
+  LockKeyhole,
   Loader2,
   Plus,
   Search,
@@ -29,6 +30,7 @@ type BlogPost = {
   tags: string[];
   readTime: number;
   status: "draft" | "published";
+  visibility: "public" | "members";
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -45,6 +47,7 @@ function mapRow(row: Record<string, unknown>): BlogPost {
     tags: (row.tags as string[]) ?? [],
     readTime: (row.read_time as number) ?? 1,
     status: (row.status as "draft" | "published") ?? "draft",
+    visibility: (row.visibility as "public" | "members") ?? "public",
     publishedAt: (row.published_at as string) ?? null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -141,7 +144,7 @@ export function BlogCmsManager() {
             Blog & Tutorial CMS
           </h2>
           <p className="mt-1 text-sm font-medium text-[var(--color-silver-pine)]">
-            Kelola artikel tutorial untuk member. Drag, tulis, publish.
+            Kelola tutorial publik dan khusus member dari satu editor.
           </p>
         </div>
         <button
@@ -184,10 +187,11 @@ export function BlogCmsManager() {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
           { label: "Total Artikel", value: posts.length, icon: BookOpen, color: "blue" },
           { label: "Published", value: posts.filter((p) => p.status === "published").length, icon: Globe, color: "emerald" },
+          { label: "Public", value: posts.filter((p) => p.status === "published" && p.visibility === "public").length, icon: Globe, color: "blue" },
           { label: "Draft", value: posts.filter((p) => p.status === "draft").length, icon: Edit2, color: "amber" },
         ].map((stat) => (
           <div key={stat.label} className="rounded-[24px] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 p-5 shadow-[var(--shadow-lg)]">
@@ -260,6 +264,20 @@ export function BlogCmsManager() {
                           <span className={`h-1.5 w-1.5 rounded-full ${post.status === "published" ? "bg-emerald-500" : "bg-amber-500"}`} />
                           {post.status}
                         </span>
+                        {post.status === "published" ? (
+                          <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                            post.visibility === "public"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-violet-100 text-violet-700"
+                          }`}>
+                            {post.visibility === "public" ? (
+                              <Globe className="h-3 w-3" />
+                            ) : (
+                              <LockKeyhole className="h-3 w-3" />
+                            )}
+                            {post.visibility === "public" ? "Public" : "Member"}
+                          </span>
+                        ) : null}
                         <span className="text-xs text-[var(--color-ash-gray)]">/{post.slug}</span>
                       </div>
                       <h3 className="mt-1.5 font-aeonik text-lg leading-snug tracking-[-0.02em] text-[var(--color-obsidian)]">

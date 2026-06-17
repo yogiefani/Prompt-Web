@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { getSiteSettingsData } from "@/lib/prompt-data";
 
 export default async function TutorialsLayout({ children }: { children: React.ReactNode }) {
@@ -8,7 +9,7 @@ export default async function TutorialsLayout({ children }: { children: React.Re
 
   return (
     <div className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)] selection:bg-[var(--color-electric-blue)] selection:text-white">
-      <header className="sticky top-0 z-40 border-b border-[rgba(83,88,98,0.1)] bg-[rgba(235,245,255,0.82)] backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-[rgba(83,88,98,0.1)] bg-[rgba(235,245,255,0.82)] backdrop-blur-xl dark:border-white/10 dark:bg-[rgba(9,13,20,0.88)]">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <BrandMark />
           <div className="hidden items-center gap-8 text-sm font-bold text-[var(--color-silver-pine)] md:flex">
@@ -17,6 +18,7 @@ export default async function TutorialsLayout({ children }: { children: React.Re
             <Link href="/tutorials" className="hover:text-[var(--color-electric-blue)] transition-colors text-[var(--color-electric-blue)]">Tutorials</Link>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link href="/login" className="secondary-button hidden sm:inline-flex">
               Login
             </Link>

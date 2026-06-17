@@ -12,7 +12,7 @@ export function HeroSection({ settings }: { settings: any }) {
       <div className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-whisper-fade-blue)] opacity-50 blur-[100px]" />
       
       <FadeIn className="flex flex-col items-center text-center lg:items-start lg:text-left">
-        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white bg-white/70 px-4 py-2 text-sm font-semibold text-[var(--color-silver-pine)] shadow-[var(--shadow-lg)] backdrop-blur-md">
+        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white bg-white/70 px-4 py-2 text-sm font-semibold text-[var(--color-silver-pine)] shadow-[var(--shadow-lg)] backdrop-blur-md dark:border-white/10 dark:bg-[rgba(15,22,33,0.82)]">
           <Sparkles className="h-4 w-4 text-[var(--color-sunburst-yellow)]" aria-hidden="true" />
           Prompt manager premium #1 di Indonesia
         </div>
@@ -61,7 +61,7 @@ export function HeroSection({ settings }: { settings: any }) {
 
       <ScaleIn id="library" className="relative w-full min-w-0" delay={0.12}>
         <div className="w-full min-w-0" style={{ perspective: "1000px" }}>
-          <div className="hero-rotate-card w-full min-w-0 rounded-[32px] bg-white p-3 shadow-2xl transition-transform duration-700 hover:rotate-x-0 hover:rotate-y-0">
+          <div className="hero-rotate-card w-full min-w-0 rounded-[32px] bg-white p-3 shadow-2xl transition-transform duration-700 hover:rotate-x-0 hover:rotate-y-0 dark:border dark:border-white/10 dark:bg-[var(--color-canvas-white)]">
             <div className="w-full min-w-0 rounded-[28px] border border-[rgba(83,88,98,0.12)] bg-[var(--color-arctic-mist)] p-4 shadow-inner overflow-hidden">
             <div className="flex flex-col gap-4 border-b border-[rgba(83,88,98,0.12)] pb-4 sm:flex-row sm:items-center sm:justify-between">
               <div>

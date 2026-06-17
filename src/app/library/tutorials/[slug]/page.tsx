@@ -35,7 +35,7 @@ export default async function TutorialDetailPage({ params }: Props) {
     }
   }
 
-  const blogPosts = isSuperadmin ? allBlogPosts : allBlogPosts.filter((p) => p.status === "published");
+  const blogPosts = allBlogPosts;
 
   return (
     <main className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)]">

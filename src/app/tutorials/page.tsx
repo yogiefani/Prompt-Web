@@ -19,7 +19,7 @@ export default async function TutorialsPage() {
             Pelajari cara kerja AI prompting dari nol sampai mahir.
           </h2>
           <p className="mt-3 max-w-2xl text-base font-medium leading-7 text-[var(--color-silver-pine)]">
-            Artikel tutorial eksklusif yang dibuat khusus untuk member PromptVault OS. Mulai dari dasar hingga teknik lanjutan.
+            Panduan AI dan prompting yang dapat dipelajari langsung. Prompt praktik tetap tersedia khusus untuk user access.
           </p>
         </div>
       </div>

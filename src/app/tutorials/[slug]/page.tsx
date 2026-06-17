@@ -95,13 +95,13 @@ export default async function TutorialDetailPage({ params }: Props) {
       <div className="rounded-[32px] bg-[var(--color-midnight-ink)] p-6 text-center text-white dark:text-[var(--color-sky-wash)] shadow-[var(--shadow-lg)] md:p-8">
         <p className="font-aeonik text-2xl tracking-[-0.02em]">Sudah paham konsepnya?</p>
         <p className="mt-2 text-sm font-medium text-white/70 dark:text-[var(--color-sky-wash)]/70">
-          Coba langsung gunakan prompt yang ada di library untuk praktik nyata.
+          Login sebagai user access untuk membuka prompt utama dan mempraktikkan tutorial ini.
         </p>
         <Link
           href="/library"
           className="mt-5 inline-flex items-center gap-2 rounded-full bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 px-6 py-3 text-sm font-bold text-[var(--color-midnight-ink)] transition-all hover:bg-[var(--color-electric-blue)] hover:text-white"
         >
-          Buka Prompt Library →
+          Login & Buka Prompt Library →
         </Link>
       </div>
     </article>
