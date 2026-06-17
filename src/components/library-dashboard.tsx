@@ -98,6 +98,7 @@ export function LibraryDashboard({
             return (
               <button
                 key={item.id}
+                id={`tour-nav-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
                 type="button"
                 className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all ${

@@ -632,3 +632,19 @@ phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
 .dark .blog-prompt-link {
   color: var(--color-sky-wash) !important;
 }
+
+/* Driver.js Dark Mode Fix */
+html.dark .driver-popover {
+  background-color: var(--color-canvas-white) !important;
+  color: var(--color-obsidian) !important;
+}
+
+html.dark .driver-popover-title,
+html.dark .driver-popover-description {
+  color: var(--color-obsidian) !important;
+}
+
+html.dark .driver-popover-footer button {
+  color: var(--color-obsidian) !important;
+  background-color: var(--color-arctic-mist) !important;
+}

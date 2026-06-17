@@ -32,20 +32,38 @@ export function OnboardingTour({ hasSeenTutorial }: { hasSeenTutorial: boolean }
           },
         },
         {
-          element: "#tour-sidebar",
+          element: "#tour-nav-library",
           popover: {
-            title: "Menu Utama",
-            description: "Di sini Anda bisa mengakses berbagai fitur seperti Prompt Library, Koleksi Anda, AI Prompt Studio, hingga Tutorial.",
+            title: "Prompt Library",
+            description: "Ini adalah perpustakaan utama. Semua prompt tersusun rapi berdasarkan kategori. Anda bisa dengan mudah mencari dan menyalin prompt yang Anda butuhkan.",
             side: "right",
             align: "start",
           },
         },
         {
-          element: "#tour-prompt-library",
+          element: "#tour-nav-requests",
           popover: {
-            title: "Prompt Library",
-            description: "Ini adalah perpustakaan utama. Semua prompt tersusun rapi berdasarkan kategori. Anda bisa dengan mudah mencari dan menyalin prompt yang Anda butuhkan.",
-            side: "bottom",
+            title: "Request Prompt",
+            description: "Tidak menemukan prompt yang Anda cari? Anda bisa mengajukan request prompt baru di sini, dan kami akan membuatkannya untuk Anda.",
+            side: "right",
+            align: "start",
+          },
+        },
+        {
+          element: "#tour-nav-studio",
+          popover: {
+            title: "AI Prompt Studio",
+            description: "Gunakan generator otomatis kami untuk membuat prompt yang dikustomisasi secara spesifik untuk kebutuhan Anda dalam hitungan detik.",
+            side: "right",
+            align: "start",
+          },
+        },
+        {
+          element: "#tour-nav-tutorials",
+          popover: {
+            title: "Tutorials",
+            description: "Pelajari panduan, teknik prompting, dan tips eksklusif untuk memaksimalkan hasil dari AI Anda di menu ini.",
+            side: "right",
             align: "start",
           },
         },
