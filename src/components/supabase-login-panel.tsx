@@ -1,14 +1,13 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { ArrowRight, Loader2, LogOut } from "lucide-react";
 import { FadeIn } from "@/components/motion-primitives";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 export function SupabaseLoginPanel() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
   const reason = searchParams.get("reason");
@@ -40,24 +39,15 @@ export function SupabaseLoginPanel() {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function handleRedirectAfterLogin(userId: string) {
-    if (!supabase) return;
+  function redirectAfterLogin() {
+    const params = new URLSearchParams();
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
+    if (nextPath?.startsWith("/") && !nextPath.startsWith("//")) {
+      params.set("next", nextPath);
+    }
 
-    // Jika parameter next ada, prioritaskan. Jika tidak, redirect ke /superadmin (jika superadmin) atau /library (jika member biasa)
-    const targetPath = nextPath?.startsWith("/")
-      ? nextPath
-      : profile?.role === "superadmin"
-        ? "/superadmin"
-        : "/library";
-
-    router.push(targetPath);
-    router.refresh();
+    const continuePath = params.size > 0 ? `/auth/continue?${params.toString()}` : "/auth/continue";
+    window.location.replace(continuePath);
   }
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
@@ -85,7 +75,7 @@ export function SupabaseLoginPanel() {
     setUser(data.user);
     setStatus("success");
     setMessage("Login berhasil. Mengalihkan halaman...");
-    await handleRedirectAfterLogin(data.user.id);
+    redirectAfterLogin();
   }
 
 
@@ -97,10 +87,10 @@ export function SupabaseLoginPanel() {
     setMessage("Session sudah keluar.");
   }
 
-  async function handleLanjutkanState() {
+  function handleLanjutkanState() {
     if (!user) return;
     setStatus("loading");
-    await handleRedirectAfterLogin(user.id);
+    redirectAfterLogin();
   }
 
   return (
