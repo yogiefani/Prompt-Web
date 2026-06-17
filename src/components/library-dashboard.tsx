@@ -26,6 +26,7 @@ import { MemberCollections } from "@/components/member-collections";
 import { MemberRequests } from "@/components/member-requests";
 import { NotificationBell } from "@/components/notification-bell";
 import { ProfileSettings } from "@/components/profile-settings";
+import { OnboardingTour } from "@/components/onboarding-tour";
 import { cheatSheetRows, promptKeywords, toneRows } from "@/lib/content";
 import type { PromptWorkspaceData } from "@/lib/prompt-data";
 import type { BlogPostListItem } from "@/lib/blog-data";
@@ -37,12 +38,14 @@ export function LibraryDashboard({
   isSuperadmin,
   blogPosts,
   initialTab = "library",
+  hasSeenTutorial = false,
   children,
 }: {
   workspace: PromptWorkspaceData;
   isSuperadmin: boolean;
   blogPosts: BlogPostListItem[];
   initialTab?: TabId;
+  hasSeenTutorial?: boolean;
   children?: React.ReactNode;
 }) {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
@@ -83,12 +86,13 @@ export function LibraryDashboard({
 
   return (
     <div className="grid min-h-screen lg:grid-cols-[280px_1fr] dark:bg-[var(--color-sky-wash)]">
+      <OnboardingTour hasSeenTutorial={hasSeenTutorial} />
       {/* Sidebar Kiri (Desktop) */}
       <aside className="sticky top-0 hidden h-screen flex-col border-r border-white/80 bg-white/75 p-5 backdrop-blur-xl lg:flex dark:bg-[var(--color-canvas-white)]/75 dark:border-white/10">
         <Link href="/" className="mb-8 block">
           <BrandMark />
         </Link>
-        <nav className="flex-1 space-y-1.5">
+        <nav id="tour-sidebar" className="flex-1 space-y-1.5">
           {sidebarMenu.map((item) => {
             const isActive = activeTab === item.id;
             return (
@@ -129,6 +133,7 @@ export function LibraryDashboard({
         {/* Theme Toggle Button (Desktop) */}
         <div className="mt-4 border-t border-[rgba(83,88,98,0.12)] dark:border-white/10 pt-4">
           <button
+            id="tour-theme-toggle"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             type="button"
             className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-silver-pine)] transition-all hover:bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 hover:text-[var(--color-obsidian)] dark:hover:bg-[var(--color-canvas-white)]/40"
@@ -245,11 +250,13 @@ export function LibraryDashboard({
                       </div>
                     </div>
                   </div>
-                  <PromptLibrary
-                    categories={workspace.categories}
-                    prompts={workspace.prompts}
-                    source={workspace.source}
-                  />
+                  <div id="tour-prompt-library">
+                    <PromptLibrary
+                      categories={workspace.categories}
+                      prompts={workspace.prompts}
+                      source={workspace.source}
+                    />
+                  </div>
                 </FadeIn>
               )}
 

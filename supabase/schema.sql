@@ -5,6 +5,7 @@ create table public.profiles (
   email text not null,
   full_name text,
   role public.user_role not null default 'access',
+  has_seen_tutorial boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

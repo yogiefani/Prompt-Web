@@ -16,6 +16,7 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
   ]);
 
   let isSuperadmin = false;
+  let hasSeenTutorial = false;
 
   if (supabase) {
     const {
@@ -25,10 +26,11 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
     if (user) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
+        .select("role, has_seen_tutorial")
         .eq("id", user.id)
         .single();
       isSuperadmin = profile?.role === "superadmin";
+      hasSeenTutorial = profile?.has_seen_tutorial ?? false;
     }
   }
 
@@ -39,7 +41,7 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
 
   return (
     <main className="min-h-screen bg-[var(--color-sky-wash)] text-[var(--color-obsidian)]">
-      <LibraryDashboard workspace={workspace} isSuperadmin={isSuperadmin} blogPosts={blogPosts} initialTab={initialTab} />
+      <LibraryDashboard workspace={workspace} isSuperadmin={isSuperadmin} blogPosts={blogPosts} initialTab={initialTab} hasSeenTutorial={hasSeenTutorial} />
     </main>
   );
 }
