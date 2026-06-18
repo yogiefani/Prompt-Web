@@ -15,11 +15,13 @@ import {
   Sparkles,
   Moon,
   Sun,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
 import { LogoutButton } from "@/components/logout-button";
 import { FadeIn, LiftCard, ScaleIn, Stagger } from "@/components/motion-primitives";
+import { MemberCommunity } from "@/components/member-community";
 import { PromptAnalyticsPanel } from "@/components/prompt-analytics-panel";
 import { SuperadminConsole } from "@/components/superadmin-console";
 import { AccessManager } from "@/components/access-manager";
@@ -50,7 +52,7 @@ const iconMap: Record<IconName, typeof Sparkles> = {
 };
 
 export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "notifications" | "settings" | "roadmap">(
+  const [activeTab, setActiveTab] = useState<"overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "community" | "notifications" | "settings" | "roadmap">(
     "overview"
   );
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -79,7 +81,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
     (request) => request.status === "pending" || request.status === "reviewing"
   ).length;
 
-  type TabId = "overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "notifications" | "settings" | "roadmap";
+  type TabId = "overview" | "cms" | "studio" | "blog" | "gallery" | "access" | "requests" | "community" | "notifications" | "settings" | "roadmap";
 
   const sidebarMenu: { id: TabId; label: string; icon: typeof LayoutDashboard; badge?: number }[] = [
     { id: "overview", label: "Overview & Analitik", icon: LayoutDashboard },
@@ -89,6 +91,7 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
     { id: "gallery", label: "Galeri Landing", icon: Sparkles },
     { id: "access", label: "Akses Member", icon: ShieldCheck },
     { id: "requests", label: "Permintaan Prompt", icon: Inbox, badge: pendingRequestsCount },
+    { id: "community", label: "Moderasi Komunitas", icon: MessageSquare },
     { id: "notifications", label: "Blast Notifikasi", icon: Sparkles },
     { id: "settings", label: "Pengaturan Publik", icon: Settings },
     { id: "roadmap", label: "Roadmap Fitur", icon: Compass },
@@ -279,6 +282,12 @@ export function SuperadminDashboard({ workspace }: SuperadminDashboardProps) {
               </div>
               <RequestInbox initialRequests={workspace.requests} source={workspace.source} />
             </ScaleIn>
+          )}
+
+          {activeTab === "community" && (
+            <FadeIn className="h-full">
+              <MemberCommunity source={workspace.source} isSuperadmin={true} />
+            </FadeIn>
           )}
 
           {activeTab === "notifications" && (
