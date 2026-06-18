@@ -8,6 +8,7 @@ import {
   BookText,
   FileText,
   MessageSquareText,
+  MessageSquare,
   ShieldCheck,
   Sparkles,
   Sun,
@@ -24,6 +25,7 @@ import { BlogList } from "@/components/blog-list";
 import { PromptStudio } from "@/components/prompt-studio";
 import { MemberCollections } from "@/components/member-collections";
 import { MemberRequests } from "@/components/member-requests";
+import { MemberCommunity } from "@/components/member-community";
 import { NotificationBell } from "@/components/notification-bell";
 import { ProfileSettings } from "@/components/profile-settings";
 import { OnboardingTour } from "@/components/onboarding-tour";
@@ -31,7 +33,7 @@ import { cheatSheetRows, promptKeywords, toneRows } from "@/lib/content";
 import type { PromptWorkspaceData } from "@/lib/prompt-data";
 import type { BlogPostListItem } from "@/lib/blog-data";
 
-type TabId = "library" | "collections" | "requests" | "studio" | "tutorials" | "cheat-sheet" | "tone" | "profile";
+type TabId = "library" | "collections" | "requests" | "community" | "studio" | "tutorials" | "cheat-sheet" | "tone" | "profile";
 
 export function LibraryDashboard({
   workspace,
@@ -39,6 +41,7 @@ export function LibraryDashboard({
   blogPosts,
   initialTab = "library",
   hasSeenTutorial = false,
+  initialPostId,
   children,
 }: {
   workspace: PromptWorkspaceData;
@@ -46,6 +49,7 @@ export function LibraryDashboard({
   blogPosts: BlogPostListItem[];
   initialTab?: TabId;
   hasSeenTutorial?: boolean;
+  initialPostId?: string;
   children?: React.ReactNode;
 }) {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
@@ -77,6 +81,7 @@ export function LibraryDashboard({
     { id: "library", label: "Prompt Library", icon: LayoutDashboard },
     { id: "collections", label: "Koleksi Saya", icon: FolderKanban },
     { id: "requests", label: "Request Prompt", icon: MessageSquareText },
+    { id: "community", label: "Komunitas Diskusi", icon: MessageSquare },
     { id: "studio", label: "AI Prompt Studio", icon: Sparkles },
     { id: "tutorials", label: "Tutorials", icon: BookText, badge: blogPosts.length > 0 ? blogPosts.length : undefined },
     { id: "cheat-sheet", label: "Cheat Sheet", icon: BookOpen },
@@ -270,6 +275,12 @@ export function LibraryDashboard({
               {activeTab === "requests" && (
                 <FadeIn className="h-full">
                   <MemberRequests source={workspace.source} />
+                </FadeIn>
+              )}
+
+              {activeTab === "community" && (
+                <FadeIn className="h-full">
+                  <MemberCommunity source={workspace.source} isSuperadmin={isSuperadmin} initialPostId={initialPostId} />
                 </FadeIn>
               )}
 

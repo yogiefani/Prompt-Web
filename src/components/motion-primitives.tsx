@@ -10,6 +10,7 @@ type MotionBlockProps = {
   className?: string;
   delay?: number;
   id?: string;
+  onClick?: () => void;
 };
 
 export function FadeIn({ children, className, delay = 0, id }: MotionBlockProps) {
@@ -83,10 +84,11 @@ export function StaggerItem({ children, className }: MotionBlockProps) {
   );
 }
 
-export function LiftCard({ children, className }: MotionBlockProps) {
+export function LiftCard({ children, className, onClick }: MotionBlockProps) {
   return (
     <motion.article
       className={className}
+      onClick={onClick}
       variants={{
         hidden: { opacity: 0, y: 16 },
         show: {

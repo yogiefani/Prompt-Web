@@ -34,7 +34,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 4. Run `supabase/schema.sql` in Supabase SQL Editor.
 5. Run `supabase/seed.sql` if you want starter categories and prompt examples.
-6. Create users in Supabase Auth.
+6. Run `supabase/seed-tutorials.sql` to add editable tutorial drafts to the superadmin CMS.
+7. Create users in Supabase Auth.
 
 New Auth users automatically get a row in `profiles` with role `access`.
 

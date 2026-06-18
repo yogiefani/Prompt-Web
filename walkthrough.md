@@ -1,3 +1,32 @@
+# Fitur Komunitas Diskusi (Community Forum) Selesai 💬
+
+Fitur forum komunitas interaktif kini telah berhasil ditambahkan! Member premium dan superadmin sekarang dapat berinteraksi, membagikan prompt/tips, melakukan tanya jawab, dan memamerkan proyek mereka langsung di dasbor `/library`.
+
+## Fitur Utama yang Dibuat:
+
+1. **Tab Baru "Komunitas Diskusi":**
+   - Ditambahkan ke panel sisi kiri dasbor `/library` dengan ikon obrolan.
+   - Menyediakan tampilan forum bergaya IndieHackers/Reddit yang responsif dan elegan dalam mode terang maupun gelap.
+
+2. **Interaksi Diskusi:**
+   - **Kategori Topik**: Member wajib memilih kategori diskusi (`💡 Ide / Showcase`, `❓ Tanya Jawab`, `🔥 Tips & Prompt`, `💬 Obrolan`).
+   - **Sistem Upvote/Like**: Member dapat memberikan upvote pada topik diskusi yang mereka sukai. Postingan terpopuler dapat diurutkan berdasarkan jumlah upvote.
+   - **Sistem Thread/Komentar**: Halaman detail diskusi utas di mana pengguna dapat membaca dan membalas komentar dengan layout modern.
+   - **Badge Role**: Label role penanda yang jelas (`Premium Member` atau `⭐ Admin`) untuk membangun reputasi dan kredibilitas.
+
+3. **Panel Moderasi Superadmin:**
+   - **Pin Post**: Superadmin dapat menyematkan diskusi penting agar selalu tampil paling atas.
+   - **Lock Post**: Superadmin dapat mengunci diskusi agar tidak dapat dikomentari lagi oleh pengguna biasa (namun tetap bisa dibaca).
+   - **Hapus Konten**: Superadmin memiliki hak untuk menghapus postingan atau komentar yang melanggar ketentuan komunitas.
+
+4. **Integrasi Notifikasi Real-time:**
+   - Ketika ada komentar baru di postingan seseorang, pembuat postingan akan otomatis mendapatkan notifikasi di lonceng. Mengklik notifikasi akan mengarahkan pengguna langsung ke detail thread tersebut.
+
+5. **Skema Database Migrasi (`20260618220000_community_forum.sql`):**
+   - Menambahkan tabel `community_posts`, `community_comments`, dan `community_post_likes` lengkap dengan kebijakan keamanan Row Level Security (RLS) untuk membatasi aksi manipulasi data hanya bagi pemilik data dan Superadmin.
+
+---
+
 # Fitur Profile & Ubah Password Selesai 🔐
 
 Halaman pengaturan profil dan fitur untuk mengubah password pengguna kini telah berhasil ditambahkan langsung ke dalam dasbor utama `/library` Anda.
