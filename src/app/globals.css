@@ -637,6 +637,47 @@ phantom-ui[loading] button, phantom-ui[loading] [role="button"] {
   color: #07111f !important;
 }
 
+/* Prose styling for legal / info pages */
+.prose-custom h2 {
+  font-family: var(--font-aeonik), var(--font-geist), sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+  color: var(--color-obsidian);
+}
+
+.prose-custom p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--color-silver-pine);
+  margin-bottom: 0.75rem;
+}
+
+.prose-custom ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.prose-custom ul li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-silver-pine);
+}
+
+.prose-custom ul li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--color-electric-blue);
+  font-size: 0.8em;
+  top: 0.3em;
+}
+
 /* Driver.js Dark Mode Fix */
 html.dark .driver-popover {
   background-color: var(--color-canvas-white) !important;

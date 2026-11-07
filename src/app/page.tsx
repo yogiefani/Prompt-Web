@@ -80,8 +80,42 @@ export default async function Home() {
         </div>
       </section>
       
-      <footer className="border-t border-[rgba(83,88,98,0.1)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 py-8 text-center text-sm font-medium text-[var(--color-silver-pine)]">
-        &copy; {new Date().getFullYear()} {settings.brandName}. All rights reserved.
+      <footer className="border-t border-[rgba(83,88,98,0.1)] bg-white dark:bg-[var(--color-canvas-white)] dark:border-white/10 py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 sm:grid-cols-3 mb-8">
+            <div>
+              <h4 className="font-aeonik text-sm font-bold text-[var(--color-obsidian)] mb-3">
+                PromptVault OS
+              </h4>
+              <p className="text-sm text-[var(--color-silver-pine)] leading-relaxed">
+                Platform prompt manager premium #1 di Indonesia untuk semua AI workflow.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-aeonik text-sm font-bold text-[var(--color-obsidian)] mb-3">
+                Navigasi
+              </h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/" className="text-[var(--color-silver-pine)] hover:text-[var(--color-electric-blue)] transition-colors">Beranda</Link></li>
+                <li><Link href="/tutorials" className="text-[var(--color-silver-pine)] hover:text-[var(--color-electric-blue)] transition-colors">Tutorial</Link></li>
+                <li><Link href="/about" className="text-[var(--color-silver-pine)] hover:text-[var(--color-electric-blue)] transition-colors">Tentang Kami</Link></li>
+                <li><Link href="/contact" className="text-[var(--color-silver-pine)] hover:text-[var(--color-electric-blue)] transition-colors">Kontak</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-aeonik text-sm font-bold text-[var(--color-obsidian)] mb-3">
+                Legal
+              </h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/privacy-policy" className="text-[var(--color-silver-pine)] hover:text-[var(--color-electric-blue)] transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/disclaimer" className="text-[var(--color-silver-pine)] hover:text-[var(--color-electric-blue)] transition-colors">Disclaimer & Terms</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-[rgba(83,88,98,0.1)] dark:border-white/10 pt-6 text-center text-sm font-medium text-[var(--color-silver-pine)]">
+            &copy; {new Date().getFullYear()} {settings.brandName}. All rights reserved.
+          </div>
+        </div>
       </footer>
     </main>
   );

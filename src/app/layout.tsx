@@ -16,9 +16,43 @@ const aeonikFallback = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "PromptVault OS - Multi-AI Prompt Manager",
+  title: {
+    default: "PromptVault OS - Multi-AI Prompt Manager Premium #1 Indonesia",
+    template: "%s | PromptVault OS",
+  },
   description:
-    "Prompt manager premium untuk GPT, Claude, Gemini, image AI, video AI, dan agent workflow.",
+    "Platform prompt manager premium #1 di Indonesia untuk GPT, Claude, Gemini, image AI, video AI, dan agent workflow. Simpan, kelola, dan temukan prompt terbaik Anda.",
+  keywords: [
+    "prompt manager",
+    "AI prompt",
+    "GPT prompt",
+    "Claude prompt",
+    "Gemini prompt",
+    "prompt Indonesia",
+    "AI workflow",
+    "prompt template",
+  ],
+  authors: [{ name: "PromptVault OS" }],
+  creator: "PromptVault OS",
+  metadataBase: new URL("https://www.promptvault.codes"),
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    siteName: "PromptVault OS",
+    title: "PromptVault OS - Multi-AI Prompt Manager Premium #1 Indonesia",
+    description:
+      "Platform prompt manager premium untuk GPT, Claude, Gemini, dan semua AI. Simpan, kelola, dan temukan prompt terbaik Anda dalam 1 detik.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PromptVault OS - Multi-AI Prompt Manager",
+    description:
+      "Platform prompt manager premium #1 di Indonesia untuk semua AI workflow.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -34,6 +68,11 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2717693315276182"
+          crossOrigin="anonymous"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
