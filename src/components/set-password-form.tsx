@@ -66,7 +66,7 @@ export function SetPasswordForm() {
       }
 
       setTimeout(() => {
-        if (resolved) return;
+        if (resolved || !supabase) return;
         supabase.auth.getUser().then(({ data: { user }, error }) => {
           if (resolved) return;
           resolved = true;
