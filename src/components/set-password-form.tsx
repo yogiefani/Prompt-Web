@@ -25,28 +25,6 @@ export function SetPasswordForm() {
     async function processInviteToken() {
       if (!supabase) return;
 
-      // Sign out any existing session first so the invite token
-      // is processed for the correct (invited) user, not whoever
-      // happens to be logged in already.
-      await supabase.auth.signOut();
-
-      // Listen for the auth state change when Supabase processes
-      // the invite token from the URL hash fragment.
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          if (event === "SIGNED_IN" && session?.user) {
-            setUserEmail(session.user.email ?? "");
-            setStatus("idle");
-            subscription.unsubscribe();
-          } else if (event === "TOKEN_REFRESHED" && session?.user) {
-            setUserEmail(session.user.email ?? "");
-            setStatus("idle");
-            subscription.unsubscribe();
-          }
-        }
-      );
-
-      // If there's an error in the hash (e.g. otp_expired), detect it
       const hash = window.location.hash;
       if (hash.includes("error=")) {
         const params = new URLSearchParams(hash.slice(1));
@@ -57,25 +35,51 @@ export function SetPasswordForm() {
             ? decodeURIComponent(errorDesc.replace(/\+/g, " "))
             : "Tautan aktivasi tidak valid, telah kedaluwarsa, atau sesi login tidak ditemukan. Silakan masuk melalui halaman login."
         );
+        return;
+      }
+
+      let resolved = false;
+
+      // Supabase auto-processes the #access_token hash and creates a
+      // session for the invited user — do NOT call signOut() before this
+      // or it destroys the session the hash just established.
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          if (resolved) return;
+          if (session?.user) {
+            resolved = true;
+            setUserEmail(session.user.email ?? "");
+            setStatus("idle");
+            subscription.unsubscribe();
+          }
+        }
+      );
+
+      // Hash may already have been processed before the listener was set up
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!resolved && session?.user) {
+        resolved = true;
+        setUserEmail(session.user.email ?? "");
+        setStatus("idle");
         subscription.unsubscribe();
         return;
       }
 
-      // Fallback timeout: if no auth event fires within 5 seconds, show error
       setTimeout(() => {
-        if (status === "checking") {
-          supabase.auth.getUser().then(({ data: { user }, error }) => {
-            if (error || !user) {
-              setStatus("error");
-              setMessage("Tautan aktivasi tidak valid, telah kedaluwarsa, atau sesi login tidak ditemukan. Silakan masuk melalui halaman login.");
-            } else {
-              setUserEmail(user.email ?? "");
-              setStatus("idle");
-            }
-          });
-        }
-        subscription.unsubscribe();
-      }, 5000);
+        if (resolved) return;
+        supabase.auth.getUser().then(({ data: { user }, error }) => {
+          if (resolved) return;
+          resolved = true;
+          if (error || !user) {
+            setStatus("error");
+            setMessage("Tautan aktivasi tidak valid, telah kedaluwarsa, atau sesi login tidak ditemukan. Silakan masuk melalui halaman login.");
+          } else {
+            setUserEmail(user.email ?? "");
+            setStatus("idle");
+          }
+          subscription.unsubscribe();
+        });
+      }, 8000);
     }
 
     processInviteToken();
