@@ -26,6 +26,7 @@ export function SetPasswordForm() {
       if (!supabase) return;
 
       const hash = window.location.hash;
+
       if (hash.includes("error=")) {
         const params = new URLSearchParams(hash.slice(1));
         const errorDesc = params.get("error_description");
@@ -38,48 +39,38 @@ export function SetPasswordForm() {
         return;
       }
 
-      let resolved = false;
+      // Manually extract tokens from the URL hash and call setSession,
+      // because @supabase/ssr's createBrowserClient does not always
+      // auto-detect the hash fragment reliably.
+      if (hash.includes("access_token=")) {
+        const params = new URLSearchParams(hash.slice(1));
+        const accessToken = params.get("access_token");
+        const refreshToken = params.get("refresh_token");
 
-      // Supabase auto-processes the #access_token hash and creates a
-      // session for the invited user — do NOT call signOut() before this
-      // or it destroys the session the hash just established.
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        (event, session) => {
-          if (resolved) return;
-          if (session?.user) {
-            resolved = true;
-            setUserEmail(session.user.email ?? "");
+        if (accessToken && refreshToken) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          if (!error && data.user) {
+            setUserEmail(data.user.email ?? "");
             setStatus("idle");
-            subscription.unsubscribe();
+            return;
           }
         }
-      );
+      }
 
-      // Hash may already have been processed before the listener was set up
+      // Fallback: check if there is already an active session
       const { data: { session } } = await supabase.auth.getSession();
-      if (!resolved && session?.user) {
-        resolved = true;
+      if (session?.user) {
         setUserEmail(session.user.email ?? "");
         setStatus("idle");
-        subscription.unsubscribe();
         return;
       }
 
-      setTimeout(() => {
-        if (resolved || !supabase) return;
-        supabase.auth.getUser().then(({ data: { user }, error }) => {
-          if (resolved) return;
-          resolved = true;
-          if (error || !user) {
-            setStatus("error");
-            setMessage("Tautan aktivasi tidak valid, telah kedaluwarsa, atau sesi login tidak ditemukan. Silakan masuk melalui halaman login.");
-          } else {
-            setUserEmail(user.email ?? "");
-            setStatus("idle");
-          }
-          subscription.unsubscribe();
-        });
-      }, 8000);
+      setStatus("error");
+      setMessage("Tautan aktivasi tidak valid, telah kedaluwarsa, atau sesi login tidak ditemukan. Silakan masuk melalui halaman login.");
     }
 
     processInviteToken();
