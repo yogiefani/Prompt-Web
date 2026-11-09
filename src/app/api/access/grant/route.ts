@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         access_source: payload.provider ?? "manual",
         product_id: payload.productId ?? "",
       },
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/set-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://www.promptvault.codes"}/set-password`,
     });
 
     if (error) {
