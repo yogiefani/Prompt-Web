@@ -22,16 +22,64 @@ export function SetPasswordForm() {
       return;
     }
 
-    // Periksa apakah user memiliki sesi aktif (karena mengeklik link undangan)
-    supabase.auth.getUser().then(({ data: { user }, error }) => {
-      if (error || !user) {
+    async function processInviteToken() {
+      if (!supabase) return;
+
+      // Sign out any existing session first so the invite token
+      // is processed for the correct (invited) user, not whoever
+      // happens to be logged in already.
+      await supabase.auth.signOut();
+
+      // Listen for the auth state change when Supabase processes
+      // the invite token from the URL hash fragment.
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          if (event === "SIGNED_IN" && session?.user) {
+            setUserEmail(session.user.email ?? "");
+            setStatus("idle");
+            subscription.unsubscribe();
+          } else if (event === "TOKEN_REFRESHED" && session?.user) {
+            setUserEmail(session.user.email ?? "");
+            setStatus("idle");
+            subscription.unsubscribe();
+          }
+        }
+      );
+
+      // If there's an error in the hash (e.g. otp_expired), detect it
+      const hash = window.location.hash;
+      if (hash.includes("error=")) {
+        const params = new URLSearchParams(hash.slice(1));
+        const errorDesc = params.get("error_description");
         setStatus("error");
-        setMessage("Tautan aktivasi tidak valid, telah kedaluwarsa, atau sesi login tidak ditemukan. Silakan masuk melalui halaman login.");
-      } else {
-        setUserEmail(user.email ?? "");
-        setStatus("idle");
+        setMessage(
+          errorDesc
+            ? decodeURIComponent(errorDesc.replace(/\+/g, " "))
+            : "Tautan aktivasi tidak valid, telah kedaluwarsa, atau sesi login tidak ditemukan. Silakan masuk melalui halaman login."
+        );
+        subscription.unsubscribe();
+        return;
       }
-    });
+
+      // Fallback timeout: if no auth event fires within 5 seconds, show error
+      setTimeout(() => {
+        if (status === "checking") {
+          supabase.auth.getUser().then(({ data: { user }, error }) => {
+            if (error || !user) {
+              setStatus("error");
+              setMessage("Tautan aktivasi tidak valid, telah kedaluwarsa, atau sesi login tidak ditemukan. Silakan masuk melalui halaman login.");
+            } else {
+              setUserEmail(user.email ?? "");
+              setStatus("idle");
+            }
+          });
+        }
+        subscription.unsubscribe();
+      }, 5000);
+    }
+
+    processInviteToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleSetPassword(event: FormEvent<HTMLFormElement>) {
@@ -62,10 +110,18 @@ export function SetPasswordForm() {
       return;
     }
 
+    // Update access_grants status from "invited" to "granted"
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      await supabase
+        .from("access_grants")
+        .update({ status: "granted" })
+        .eq("email", user.email.toLowerCase());
+    }
+
     setStatus("success");
     setMessage("Password berhasil disetel! Mengalihkan ke pustaka prompt...");
 
-    // Berikan jeda 1.5 detik untuk animasi sukses
     window.setTimeout(() => {
       router.push("/library");
       router.refresh();
